@@ -3,7 +3,8 @@
 The **Police** agent for a distributed Cops-and-Robbers game played over a
 peer-to-peer network. This repository contains the police side only.
 
-> **Companion repository (Thief agent):** _not yet created — link goes here._
+> **Companion repository (Thief agent):**
+> **https://github.com/Moaawiyah/Ai_thief**
 >
 > The specification (ch. 9.4) requires each group to submit two separate
 > repositories, police and thief, with each README cross-linking to the other.
@@ -55,7 +56,7 @@ _Pending — requires the live GUI belief map and the Replay App showing
 `Verified OK` (step 8)._
 
 ### 6. Companion repository link
-See the cross-link at the top of this file.
+Thief agent: **https://github.com/Moaawiyah/Ai_thief**
 
 ---
 
@@ -63,8 +64,9 @@ See the cross-link at the top of this file.
 
 **Step 2 of 9 complete.** The deterministic domain layer is implemented and
 tested; networking, security, belief and strategy are not. See
-[PLAN.md](PLAN.md) for the build order, [TODO.md](TODO.md) for the active step,
-and [PRD.md](PRD.md) for the product requirements.
+[docs/PLAN.md](docs/PLAN.md) for the build order, [docs/TODO.md](docs/TODO.md)
+for the active step, and [docs/PRD.md](docs/PRD.md) for the product
+requirements.
 
 ## Layout
 
@@ -78,8 +80,16 @@ src/police_agent/
 config/police/
   game.json          shared, signed terms — byte-identical with the thief's copy
   game.toml.example  template for this peer's private, uncommitted config
+docs/
+  PRD.md   product requirements
+  PLAN.md  incremental build order
+  TODO.md  active step and carried-forward work
 tests/
 ```
+
+`README.md` and `CLAUDE.md` stay at the repository root: the specification
+(ch. 9.4.2) requires the academic report to be the root `README.md`, and
+`CLAUDE.md` is read from the project root by tooling.
 
 ## Running
 
