@@ -6,8 +6,8 @@ config/*/game.json "scoring" block (specification Appendix Vav, table 17) rather
 than being hardcoded here, because the two peers negotiate that table.
 """
 
-from police_thief.constants import Role
-from police_thief.domain.rules import CAPTURE, SURVIVAL
+from police_agent.constants import Role
+from police_agent.domain.rules import CAPTURE, SURVIVAL
 
 # outcome -> (key for whoever played police, key for whoever played thief)
 _POINT_KEYS = {

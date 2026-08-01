@@ -13,6 +13,24 @@ The system consists of two independent agents:
 Each agent runs as an independent process and eventually communicates
 directly with the other peer.
 
+**This repository is the POLICE agent only.**
+
+The specification (ch. 2.4.2, ch. 9.4) requires the two agents to live in
+two separate GitHub repositories and to run as two completely separate
+processes. Sharing memory, importing a shared module that holds live
+state, or reading shared variables between the two sides disqualifies the
+solution even if the game technically works.
+
+Consequences for work in this repo:
+
+- do not add thief agent logic here;
+- do not add a `config/thief/` directory here;
+- rules the thief evaluates about itself (Appendix ה 46/47) are not
+  computed here — the police receives them as signed claims and
+  re-verifies them at the end-of-game audit;
+- the thief is never an in-process object at runtime; for testing, use a
+  test double under `tests/`.
+
 The project includes several major areas:
 
 - deterministic board and game rules;

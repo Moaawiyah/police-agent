@@ -11,7 +11,7 @@ instead of re-checking them in every caller. The rules differ per action:
 
 from dataclasses import dataclass
 
-from police_thief.constants import Direction, MoveType
+from police_agent.constants import Direction, MoveType
 
 
 @dataclass(frozen=True)

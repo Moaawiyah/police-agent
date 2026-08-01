@@ -1,9 +1,9 @@
-import police_thief
-from police_thief import domain, infra, peer, shared
+import police_agent
+from police_agent import domain, infra, peer, shared
 
 
 def test_package_importable():
-    assert police_thief is not None
+    assert police_agent is not None
 
 
 def test_subpackages_importable():

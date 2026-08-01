@@ -1,7 +1,7 @@
 [project]
-name = "police-thief"
+name = "police-agent"
 version = "0.1.0"
-description = "Distributed Police-vs-Thief P2P agent (FastMCP, Dec-POMDP, commit-reveal)"
+description = "Police agent for the distributed Police-vs-Thief P2P game (FastMCP, Dec-POMDP, commit-reveal)"
 readme = "README.md"
 authors = [
     { name = "moaawiyahhaj", email = "moaawiyah.haj@gmail.com" }
@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-police-thief = "police_thief:main"
+police-agent = "police_agent:main"
 
 [build-system]
 requires = ["uv_build>=0.11.10,<0.12.0"]
