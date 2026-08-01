@@ -1,6 +1,7 @@
 # Development Plan — Police Agent
 
-Incremental build order (per CLAUDE.md). Each step must be implemented, tested,
+Incremental build order (per [CLAUDE.md](../CLAUDE.md)). Each step must be
+implemented, tested,
 and verified against the specification before moving to the next. This repo
 builds the **police** agent only; the thief is a separate repository.
 

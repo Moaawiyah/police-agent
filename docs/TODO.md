@@ -36,6 +36,9 @@
       answer, every barrier-capture report and any confinement claim against
       the revealed positions. Operates on the opponent's revealed records, not
       on `OwnGameState`.
-- [ ] Create the companion **thief repository** and add the cross-link to
-      `README.md` (mandatory, spec ch. 9.4).
+- [x] Companion **thief repository** created and cross-linked from `README.md`:
+      https://github.com/Moaawiyah/Ai_thief (public, so accessible to the grader).
+- [ ] Add the reverse cross-link in the **thief repo's** README, pointing back to
+      https://github.com/Moaawiyah/police-agent — ch. 9.4 requires the link in
+      *both* directions. Done in that repo, not this one.
 - [ ] Merge the feature branch into the main branch (Appendix ג).
