@@ -2,8 +2,8 @@
 
 import pytest
 
-from police_thief.constants import Direction, MoveType
-from police_thief.domain.actions import Action, barrier, hold, move
+from police_agent.constants import Direction, MoveType
+from police_agent.domain.actions import Action, barrier, hold, move
 
 
 class TestValidation:

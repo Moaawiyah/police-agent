@@ -1,6 +1,6 @@
 """Tests for league scoring and the series tie rule (pure functions)."""
 
-from police_thief.domain.scoring import aggregate, score_subgame
+from police_agent.domain.scoring import aggregate, score_subgame
 
 # Mirrors the "scoring" block of config/*/game.json.
 SCORING = {

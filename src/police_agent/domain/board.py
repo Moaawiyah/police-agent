@@ -6,7 +6,7 @@ state elsewhere (see own_state.py) and passes the known barrier set in per call,
 which keeps the geometry trivially testable and free of hidden shared state.
 """
 
-from police_thief.constants import DELTAS, Cell, Direction
+from police_agent.constants import DELTAS, Cell, Direction
 
 
 class Board:

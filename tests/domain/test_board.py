@@ -2,8 +2,8 @@
 
 import pytest
 
-from police_thief.constants import Direction
-from police_thief.domain.board import Board
+from police_agent.constants import Direction
+from police_agent.domain.board import Board
 
 
 class TestGeometry:

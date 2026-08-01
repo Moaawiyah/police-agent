@@ -17,9 +17,7 @@ htmlcov/
 
 # Private per-peer config (never shared, may contain identifying info/credentials)
 config/police/game.toml
-config/thief/game.toml
 config/police/*.local.toml
-config/thief/*.local.toml
 
 # Secrets / credentials
 .env
