@@ -43,9 +43,8 @@ two-agent Dec-POMDP `⟨n, S, {Aᵢ}, P, R, {Ωᵢ}, O, γ⟩` with `n = 2`, in 
 agent observes only its own local scent signal rather than the true board state.
 
 ### 2. FastMCP orchestration dilemmas
-_Partial — the transport exists (step 4); the orchestration loop that drives it
-is step 8._ Each peer hosts its own FastMCP server and knows exactly one thing
-about its opponent: a URL. Three dilemmas the transport had to settle:
+Each peer hosts its own FastMCP server and knows exactly one thing about its
+opponent: a URL. Four dilemmas the orchestration had to settle:
 
 - **Who waits for whom.** Two independently launched processes never start
   together, so a refused connection in the opening seconds is the expected case,
@@ -57,6 +56,10 @@ about its opponent: a URL. Three dilemmas the transport had to settle:
   loop is single-threaded. The tools therefore do no reasoning at all — they drop
   the raw payload into a queue and return, so a slow strategy can never stall the
   opponent's HTTP call.
+- **Trusting a claim you cannot check.** The thief reports its own capture and
+  survival; the police can verify neither during play. Survival is checked
+  against the agreed threshold immediately and disputed if premature; the rest
+  waits for the audit, where a log that will not hash forfeits the game outright.
 
 ### 3. Strategies implemented
 _Partial — the shipped heuristic exists (step 7); it will be re-tuned once the
@@ -88,17 +91,35 @@ Thief agent: **https://github.com/Moaawiyah/Ai_thief**
 
 ## Current status
 
-**Steps 1, 2, 4 and 7 complete.** The deterministic domain layer, the FastMCP
-peer-to-peer transport and the police strategy are implemented and tested.
-Steps 4 and 7 were built ahead of the plan's order, so two gaps remain open
-behind them: there is no runtime loop yet joining the transport to the brain
-(step 3/8), and the strategy currently consumes a placeholder `ThreatEstimate`
-rather than a real belief map (step 6). Commit-reveal (step 5) is not started —
-the `commit` field on the wire is an opaque string for now.
+**The police agent plays a complete sub-game.** Handshake, turn loop, sealed
+moves and the end-of-game audit all work over real MCP sockets against a
+separate process.
+
+Two gaps are open and both matter before a league match:
+
+- **Scent emission is a no-op.** The police broadcasts an empty `smell_grid`,
+  so an opponent receives no signal from it. The match completes correctly; it
+  is not yet a fair contest. Step 6.
+- **The audit checks hashes, not meaning.** A rewritten opponent log is caught.
+  A log that hashes correctly but contradicts the claims made during play is
+  not yet re-checked. Step 5, partially done.
 
 See [docs/PLAN.md](docs/PLAN.md) for the build order, [docs/TODO.md](docs/TODO.md)
-for the active step, and [docs/PRD.md](docs/PRD.md) for the product
+for what is carried forward, and [docs/PRD.md](docs/PRD.md) for the product
 requirements.
+
+## Running a match
+
+Both peers are separate processes. Copy `game.toml.example` to `game.toml`, set
+`network.my_port` and `network.opponent_url`, then:
+
+```
+uv run police-agent                          # uses config/police/game.toml
+uv run police-agent --port 8801 --opponent http://127.0.0.1:8802/mcp
+uv run police-agent --summary result.json    # also write the match record
+```
+
+The thief must be started from its own repository, as a separate process.
 
 ## Layout
 
@@ -106,11 +127,12 @@ requirements.
 src/police_agent/
   constants.py  roles, action types, the four legal directions
   exceptions.py the deliberate-error hierarchy (a crash is a technical loss)
-  domain/       board geometry, actions, own state, rules, scoring
+  __main__.py   the `police-agent` CLI: start my server, play one sub-game
+  domain/       board geometry, actions, own state, rules, scoring, commit-reveal
   strategy/     the police brain: chase heuristic, barrier policy, threat estimate
   infra/        FastMCP server (my mailbox) and client (the opponent's URL)
-  peer/         wire protocol; orchestration and turn handling not implemented
-  shared/       config loading, rate limiting (not implemented)
+  peer/         the runtime: handshake, turn loop, sealing, audit, wire protocol
+  shared/       config loading (rate limiting not implemented)
 config/police/
   game.json          shared, signed terms — byte-identical with the thief's copy
   game.toml.example  template for this peer's private, uncommitted config
@@ -129,7 +151,7 @@ tests/
 
 ```
 uv sync
-uv run pytest --cov              # 154 tests, 99% coverage (floor: 85%)
+uv run pytest --cov              # 229 tests, 99% coverage (floor: 85%)
 uv run pytest -m "not slow"      # skip the tests that bind real sockets
 uv run ruff check .
 uv run ruff format --check .

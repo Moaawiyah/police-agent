@@ -22,6 +22,12 @@ SURVIVAL = "survival"
 TIMEOUT = "timeout"
 TECHNICAL_LOSS = "technical_loss"
 
+# A revealed log that does not hash to the commitments published during play.
+# Kept distinct from a technical loss because it is not a crash or a forfeit: it
+# is evidence the opponent rewrote its history, and the honest peer wins on it
+# regardless of what happened on the board.
+TAMPER_FORFEIT = "tamper_forfeit"
+
 
 class GameRules:
     """The agreed end-of-game conditions for one sub-game.
