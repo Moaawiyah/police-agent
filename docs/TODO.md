@@ -76,7 +76,21 @@ rather than a separate simulation path.
 
 ## Carried forward
 
-- [ ] **Scent emission is a no-op** (`peer/seams.py`, `NullScent`). The police
+- [ ] **Cross-repo — the thief does not concede a barrier capture.** When a
+      police barrier traps the thief (Appendix ה 46/47), the thief's runtime
+      sets its own result to `capture` but sends its terminal message with
+      `claim_response = None`. The police only registers a win on
+      `claim_response.caught`, so it keeps playing, times out, and records
+      `technical_loss`. Both peers name the police as winner, but the two
+      `result` strings disagree. Fix belongs in the **thief repo** (send
+      `{"caught": true}` on that path); settle it before the league match.
+- [ ] **Cross-repo — timeout asymmetry.** The thief waits 30 s for the audit
+      reveal; this peer's turn timeout falls back to 60 s, and to **180 s** if
+      `game.toml` is copied unchanged from the example. The thief will walk away
+      before the police notices it has gone. Agree one number.
+- [ ] **Scent emission is a no-op** (`peer/seams.py`, `NullScent`). Note the
+      thief's `turn_message` also hardcodes `smell_grid={}`, so *both* sides are
+      currently blind and the belief systems on both sides get no input. The police
       broadcasts an empty `smell_grid`, so an opponent gets no signal from us
       and must fall back on its prior. A match runs correctly end to end and is
       worth running to prove the wiring, but it is **not a fair test of either

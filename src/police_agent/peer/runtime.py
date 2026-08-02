@@ -51,7 +51,13 @@ class PoliceRuntime:
 
         size = self.terms["board_size"]
         self.state = OwnGameState(tuple(self.terms["cop_start"]), size)
-        self.rules = GameRules(self.terms["max_steps"], self.terms["survival_threshold"])
+        # The survival threshold is deliberately not a signed term -- the
+        # reference does not sign it, and matching its term list exactly is what
+        # lets the handshake succeed against anyone who followed it. It still
+        # comes from the shared, byte-identical game.json, so both peers agree;
+        # `require` is what makes a missing one a config error rather than a
+        # crash on the turn it would first be consulted.
+        self.rules = GameRules(self.terms["max_steps"], config.require("rules.survival_threshold"))
         self.barriers_max = self.terms["barriers_max"]
 
         self.threat = threat or ScentThreat(size)
