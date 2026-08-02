@@ -45,7 +45,28 @@
 - [ ] Re-tune once step 6 supplies a real `BeliefGrid` — the stand-in estimates
       are certain in a way a real belief never is, which flatters the heuristic
 
-## Step 3 — Local playable simulation (next)
+## Step 3 / 8 — Runtime peer process (done, built out of order)
+
+- [x] `shared/config.py` + `shared/schema.py`: load the agreed `game.json` and
+      the private `game.toml`, dotted access. The agreed file is overlaid *on
+      top of* the private one so a peer cannot sign one board and play another
+- [x] `peer/terms.py`: the must-match subset, validated before a port is opened
+- [x] `peer/handshake.py`: mutual signed-terms exchange (`Negotiation`)
+- [x] `peer/runtime.py`: `PoliceRuntime` — negotiate → wait → fold in → decide
+      and send → audit. The thief opens, so the police waits first
+- [x] `peer/turn_handler.py` / `peer/turn_sender.py` / `peer/sealing.py`
+- [x] `peer/summary.py`: audit exchange; a forged opponent log forfeits
+- [x] `domain/crypto.py`: SHA-256 commit-reveal (partial step 5 — see below)
+- [x] `strategy/scent_threat.py`: interim argmax-of-scent threat estimate
+- [x] `__main__.py`: `police-agent` CLI (`--port`, `--opponent`, `--summary`)
+- [x] `tests/peer/fake_transport.py`: scripted thief double, same six-method
+      surface as `McpTransport`; plus a live two-port match in `tests/infra/`
+
+## Step 3 — Local playable simulation (superseded)
+
+Overtaken by the runtime above: the scripted match driver this step called for
+is `tests/peer/fake_transport.py`, and it drives the real `PoliceRuntime`
+rather than a separate simulation path.
 
 - [ ] Load `config/police/game.json` into the domain layer
 - [ ] Test double standing in for the thief (test scaffolding only — never
@@ -55,6 +76,19 @@
 
 ## Carried forward
 
+- [ ] **Scent emission is a no-op** (`peer/seams.py`, `NullScent`). The police
+      broadcasts an empty `smell_grid`, so an opponent gets no signal from us
+      and must fall back on its prior. A match runs correctly end to end and is
+      worth running to prove the wiring, but it is **not a fair test of either
+      strategy** until step 6 supplies a real decaying field.
+- [ ] **Step 5 is only half done.** Sealing, the handshake signature and the
+      hash re-verification of the opponent's revealed log all work. What is
+      still missing is the *semantic* audit: re-checking the thief's capture
+      answers and survival claim against its revealed positions. `audit_records`
+      proves the log was not rewritten; it does not yet prove the log is
+      consistent with what the thief claimed during play.
+- [ ] **No nonce anti-replay** on incoming turns — a replayed message would be
+      processed twice. Track seen `(step, commit)` pairs.
 - [ ] **Specification ambiguity — Appendix ה 46.** The barrier policy never
       walls the cell it *believes* the thief occupies, even though a barrier
       there is a capture condition: the specification does not pin down how that

@@ -25,3 +25,7 @@ class ProtocolError(PoliceAgentError):
 
 class MoveError(PoliceAgentError):
     """An illegal or invalid game move."""
+
+
+class CryptoError(PoliceAgentError):
+    """A commitment did not match what was revealed, or terms were not signed."""

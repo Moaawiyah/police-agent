@@ -1,0 +1,66 @@
+"""Playing one turn: decide, apply, seal, send.
+
+Split out of `runtime.py` so both files stay within the 150-line rule, and
+because the ordering here is the part worth reading on its own. It is fixed:
+the move is applied to local state *before* it is sealed, and sealed before it
+is sent. A message that went out before the state was committed to would be a
+promise this peer had not yet made to itself.
+
+Takes the runtime rather than a dozen arguments. That is a deliberate trade: the
+alternative threads state, brain, threat, rules, transport, records and config
+through every call, and the coupling is real either way.
+"""
+
+from police_agent.constants import Cell, MoveType
+from police_agent.domain.actions import hold
+from police_agent.peer.sealing import build_turn_message, sealed_step_record
+
+
+def take_turn(runtime, claim_response: dict | None = None) -> None:
+    """Compute this peer's turn, commit to it locally, and hand it to the opponent."""
+    decision = runtime.brain.decide(runtime.state, runtime.threat, runtime.barriers_max)
+    if not runtime.state.apply_move(decision.action, runtime.barriers_max):
+        # The brain is contractually forbidden from returning an illegal action,
+        # so reaching this is a bug in the strategy, not a game event. Holding
+        # keeps the match alive and lets the audit show what happened, rather
+        # than crashing this peer into a technical loss over someone else's bug.
+        runtime.state.apply_move(hold(), runtime.barriers_max)
+        decision = _held_instead(decision)
+
+    claim = _capture_claim(runtime, decision)
+    record = sealed_step_record(runtime.state, decision.rationale, claim)
+    runtime.records.append(record)
+    message = build_turn_message(
+        runtime.state,
+        commit=record["commit"],
+        smell_grid=runtime.scent.emit(runtime.state.position),
+        hint=runtime.hint_writer(runtime.state, claim),
+        capture_claim=claim,
+        claim_response=claim_response,
+    )
+    runtime.transport.send_turn(message.to_dict())
+    runtime.notify({"type": "moved", "decision": decision, "commit": record["commit"]})
+
+
+def _capture_claim(runtime, decision) -> Cell | None:
+    """The cell the police claims the thief occupies: the one it just stepped onto.
+
+    Only a step is a claim. Placing a barrier or holding does not move the
+    police, so re-claiming the same cell would ask the thief a question it has
+    already answered and burn a turn doing it.
+    """
+    if decision.action.move_type is not MoveType.MOVE:
+        return None
+    return runtime.state.position
+
+
+def _held_instead(decision):
+    """Rewrite a rejected decision as the HOLD that was actually applied.
+
+    The sealed record must describe what happened, not what was intended; an
+    audit compares the record against the revealed moves, and a record claiming
+    a move that never landed would fail against this peer's own honest log.
+    """
+    from police_agent.strategy.decision import Decision
+
+    return Decision(hold(), f"held: strategy returned an illegal action ({decision.action})")
