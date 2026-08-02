@@ -109,6 +109,12 @@ class PoliceRuntime:
     def _apply_incoming(self, message: TurnMessage) -> None:
         outcome = self.handler.process(message)
         self.disputes.extend(outcome.disputes)
+        if outcome.replayed:
+            # Not a turn, so it does not earn one back. Keep waiting: a peer that
+            # only ever repeats itself goes silent by the watchdog instead, and a
+            # duplicate is as likely to be the transport's retry as an attack.
+            self.notify({"type": "replay_ignored", "step": message.step})
+            return
         self.notify({"type": "incoming", "step": message.step})
 
         if outcome.i_won:

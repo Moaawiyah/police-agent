@@ -145,8 +145,13 @@ rather than a separate simulation path.
       answers and survival claim against its revealed positions. `audit_records`
       proves the log was not rewritten; it does not yet prove the log is
       consistent with what the thief claimed during play.
-- [ ] **No nonce anti-replay** on incoming turns — a replayed message would be
-      processed twice. Track seen `(step, commit)` pairs.
+- [x] **Anti-replay on incoming turns** (`peer/turn_handler.py`). Every turn is
+      identified by its commit and remembered; a repeat is dropped before it
+      touches state, and `peer/runtime.py` does not answer one. The commit is
+      keyed on rather than a `(step, commit)` pair because the step sits *inside*
+      the sealed payload, so rewriting it on the wire cannot launder a spent
+      turn. Dropped rather than forfeited: `McpTransport` retries, so a repeat
+      is at least as likely to be our own network as an opponent.
 - [ ] **Specification ambiguity — Appendix ה 46.** The barrier policy never
       walls the cell it *believes* the thief occupies, even though a barrier
       there is a capture condition: the specification does not pin down how that

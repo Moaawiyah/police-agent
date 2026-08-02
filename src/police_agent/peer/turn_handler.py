@@ -9,6 +9,9 @@ The thief's claims are checked, not believed. A survival claim is tested against
 the agreed threshold before it is allowed to end the game, because the peer
 making the claim is the peer that benefits from it. What cannot be checked here
 is checked at the audit, once the sealed positions are revealed.
+
+A turn is also only ever folded in once. Every message that arrives here is
+identified and remembered, and a repeat is dropped before it can touch anything.
 """
 
 from dataclasses import dataclass, field
@@ -25,6 +28,7 @@ class IncomingOutcome:
 
     i_won: bool = False  # the thief confirmed my capture claim
     opponent_won: bool = False  # the thief claimed survival and it checks out
+    replayed: bool = False  # a turn already processed; nothing was folded in
     disputes: list[str] = field(default_factory=list)  # claims that failed my check
 
 
@@ -36,8 +40,21 @@ class TurnHandler:
         self.threat = threat
         self.rules = rules
         self.history: list[dict] = []  # every message received, for replay and the report
+        self._seen: set[str] = set()  # turn identities already spent
 
     def process(self, message: TurnMessage) -> IncomingOutcome:
+        fingerprint = self._fingerprint(message)
+        if fingerprint in self._seen:
+            # Dropped before anything is touched. Folding a turn in twice would
+            # diffuse the belief an extra step and re-answer a claim already
+            # answered, and -- worse -- every accepted turn draws a reply, so an
+            # opponent could walk this peer through its whole move budget just
+            # by echoing one message back at it.
+            return IncomingOutcome(
+                replayed=True,
+                disputes=[f"ignored a repeat of an already-played turn (step {message.step})"],
+            )
+        self._seen.add(fingerprint)
         self.history.append(message.to_dict())
         if message.barrier_placed:
             # Barriers are a police-only mechanic (3.4), so this should not arrive
@@ -57,6 +74,22 @@ class TurnHandler:
         if message.win_claim:
             self._check_survival(message, outcome)
         return outcome
+
+    @staticmethod
+    def _fingerprint(message: TurnMessage) -> str:
+        """What makes a turn that turn and no other.
+
+        The commit is a SHA-256 over the sender's sealed payload salted with a
+        fresh nonce, so two honest turns never share one. The step is *inside*
+        that payload, which is what makes the commit alone the stronger key: a
+        replay that rewrites the step on the wire still arrives carrying a
+        commit already spent, where a (step, commit) pair would wave it through.
+
+        A peer sending no commit at all is already breaking the protocol
+        (Appendix He 17). Falling back to the step keeps a verbatim replay from
+        that peer detectable instead of giving up on it entirely.
+        """
+        return message.commit or f"step-{message.step}"
 
     def _check_survival(self, message: TurnMessage, outcome: IncomingOutcome) -> None:
         """Allow a survival claim only when the agreed threshold has been reached.
