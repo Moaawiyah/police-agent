@@ -19,6 +19,32 @@
 - [x] `domain/scoring.py`: scoring table + series tie rule
 - [x] Split into a police-only repository (spec ch. 2.4.2, 9.4)
 
+## Step 4 — P2P/FastMCP communication (done, built out of order)
+
+- [x] `peer/protocol.py`: `TurnMessage` / `AuditPayload` / `ControlMessage`;
+      `from_dict` rejects missing required fields, tolerates unknown ones so a
+      another team's superset stays interoperable (ch. 9.4)
+- [x] `infra/mcp_server.py`: this peer's own server — `PeerInboxes`,
+      `build_peer_server`, `start_peer_server`, port-conflict guard
+- [x] `infra/mcp_client.py`: `McpTransport` — retrying outbound calls, inbox
+      polling, `drain_inboxes` for a restarted sub-game
+- [x] Two-port integration test over real HTTP sockets (`@pytest.mark.slow`)
+- [ ] Not done here: the runtime loop that drives the transport (step 8), and
+      the config loader that supplies `my_port` / `opponent_url` — timeouts and
+      URLs are constructor arguments for now
+
+## Step 7 — Police strategy (done, built out of order)
+
+- [x] `strategy/brain.py`: `PoliceBrainBase` seam + shipped `PoliceBrain`
+      (minimise Manhattan distance, tie-break toward unvisited)
+- [x] `strategy/barrier.py`: deterministic placement — wall only when it leaves
+      the believed thief ≤ 1 escape, never when it would confine the police (3.4)
+- [x] `strategy/threat.py`: `ThreatEstimate` Protocol + `PointThreat` /
+      `UniformThreat` stand-ins until the belief map lands
+- [x] `strategy/__init__.py`: `resolve_brain` reading `strategy.police_class`
+- [ ] Re-tune once step 6 supplies a real `BeliefGrid` — the stand-in estimates
+      are certain in a way a real belief never is, which flatters the heuristic
+
 ## Step 3 — Local playable simulation (next)
 
 - [ ] Load `config/police/game.json` into the domain layer
@@ -28,6 +54,17 @@
       strategy is step 7
 
 ## Carried forward
+
+- [ ] **Specification ambiguity — Appendix ה 46.** The barrier policy never
+      walls the cell it *believes* the thief occupies, even though a barrier
+      there is a capture condition: the specification does not pin down how that
+      is evaluated against a sealed, simultaneous move. Stepping onto the cell is
+      a capture attempt that costs no quota, so the ambiguous option is never the
+      only one available. Resolve the timing with the other group before the
+      interoperability test, then revisit `strategy/barrier.py`.
+- [ ] **`_send_with_retry` catches bare `Exception`** — a genuine bug such as a
+      misspelled tool name retries for the full connect budget before surfacing
+      as a `TransportError`. Narrow it once the runtime loop exercises the path.
 
 - [ ] **Step 5 — audit verification.** The thief-side capture rules (Appendix ה
       46/47) were removed from `domain/rules.py` because the police cannot
