@@ -4,12 +4,29 @@ from police_agent.domain.own_state import OwnGameState
 from police_agent.domain.rules import GameRules
 from police_agent.peer.protocol import TurnMessage
 from police_agent.peer.turn_handler import TurnHandler
-from police_agent.strategy.scent_threat import ScentThreat
+from police_agent.strategy.belief import BeliefGrid
 from tests.peer.fake_transport import thief_turn
 
 
-def handler(max_steps: int = 10, survival: int = 10) -> TurnHandler:
-    return TurnHandler(OwnGameState((0, 0), 7), ScentThreat(7), GameRules(max_steps, survival))
+def handler(max_steps: int = 10, survival: int = 10, threat=None) -> TurnHandler:
+    threat = threat if threat is not None else BeliefGrid(7)
+    return TurnHandler(OwnGameState((0, 0), 7), threat, GameRules(max_steps, survival))
+
+
+class RecordingThreat:
+    """A belief that only remembers the order it was called in."""
+
+    def __init__(self) -> None:
+        self.calls: list[str] = []
+
+    def diffuse(self) -> None:
+        self.calls.append("diffuse")
+
+    def observe_smell(self, cells) -> None:
+        self.calls.append("observe_smell")
+
+    def most_likely(self):
+        return (0, 0)
 
 
 def process(subject: TurnHandler, **fields):
@@ -50,6 +67,14 @@ def test_scent_updates_what_the_police_will_chase():
     process(subject, smell_grid={"5,5": 0.9, "1,1": 0.2})
 
     assert subject.threat.most_likely() == (5, 5)
+
+
+def test_the_belief_is_spread_before_the_fresh_scent_sharpens_it():
+    """A message proves the thief moved, so predicting must precede observing."""
+    recorder = RecordingThreat()
+    process(handler(threat=recorder), smell_grid={"5,5": 0.9})
+
+    assert recorder.calls == ["diffuse", "observe_smell"]
 
 
 def test_a_declared_barrier_is_recorded_even_from_the_thief():
