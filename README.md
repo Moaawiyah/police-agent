@@ -43,10 +43,36 @@ two-agent Dec-POMDP `⟨n, S, {Aᵢ}, P, R, {Ωᵢ}, O, γ⟩` with `n = 2`, in 
 agent observes only its own local scent signal rather than the true board state.
 
 ### 2. FastMCP orchestration dilemmas
-_Pending — arrives with P2P communication (step 4) and orchestration (step 8)._
+_Partial — the transport exists (step 4); the orchestration loop that drives it
+is step 8._ Each peer hosts its own FastMCP server and knows exactly one thing
+about its opponent: a URL. Three dilemmas the transport had to settle:
+
+- **Who waits for whom.** Two independently launched processes never start
+  together, so a refused connection in the opening seconds is the expected case,
+  not an error. Outbound calls retry until a deadline; only then is it a
+  `TransportError`.
+- **Where the turn token lives.** There is no referee to hold one, so receiving
+  a `TurnMessage` *is* the hand-over. The message is the token.
+- **Serving vs. playing.** MCP tools run on server worker threads while the game
+  loop is single-threaded. The tools therefore do no reasoning at all — they drop
+  the raw payload into a queue and return, so a slow strategy can never stall the
+  opponent's HTTP call.
 
 ### 3. Strategies implemented
-_Pending — arrives with the police strategy (step 7)._
+_Partial — the shipped heuristic exists (step 7); it will be re-tuned once the
+belief map (step 6) replaces the placeholder threat estimate._
+
+- **Chase.** Minimise Manhattan distance to the believed thief cell — the true
+  remaining move count once diagonals are illegal — breaking ties toward
+  unvisited cells, which the scoring table credits.
+- **Barrier.** A barrier costs a fixed quota slot *and* that turn's step, so it
+  is placed only when it provably corners: the believed thief within reach, the
+  wall landing on one of its own legal steps, and at most one escape left after
+  it. Placements that would leave the police itself with no legal step are
+  rejected outright (spec 3.4).
+- **Determinism.** No random draw sits in the move path. Moves are sealed and
+  re-checked against the revealed logs in the end-of-game audit, so a decision
+  that turned on a coin flip could not be recomputed from a replayed log.
 
 ### 4. Learning curves
 _Not applicable unless a reinforcement-learning agent is trained._
@@ -62,9 +88,15 @@ Thief agent: **https://github.com/Moaawiyah/Ai_thief**
 
 ## Current status
 
-**Step 2 of 9 complete.** The deterministic domain layer is implemented and
-tested; networking, security, belief and strategy are not. See
-[docs/PLAN.md](docs/PLAN.md) for the build order, [docs/TODO.md](docs/TODO.md)
+**Steps 1, 2, 4 and 7 complete.** The deterministic domain layer, the FastMCP
+peer-to-peer transport and the police strategy are implemented and tested.
+Steps 4 and 7 were built ahead of the plan's order, so two gaps remain open
+behind them: there is no runtime loop yet joining the transport to the brain
+(step 3/8), and the strategy currently consumes a placeholder `ThreatEstimate`
+rather than a real belief map (step 6). Commit-reveal (step 5) is not started —
+the `commit` field on the wire is an opaque string for now.
+
+See [docs/PLAN.md](docs/PLAN.md) for the build order, [docs/TODO.md](docs/TODO.md)
 for the active step, and [docs/PRD.md](docs/PRD.md) for the product
 requirements.
 
@@ -73,9 +105,11 @@ requirements.
 ```
 src/police_agent/
   constants.py  roles, action types, the four legal directions
+  exceptions.py the deliberate-error hierarchy (a crash is a technical loss)
   domain/       board geometry, actions, own state, rules, scoring
-  infra/        FastMCP server/client, email, LLM provider (not implemented)
-  peer/         orchestration, handshake, turn handling (not implemented)
+  strategy/     the police brain: chase heuristic, barrier policy, threat estimate
+  infra/        FastMCP server (my mailbox) and client (the opponent's URL)
+  peer/         wire protocol; orchestration and turn handling not implemented
   shared/       config loading, rate limiting (not implemented)
 config/police/
   game.json          shared, signed terms — byte-identical with the thief's copy
@@ -95,7 +129,8 @@ tests/
 
 ```
 uv sync
-uv run pytest --cov      # 55 tests, 99% coverage (floor: 85%)
+uv run pytest --cov              # 154 tests, 99% coverage (floor: 85%)
+uv run pytest -m "not slow"      # skip the tests that bind real sockets
 uv run ruff check .
 uv run ruff format --check .
 ```

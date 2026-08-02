@@ -36,6 +36,9 @@ ignore = ["E501"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = [
+    "slow: talks over real sockets; deselect with -m 'not slow'",
+]
 
 [tool.coverage.run]
 source = ["src"]
