@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from police_agent.domain.own_state import OwnGameState
 from police_agent.domain.rules import GameRules
 from police_agent.peer.protocol import TurnMessage
-from police_agent.strategy.scent_threat import ScentThreat
+from police_agent.strategy.threat import ThreatEstimate
 
 
 @dataclass
@@ -31,7 +31,7 @@ class IncomingOutcome:
 class TurnHandler:
     """Applies the thief's messages to the police's own view of the game."""
 
-    def __init__(self, state: OwnGameState, threat: ScentThreat, rules: GameRules) -> None:
+    def __init__(self, state: OwnGameState, threat: ThreatEstimate, rules: GameRules) -> None:
         self.state = state
         self.threat = threat
         self.rules = rules
@@ -45,7 +45,11 @@ class TurnHandler:
             # is impassable for both sides, and refusing to record one could only
             # ever hurt this peer by letting it plan a route through a wall.
             self.state.note_barrier(tuple(message.barrier_placed))
-        self.threat.absorb(message.smell_grid)
+        # One step of the belief filter, and the order is the substance of it:
+        # the message is proof the thief moved, so the belief spreads *before*
+        # the scent that arrived with it is allowed to sharpen it again.
+        self.threat.diffuse()
+        self.threat.observe_smell(message.smell_grid)
 
         outcome = IncomingOutcome()
         if message.claim_response and message.claim_response.get("caught"):

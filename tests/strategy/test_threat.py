@@ -30,18 +30,33 @@ class TestUniformThreat:
 
 
 class TestProtocol:
-    """The interface is structural, so a future BeliefGrid satisfies it unchanged."""
+    """The interface is structural: answering the three calls is the whole contract."""
 
     def test_the_shipped_estimates_satisfy_it(self):
         assert isinstance(PointThreat((1, 1)), ThreatEstimate)
         assert isinstance(UniformThreat(5), ThreatEstimate)
 
-    def test_an_unrelated_class_that_answers_most_likely_also_satisfies_it(self):
+    def test_an_unrelated_class_that_answers_the_three_calls_also_satisfies_it(self):
         class FakeBelief:
+            def diffuse(self):
+                pass
+
+            def observe_smell(self, cells):
+                pass
+
             def most_likely(self):
                 return (4, 4)
 
         assert isinstance(FakeBelief(), ThreatEstimate)
+
+    def test_answering_only_most_likely_is_not_enough(self):
+        """The turn loop calls all three, so a partial estimate fails mid-match."""
+
+        class HalfABelief:
+            def most_likely(self):
+                return (4, 4)
+
+        assert not isinstance(HalfABelief(), ThreatEstimate)
 
     def test_a_class_without_most_likely_does_not(self):
         class NotABelief:

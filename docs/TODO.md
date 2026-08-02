@@ -33,6 +33,31 @@
       the config loader that supplies `my_port` / `opponent_url` — timeouts and
       URLs are constructor arguments for now
 
+## Step 6 — Scent and belief (done)
+
+- [x] `domain/scent.py`: `ScentField` — the mandatory pheromone mechanism, to
+      ch. 4.3's update law `τ(t+1) = (1−ρ)·τ(t) + Δτ` clamped at zero. Radial
+      deposit over the agreed 5×5 window, multiplicative decay once per full
+      turn, `{"r,c": intensity}` snapshot. Constants come from the signed terms
+      (Appendix ו table 16 marks all three *kavua*); nothing here invents one.
+      Tests pin it against figure 4, figure 5 and ch. 4.4's worked example
+- [x] `strategy/belief.py`: `BeliefGrid` — the Bayesian belief map of ch. 6.4.
+      Flat prior, `diffuse()` predict over the agreed orthogonal move set,
+      `observe_smell()` update by `1 + trust·τ`, normalise, `exclude()`,
+      `as_matrix()` for the step-8 heatmap. Pairs with the existing Manhattan
+      chase to give the "Bayes + Manhattan" policy the book recommends (6.3.1)
+- [x] `strategy/threat.py`: `ThreatEstimate` widened to the three calls the turn
+      loop makes; `absorb()` was being called without ever being declared
+- [x] Wired: `peer/turn_handler.py` diffuses *then* observes (predict before
+      update), `peer/runtime.py` builds both from the terms, `NullScent` and
+      `strategy/scent_threat.py` retired
+- [ ] `belief.smell_trust` (default 4.0) is untuned — it is the one knob that
+      decides how fast a reading overwhelms the prior. Tune it against a live
+      thief, not against the fake transport
+- [ ] The absorbed opponent trail is not kept: the belief consumes each received
+      grid directly. `ScentField.absorb`/`decay_all`/`strongest_cell` exist and
+      are tested for when the step-8 GUI wants a trail layer to draw
+
 ## Step 7 — Police strategy (done, built out of order)
 
 - [x] `strategy/brain.py`: `PoliceBrainBase` seam + shipped `PoliceBrain`
@@ -57,7 +82,6 @@
 - [x] `peer/turn_handler.py` / `peer/turn_sender.py` / `peer/sealing.py`
 - [x] `peer/summary.py`: audit exchange; a forged opponent log forfeits
 - [x] `domain/crypto.py`: SHA-256 commit-reveal (partial step 5 — see below)
-- [x] `strategy/scent_threat.py`: interim argmax-of-scent threat estimate
 - [x] `__main__.py`: `police-agent` CLI (`--port`, `--opponent`, `--summary`)
 - [x] `tests/peer/fake_transport.py`: scripted thief double, same six-method
       surface as `McpTransport`; plus a live two-port match in `tests/infra/`
@@ -88,13 +112,33 @@ rather than a separate simulation path.
       reveal; this peer's turn timeout falls back to 60 s, and to **180 s** if
       `game.toml` is copied unchanged from the example. The thief will walk away
       before the police notices it has gone. Agree one number.
-- [ ] **Scent emission is a no-op** (`peer/seams.py`, `NullScent`). Note the
-      thief's `turn_message` also hardcodes `smell_grid={}`, so *both* sides are
-      currently blind and the belief systems on both sides get no input. The police
-      broadcasts an empty `smell_grid`, so an opponent gets no signal from us
-      and must fall back on its prior. A match runs correctly end to end and is
-      worth running to prove the wiring, but it is **not a fair test of either
-      strategy** until step 6 supplies a real decaying field.
+- [ ] **Cross-repo — the scent model must be locked before the series.** Appendix
+      ה 23 makes this a condition of the game being valid at all ("deviation in
+      the decay formula voids the game"), and ch. 4.5 asks the two groups to
+      agree the emission/decay model in full and hash it. `domain/scent.py`
+      follows the **book**, and reproduces all four of its published numbers
+      (figure 4's window, figure 5's curve, ch. 4.4's `0.81`, and the stated
+      `[0, 0.9]` range). The course **reference implementation does not**, in
+      three places — so an opponent who copied it will compute a different
+      field, and this is the conversation to have before the league:
+      | | Ours (the book) | Reference |
+      |---|---|---|
+      | Decay | `(1−ρ)·v`, still ≈0.11 at t=20 | `v − 0.10`, gone by t=9 |
+      | Falloff | radial 0.90/0.62/0.42/0.20/0.14/0.04 | Chebyshev rings 0.9/0.6/0.3 |
+      | Order | decay then deposit → centre goes out at `0.9` | deposit then decay → `0.8` |
+      The three *values* (0.9, 0.10, 5×5) are Appendix ו table 16 fixed
+      constants and are identical either way; only the formulas differ.
+- [ ] **Two readings the book does not settle**, both decided in `domain/scent.py`
+      and worth putting in the agreement explicitly rather than leaving implicit:
+      the falloff *curve* (a Gaussian at σ=1.15 is what reproduces figure 4, but
+      ch. 4.5 leaves the curve to the two groups), and whether `+ Δτ` means
+      accumulate or refresh (we refresh — ch. 4.4's `0.81` only holds that way,
+      and it is what makes the stated `[0, 0.9]` range hold without a clamp).
+- [ ] **Cross-repo — the thief still hardcodes `smell_grid={}`.** This peer now
+      broadcasts a real decaying field, so the police's belief map is fed, but
+      the thief's is not and it must fall back on its prior. Until that side
+      emits too, a match is still not a symmetric test of strategy. Fix belongs
+      in the **thief repo**.
 - [ ] **Step 5 is only half done.** Sealing, the handshake signature and the
       hash re-verification of the opponent's revealed log all work. What is
       still missing is the *semantic* audit: re-checking the thief's capture

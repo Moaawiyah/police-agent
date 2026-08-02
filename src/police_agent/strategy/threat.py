@@ -4,15 +4,15 @@ The police never learns the thief's true cell while the game is running (see
 domain/rules.py): it only ever holds a *belief* reconstructed from scent. So the
 strategy must not take a thief position as an argument -- it takes an estimate.
 
-This module deliberately states the narrowest possible interface: the single
-question a chase heuristic actually asks. Keeping it that narrow is what lets
-strategy be built before the Bayesian belief map exists. The `BeliefGrid` of the
-scent/belief step will satisfy `ThreatEstimate` structurally the moment it is
-written, because it already answers `most_likely()` -- nothing in this package
-will need to change then, and nothing here depends on that step landing first.
+The interface is deliberately the narrowest one the turn loop actually uses:
+two calls to fold in what a turn revealed, and one question the chase heuristic
+asks. `strategy/belief.py::BeliefGrid` is the real implementation; the two
+concrete estimates below exist so the strategy stays testable against a known,
+fixed target and so a scripted simulation can be run without a live opponent.
 
-The two concrete estimates below exist so the strategy is testable and the local
-simulation is runnable in the meantime.
+The stand-ins do not diffuse and do not observe. That is not an oversight: a
+certainty has nothing to spread and nothing to learn, and giving them real
+behaviour would make them a second, quietly diverging belief map.
 """
 
 from typing import Protocol, runtime_checkable
@@ -22,11 +22,19 @@ from police_agent.constants import Cell
 
 @runtime_checkable
 class ThreatEstimate(Protocol):
-    """The one question the police strategy asks about the thief's location.
+    """What the turn loop tells an estimate, and the one thing it asks back.
 
-    Structural, not inherited: an implementation only has to answer the method,
+    Structural, not inherited: an implementation only has to answer the methods,
     it must not import or subclass anything from this package.
     """
+
+    def diffuse(self) -> None:
+        """The thief has moved. Spread the belief over where it could now be."""
+        ...
+
+    def observe_smell(self, cells: dict | None) -> None:
+        """Fold in one received scent grid, `{"r,c": intensity}`."""
+        ...
 
     def most_likely(self) -> Cell:
         """The cell the thief is currently believed most likely to occupy."""
@@ -45,6 +53,12 @@ class PointThreat:
     def __init__(self, cell: Cell) -> None:
         self.cell = cell
 
+    def diffuse(self) -> None:
+        """A fixed target does not drift; the point of it is that it holds still."""
+
+    def observe_smell(self, cells: dict | None) -> None:
+        """Certainty has nothing to learn from a scent reading."""
+
     def most_likely(self) -> Cell:
         return self.cell
 
@@ -62,6 +76,12 @@ class UniformThreat:
         if board_size < 1:
             raise ValueError(f"Board size must be positive, got {board_size}")
         self.board_size = board_size
+
+    def diffuse(self) -> None:
+        """A flat prior is already maximally spread; diffusing it changes nothing."""
+
+    def observe_smell(self, cells: dict | None) -> None:
+        """Staying uniform is what makes this the *prior* rather than a belief."""
 
     def most_likely(self) -> Cell:
         middle = (self.board_size - 1) // 2

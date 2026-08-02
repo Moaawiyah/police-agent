@@ -8,26 +8,27 @@ The thief opens. The police therefore *waits first*, and a turn arriving is what
 makes it this peer's move -- the message is the turn token. A peer that sent
 before hearing would be playing two turns in a row.
 
-Everything the runtime cannot yet compute for itself is injected: the brain, the
-threat estimate, the scent emitter. That is what lets this file be finished
-while the belief map and the scent field are still ahead of it, and it is also
-what makes the loop testable against a fake transport with no sockets involved.
+The brain, the belief map and the scent field are all injected rather than built
+in place. Each has a working default, so the shipped agent needs no wiring; the
+seam exists because it is what lets the whole loop be tested against a fake
+transport and a scripted estimate, with no sockets and no opponent involved.
 """
 
 import time
 
 from police_agent.domain.own_state import OwnGameState
 from police_agent.domain.rules import CAPTURE, SURVIVAL, TECHNICAL_LOSS, TIMEOUT, GameRules
+from police_agent.domain.scent import ScentField
 from police_agent.peer.handshake import identity_from_config, negotiate
 from police_agent.peer.protocol import TurnMessage
 from police_agent.peer.sealing import now_iso
-from police_agent.peer.seams import NullScent, silent_hint
+from police_agent.peer.seams import silent_hint
 from police_agent.peer.summary import build_summary, exchange_and_audit
 from police_agent.peer.terms import validate_agreement
 from police_agent.peer.turn_handler import TurnHandler
 from police_agent.peer.turn_sender import take_turn
 from police_agent.strategy import resolve_brain
-from police_agent.strategy.scent_threat import ScentThreat
+from police_agent.strategy.belief import BeliefGrid
 
 
 class PoliceRuntime:
@@ -60,9 +61,9 @@ class PoliceRuntime:
         self.rules = GameRules(self.terms["max_steps"], config.require("rules.survival_threshold"))
         self.barriers_max = self.terms["barriers_max"]
 
-        self.threat = threat or ScentThreat(size)
+        self.threat = threat or BeliefGrid.from_config(self.terms, config)
         self.brain = brain or resolve_brain(config)
-        self.scent = scent or NullScent()
+        self.scent = scent or ScentField.from_terms(self.terms)
         self.hint_writer = hint_writer or silent_hint
         self.handler = TurnHandler(self.state, self.threat, self.rules)
 

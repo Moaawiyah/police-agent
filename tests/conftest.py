@@ -10,10 +10,22 @@ from pathlib import Path
 
 import pytest
 
+from police_agent.domain.scent import ScentField
 from police_agent.shared.config import Config, load_config
 from police_agent.shared.schema import put, translate_shared
 
 CONFIG_DIR = Path(__file__).resolve().parents[1] / "config" / "police"
+
+# The scent constants exactly as the specification fixes them (Appendix Vav,
+# table 16). Spelled out rather than read from the config so that a test proving
+# what a 0.9 centre looks like cannot be quietly rewritten by editing a file.
+SCENT_TERMS = {
+    "board_size": 7,
+    "smell_grid_size": 5,
+    "decay_per_step": 0.10,
+    "emit_intensity": 0.9,
+    "min_center_intensity": 0.5,
+}
 
 
 @pytest.fixture
@@ -34,3 +46,8 @@ def config_with(**overrides) -> Config:
     for key, value in overrides.items():
         put(data, key.replace("__", "."), value)
     return Config(data, shared)
+
+
+def scent_field(**overrides) -> ScentField:
+    """A field on the agreed constants, with any of them overridden by name."""
+    return ScentField.from_terms({**SCENT_TERMS, **overrides})
