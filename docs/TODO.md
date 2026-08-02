@@ -58,6 +58,60 @@
       grid directly. `ScentField.absorb`/`decay_all`/`strongest_cell` exist and
       are tested for when the step-8 GUI wants a trail layer to draw
 
+## Step 6.5 — The verbal layer (done)
+
+- [x] `infra/ollama.py`: one stdlib call to a local Ollama server. `stream` and
+      `think` both off — Qwen3 reasons out loud by default and would spend the
+      whole token ceiling doing it. Every failure raises `OllamaError`, so the
+      caller has exactly one thing to catch
+- [x] `strategy/talk.py`: `HintWriter` — builds the prompt, cleans the reply,
+      enforces the signed `hint_max_words` cap, and falls back to a canned line
+      on any failure. Default provider is `ollama` with `qwen3:4b`; the
+      `[trash_talk]` block in `game.toml` is private tuning and is never signed
+- [x] Wired at `peer/turn_sender.py`, which now passes the thief's last hint so
+      the line can answer it. `peer/seams.py` retired — the placeholder it held
+      was the whole file
+- [x] Appendix ה 27 (no numeric locations on the wire) is enforced by *never
+      putting a cell in the prompt*: the model is told the city, whether the
+      police is closing in, and what the thief said. Coordinates are scrubbed
+      from the reply as well, since a model told nothing can still invent some
+- [ ] Not verified against a live model — Ollama was not running on this
+      machine. Run `ollama serve` and `ollama pull qwen3:4b`, then play a match
+      and read the hints back out of the log before the league
+- [ ] The police never bluffs deliberately. The specification permits a
+      misleading hint (ch. 4.4) and the prompt allows it, but nothing steers the
+      model toward a *useful* lie — baiting the thief toward a barrier is a real
+      tactic left on the table
+
+## Step 6.5b — The bluff classifier (done)
+
+The other half of the verbal layer: the police now *listens*. Ch. 6.4 wants the
+hint in the Bayes update carrying a reliability coefficient; ch. 6.5 casts the
+model as a bluff classifier. Ch. 4.4 supplies the method, and the scent is the
+arbiter of it.
+
+- [x] `strategy/hint_claim.py`: free text → a compass claim. The model answers
+      one character; word-boundary keywords catch what it misses and are the
+      whole reader when no model is configured. Two directions in one sentence
+      claim nothing — guessing would invent evidence
+- [x] `strategy/bearings.py`: `strongest_cell`, `cells_toward`, `agrees` — the
+      geometry, split out so `bluff.py` is judgement alone
+- [x] `strategy/bluff.py`: `BluffAnalyst` — checks each claim against the
+      freshest cell of the trail that arrived with it, keeps a Laplace-smoothed
+      reliability, and lets a claim move the belief only when no trail arrived
+      (otherwise the same turn's evidence would count twice)
+- [x] `strategy/belief.py`: `scale(cells, factor)` — the update step opened up
+      for evidence that is not scent. The belief still knows nothing of compasses
+- [x] Reported: `opponent_reliability` and `hint_readings` in the match summary
+- [ ] **Reliability is per sub-game, not per opponent.** A thief that lies its
+      way through game 1 starts game 2 with a clean slate, because the analyst is
+      built fresh in `PoliceRuntime.__init__`. Carrying it across a series would
+      be worth real points in the league
+- [ ] Only compass claims are read. A hint naming a landmark ("by the harbour")
+      is unusable because the board is abstract and nothing maps a name to a
+      cell. Agreeing a landmark→region map with the thief team would open this up
+- [ ] The gain (0.6) and the smoothing prior are untuned, like `smell_trust`
+
 ## Step 7 — Police strategy (done, built out of order)
 
 - [x] `strategy/brain.py`: `PoliceBrainBase` seam + shipped `PoliceBrain`
@@ -145,8 +199,13 @@ rather than a separate simulation path.
       answers and survival claim against its revealed positions. `audit_records`
       proves the log was not rewritten; it does not yet prove the log is
       consistent with what the thief claimed during play.
-- [ ] **No nonce anti-replay** on incoming turns — a replayed message would be
-      processed twice. Track seen `(step, commit)` pairs.
+- [x] **Anti-replay on incoming turns** (`peer/turn_handler.py`). Every turn is
+      identified by its commit and remembered; a repeat is dropped before it
+      touches state, and `peer/runtime.py` does not answer one. The commit is
+      keyed on rather than a `(step, commit)` pair because the step sits *inside*
+      the sealed payload, so rewriting it on the wire cannot launder a spent
+      turn. Dropped rather than forfeited: `McpTransport` retries, so a repeat
+      is at least as likely to be our own network as an opponent.
 - [ ] **Specification ambiguity — Appendix ה 46.** The barrier policy never
       walls the cell it *believes* the thief occupies, even though a barrier
       there is a capture condition: the specification does not pin down how that

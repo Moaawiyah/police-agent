@@ -9,7 +9,8 @@ from police_agent.strategy.belief import BeliefGrid
 
 
 def total(belief: BeliefGrid) -> float:
-    return sum(sum(row) for row in belief.as_matrix())
+    """Rounded past float noise: the invariant is "sums to one"."""
+    return round(sum(sum(row) for row in belief.as_matrix()), 9)
 
 
 def test_mass_spreads_only_the_way_the_thief_may_actually_move():

@@ -59,6 +59,10 @@ def build_summary(runtime, result: str, winner: str | None, audit: dict) -> dict
         "group_name": runtime.config.get("game.group_name", "unnamed"),
         "peer_identity": runtime.peer_identity,
         "audit": audit,
+        # How far the thief's words survived contact with its own scent trail.
+        # Below 0.5 is a peer that talked its way into being disbelieved.
+        "opponent_reliability": round(runtime.analyst.reliability, 3),
+        "hint_readings": runtime.handler.readings,
         "disputes": runtime.disputes,
         "records": runtime.records,
         "history": runtime.handler.history,

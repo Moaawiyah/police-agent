@@ -5,12 +5,13 @@ from police_agent.domain.rules import GameRules
 from police_agent.peer.protocol import TurnMessage
 from police_agent.peer.turn_handler import TurnHandler
 from police_agent.strategy.belief import BeliefGrid
+from police_agent.strategy.bluff import BluffAnalyst, Verdict
 from tests.peer.fake_transport import thief_turn
 
 
-def handler(max_steps: int = 10, survival: int = 10, threat=None) -> TurnHandler:
+def handler(max_steps: int = 10, survival: int = 10, threat=None, analyst=None) -> TurnHandler:
     threat = threat if threat is not None else BeliefGrid(7)
-    return TurnHandler(OwnGameState((0, 0), 7), threat, GameRules(max_steps, survival))
+    return TurnHandler(OwnGameState((0, 0), 7), threat, GameRules(max_steps, survival), analyst)
 
 
 class RecordingThreat:
@@ -24,6 +25,9 @@ class RecordingThreat:
 
     def observe_smell(self, cells) -> None:
         self.calls.append("observe_smell")
+
+    def scale(self, cells, factor) -> None:
+        self.calls.append("scale")
 
     def most_likely(self):
         return (0, 0)
@@ -75,6 +79,45 @@ def test_the_belief_is_spread_before_the_fresh_scent_sharpens_it():
     process(handler(threat=recorder), smell_grid={"5,5": 0.9})
 
     assert recorder.calls == ["diffuse", "observe_smell"]
+
+
+def test_the_analyst_judges_the_hint_against_the_trail_that_arrived_with_it():
+    """It needs the hint, the prior belief, and the freshest smelled cell."""
+    seen = {}
+
+    class Analyst:
+        def assess(self, hint, believed, smelled):
+            seen.update(hint=hint, believed=believed, smelled=smelled)
+            return Verdict()
+
+        def apply(self, verdict, belief, origin):
+            pass
+
+    subject = TurnHandler(
+        OwnGameState((0, 0), 7), BeliefGrid(7), GameRules(10, 10), analyst=Analyst()
+    )
+    process(subject, smell_grid={"5,5": 0.9, "1,1": 0.2}, hint="gone north")
+
+    prior = BeliefGrid(7)
+    prior.diffuse()  # what the belief was after the thief moved, before it smelled
+
+    assert seen["hint"] == "gone north"
+    assert seen["smelled"] == (5, 5)  # the strongest cell, not merely the grid
+    assert seen["believed"] == prior.most_likely()  # the prior the trail revises
+
+
+def test_what_was_made_of_each_hint_is_kept_for_the_report():
+    subject = handler(analyst=BluffAnalyst())
+    process(subject, step=1, smell_grid={"5,5": 0.9}, hint="I went north")
+
+    assert "step 1" in subject.readings[0]
+
+
+def test_hints_are_ignored_entirely_when_no_analyst_is_configured():
+    subject = handler()
+    process(subject, hint="I went north")
+
+    assert subject.readings == []
 
 
 def test_a_declared_barrier_is_recorded_even_from_the_thief():

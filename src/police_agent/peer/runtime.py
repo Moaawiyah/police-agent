@@ -22,13 +22,14 @@ from police_agent.domain.scent import ScentField
 from police_agent.peer.handshake import identity_from_config, negotiate
 from police_agent.peer.protocol import TurnMessage
 from police_agent.peer.sealing import now_iso
-from police_agent.peer.seams import silent_hint
 from police_agent.peer.summary import build_summary, exchange_and_audit
 from police_agent.peer.terms import validate_agreement
 from police_agent.peer.turn_handler import TurnHandler
 from police_agent.peer.turn_sender import take_turn
 from police_agent.strategy import resolve_brain
 from police_agent.strategy.belief import BeliefGrid
+from police_agent.strategy.bluff import resolve_bluff_analyst
+from police_agent.strategy.talk import resolve_hint_writer
 
 
 class PoliceRuntime:
@@ -42,6 +43,7 @@ class PoliceRuntime:
         threat=None,
         scent=None,
         hint_writer=None,
+        analyst=None,
         listener=None,
     ) -> None:
         # Validated before anything else: a missing agreed term is far cheaper to
@@ -52,20 +54,20 @@ class PoliceRuntime:
 
         size = self.terms["board_size"]
         self.state = OwnGameState(tuple(self.terms["cop_start"]), size)
-        # The survival threshold is deliberately not a signed term -- the
-        # reference does not sign it, and matching its term list exactly is what
-        # lets the handshake succeed against anyone who followed it. It still
-        # comes from the shared, byte-identical game.json, so both peers agree;
-        # `require` is what makes a missing one a config error rather than a
-        # crash on the turn it would first be consulted.
+        # The survival threshold is deliberately not a signed term: the reference
+        # does not sign it, and matching its term list exactly is what lets the
+        # handshake succeed against anyone who followed it. It still comes from
+        # the shared, byte-identical game.json, so both peers agree. `require`
+        # makes a missing one a config error rather than a crash mid-match.
         self.rules = GameRules(self.terms["max_steps"], config.require("rules.survival_threshold"))
         self.barriers_max = self.terms["barriers_max"]
 
         self.threat = threat or BeliefGrid.from_config(self.terms, config)
         self.brain = brain or resolve_brain(config)
         self.scent = scent or ScentField.from_terms(self.terms)
-        self.hint_writer = hint_writer or silent_hint
-        self.handler = TurnHandler(self.state, self.threat, self.rules)
+        self.hint_writer = hint_writer or resolve_hint_writer(config)
+        self.analyst = analyst or resolve_bluff_analyst(config)
+        self.handler = TurnHandler(self.state, self.threat, self.rules, self.analyst)
 
         self._listener = listener or (lambda event: None)
         self.records: list[dict] = []
@@ -109,6 +111,12 @@ class PoliceRuntime:
     def _apply_incoming(self, message: TurnMessage) -> None:
         outcome = self.handler.process(message)
         self.disputes.extend(outcome.disputes)
+        if outcome.replayed:
+            # Not a turn, so it does not earn one back. Keep waiting: a peer that
+            # only ever repeats itself goes silent by the watchdog instead, and a
+            # duplicate is as likely to be the transport's retry as an attack.
+            self.notify({"type": "replay_ignored", "step": message.step})
+            return
         self.notify({"type": "incoming", "step": message.step})
 
         if outcome.i_won:
