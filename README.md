@@ -60,6 +60,13 @@ opponent: a URL. Four dilemmas the orchestration had to settle:
   survival; the police can verify neither during play. Survival is checked
   against the agreed threshold immediately and disputed if premature; the rest
   waits for the audit, where a log that will not hash forfeits the game outright.
+- **Whose vocabulary wins.** Both peers compare the agreed-terms dict for exact
+  equality, so a term one side signs and the other does not fails the handshake
+  even when every shared value agrees — and a peer always agrees with itself, so
+  no local test catches it. The signed key set is therefore copied verbatim from
+  the course reference rather than designed, and pinned by a test
+  (`tests/peer/test_terms_contract.py`). `survival_threshold` is consequently
+  *not* signed: the reference does not sign it, so neither may we.
 
 ### 3. Strategies implemented
 _Partial — the shipped heuristic exists (step 7); it will be re-tuned once the
@@ -151,7 +158,7 @@ tests/
 
 ```
 uv sync
-uv run pytest --cov              # 229 tests, 99% coverage (floor: 85%)
+uv run pytest --cov              # 236 tests, 99% coverage (floor: 85%)
 uv run pytest -m "not slow"      # skip the tests that bind real sockets
 uv run ruff check .
 uv run ruff format --check .

@@ -29,6 +29,9 @@ _TRANSLATION: tuple[tuple[str, str], ...] = (
     ("pheromones.pheromone_center_intensity", "smell.emit_intensity"),
     ("pheromones.pheromone_decay", "smell.decay_per_step"),
     ("pheromones.pheromone_grid_size", "smell.grid_size"),
+    # Absent from the shipped game.json; both peers fall back to the same agreed
+    # default (see peer/terms.py). Mapped so an explicit value would still win.
+    ("pheromones.pheromone_min_center_intensity", "smell.min_center_intensity"),
     ("network_and_league.response_timeout_sec", "network.response_timeout_seconds"),
     ("network_and_league.watchdog_timeout_sec", "network.watchdog_timeout_seconds"),
     ("network_and_league.num_games", "game.num_games"),
