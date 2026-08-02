@@ -12,7 +12,9 @@ from tests.conftest import config_with
 
 
 def total(belief: BeliefGrid) -> float:
-    return sum(sum(row) for row in belief.as_matrix())
+    """The mass, rounded past float noise -- the invariant is "sums to one",
+    not "sums to one in binary floating point"."""
+    return round(sum(sum(row) for row in belief.as_matrix()), 9)
 
 
 class TestDistribution:

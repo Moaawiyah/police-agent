@@ -36,6 +36,10 @@ class ThreatEstimate(Protocol):
         """Fold in one received scent grid, `{"r,c": intensity}`."""
         ...
 
+    def scale(self, cells, factor: float) -> None:
+        """Reweight a set of cells -- evidence that did not arrive as scent."""
+        ...
+
     def most_likely(self) -> Cell:
         """The cell the thief is currently believed most likely to occupy."""
         ...
@@ -58,6 +62,9 @@ class PointThreat:
 
     def observe_smell(self, cells: dict | None) -> None:
         """Certainty has nothing to learn from a scent reading."""
+
+    def scale(self, cells, factor: float) -> None:
+        """Nor from a hint. A fixed target is fixed against all evidence."""
 
     def most_likely(self) -> Cell:
         return self.cell
@@ -82,6 +89,9 @@ class UniformThreat:
 
     def observe_smell(self, cells: dict | None) -> None:
         """Staying uniform is what makes this the *prior* rather than a belief."""
+
+    def scale(self, cells, factor: float) -> None:
+        """A prior that reweighted itself on evidence would be a belief map."""
 
     def most_likely(self) -> Cell:
         middle = (self.board_size - 1) // 2

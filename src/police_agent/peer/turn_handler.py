@@ -19,6 +19,7 @@ from dataclasses import dataclass, field
 from police_agent.domain.own_state import OwnGameState
 from police_agent.domain.rules import GameRules
 from police_agent.peer.protocol import TurnMessage
+from police_agent.strategy.bearings import strongest_cell
 from police_agent.strategy.threat import ThreatEstimate
 
 
@@ -35,11 +36,19 @@ class IncomingOutcome:
 class TurnHandler:
     """Applies the thief's messages to the police's own view of the game."""
 
-    def __init__(self, state: OwnGameState, threat: ThreatEstimate, rules: GameRules) -> None:
+    def __init__(
+        self,
+        state: OwnGameState,
+        threat: ThreatEstimate,
+        rules: GameRules,
+        analyst=None,
+    ) -> None:
         self.state = state
         self.threat = threat
         self.rules = rules
+        self.analyst = analyst  # reads the thief's hints; None means ignore them
         self.history: list[dict] = []  # every message received, for replay and the report
+        self.readings: list[str] = []  # what was made of each hint, for the report
         self._seen: set[str] = set()  # turn identities already spent
 
     def process(self, message: TurnMessage) -> IncomingOutcome:
@@ -66,6 +75,8 @@ class TurnHandler:
         # the message is proof the thief moved, so the belief spreads *before*
         # the scent that arrived with it is allowed to sharpen it again.
         self.threat.diffuse()
+        believed = self.threat.most_likely()  # where the hint gets measured from
+        self._weigh_hint(message, believed)
         self.threat.observe_smell(message.smell_grid)
 
         outcome = IncomingOutcome()
@@ -74,6 +85,20 @@ class TurnHandler:
         if message.win_claim:
             self._check_survival(message, outcome)
         return outcome
+
+    def _weigh_hint(self, message: TurnMessage, believed) -> None:
+        """Put the thief's words on trial against the trail that arrived with them.
+
+        Before the scent is folded in, not after: the claim is measured against
+        where the police *believed* the thief was, which is the prior the trail
+        is about to revise.
+        """
+        if self.analyst is None:
+            return
+        verdict = self.analyst.assess(message.hint, believed, strongest_cell(message.smell_grid))
+        self.analyst.apply(verdict, self.threat, believed)
+        if verdict.note:
+            self.readings.append(f"step {message.step}: {verdict.note}")
 
     @staticmethod
     def _fingerprint(message: TurnMessage) -> str:

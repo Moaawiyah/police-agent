@@ -32,6 +32,9 @@ class RecordingThreat:
     def observe_smell(self, cells) -> None:
         self.calls.append("observe_smell")
 
+    def scale(self, cells, factor) -> None:
+        self.calls.append("scale")
+
     def most_likely(self):
         return (0, 0)
 

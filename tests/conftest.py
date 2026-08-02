@@ -43,6 +43,11 @@ def config_with(**overrides) -> Config:
     """
     shared = json.loads((CONFIG_DIR / "game.json").read_text(encoding="utf-8"))
     data = translate_shared(shared)
+    # The shipped agent asks a local model for its banter. A unit test must not:
+    # it would reach for a socket every turn, pass or fail on whether Ollama
+    # happens to be running, and take seconds doing it. Tests that want the model
+    # path inject their own asker (see tests/strategy/test_talk.py).
+    put(data, "trash_talk.provider", "template")
     for key, value in overrides.items():
         put(data, key.replace("__", "."), value)
     return Config(data, shared)

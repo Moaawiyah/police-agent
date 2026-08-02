@@ -34,12 +34,23 @@ def take_turn(runtime, claim_response: dict | None = None) -> None:
         runtime.state,
         commit=record["commit"],
         smell_grid=runtime.scent.emit(runtime.state.position),
-        hint=runtime.hint_writer(runtime.state, claim),
+        hint=runtime.hint_writer(runtime.state, claim, _opponent_hint(runtime)),
         capture_claim=claim,
         claim_response=claim_response,
     )
     runtime.transport.send_turn(message.to_dict())
     runtime.notify({"type": "moved", "decision": decision, "commit": record["commit"]})
+
+
+def _opponent_hint(runtime) -> str:
+    """The last thing the thief said, so this turn's line can answer it.
+
+    Free text from another team's process, passed to the verbal layer and
+    nowhere near a decision -- the specification permits it to be a lie
+    (ch. 4.4), so believing any of it would be the point of the trap.
+    """
+    history = runtime.handler.history
+    return str(history[-1].get("hint", "")) if history else ""
 
 
 def _capture_claim(runtime, decision) -> Cell | None:

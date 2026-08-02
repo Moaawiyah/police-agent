@@ -36,12 +36,15 @@ class TestProtocol:
         assert isinstance(PointThreat((1, 1)), ThreatEstimate)
         assert isinstance(UniformThreat(5), ThreatEstimate)
 
-    def test_an_unrelated_class_that_answers_the_three_calls_also_satisfies_it(self):
+    def test_an_unrelated_class_that_answers_every_call_also_satisfies_it(self):
         class FakeBelief:
             def diffuse(self):
                 pass
 
             def observe_smell(self, cells):
+                pass
+
+            def scale(self, cells, factor):
                 pass
 
             def most_likely(self):
