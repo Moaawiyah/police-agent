@@ -39,7 +39,17 @@ def take_turn(runtime, claim_response: dict | None = None) -> None:
         claim_response=claim_response,
     )
     runtime.transport.send_turn(message.to_dict())
-    runtime.notify({"type": "moved", "decision": decision, "commit": record["commit"]})
+    runtime.notify(
+        {
+            "type": "moved",
+            "decision": decision,
+            "commit": record["commit"],
+            # The line that went out with the move. It is nowhere in the sealed
+            # record -- the payload is the peer's *truth*, and a taunt is not --
+            # so an observer that missed this event cannot recover it later.
+            "hint": message.hint,
+        }
+    )
 
 
 def _opponent_hint(runtime) -> str:

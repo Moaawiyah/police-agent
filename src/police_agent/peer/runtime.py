@@ -17,8 +17,16 @@ transport and a scripted estimate, with no sockets and no opponent involved.
 import time
 
 from police_agent.domain.own_state import OwnGameState
-from police_agent.domain.rules import CAPTURE, SURVIVAL, TECHNICAL_LOSS, TIMEOUT, GameRules
+from police_agent.domain.rules import (
+    ABORTED,
+    CAPTURE,
+    SURVIVAL,
+    TECHNICAL_LOSS,
+    TIMEOUT,
+    GameRules,
+)
 from police_agent.domain.scent import ScentField
+from police_agent.peer.controls import GameControls
 from police_agent.peer.handshake import identity_from_config, negotiate
 from police_agent.peer.protocol import TurnMessage
 from police_agent.peer.sealing import now_iso
@@ -26,6 +34,7 @@ from police_agent.peer.summary import build_summary, exchange_and_audit
 from police_agent.peer.terms import validate_agreement
 from police_agent.peer.turn_handler import TurnHandler
 from police_agent.peer.turn_sender import take_turn
+from police_agent.peer.view import snapshot
 from police_agent.strategy import resolve_brain
 from police_agent.strategy.belief import BeliefGrid
 from police_agent.strategy.bluff import resolve_bluff_analyst
@@ -45,6 +54,7 @@ class PoliceRuntime:
         hint_writer=None,
         analyst=None,
         listener=None,
+        controls=None,
     ) -> None:
         # Validated before anything else: a missing agreed term is far cheaper to
         # discover here than three turns into a match against another group.
@@ -69,7 +79,8 @@ class PoliceRuntime:
         self.analyst = analyst or resolve_bluff_analyst(config)
         self.handler = TurnHandler(self.state, self.threat, self.rules, self.analyst)
 
-        self._listener = listener or (lambda event: None)
+        self._listener = listener
+        self.controls = controls or GameControls()
         self.records: list[dict] = []
         self.disputes: list[str] = []
         self.peer_identity: dict = {}
@@ -78,8 +89,16 @@ class PoliceRuntime:
         self._result: tuple[str, str | None] | None = None
 
     def notify(self, event: dict) -> None:
-        """Publish a progress event. The GUI subscribes here; nothing else needs to."""
-        self._listener(event)
+        """Publish a progress event, carrying what the board looked like at the time.
+
+        The snapshot is taken here, on the game thread, because a watcher that
+        read the runtime later would read a board that had already moved on. It
+        is skipped entirely when nobody is listening: the headless agent copies
+        no sets and builds no belief matrix it will never draw.
+        """
+        if self._listener is None:
+            return
+        self._listener({**event, "view": snapshot(self)})
 
     def run(self) -> dict:
         """Play one sub-game to a result and return the match summary."""
@@ -99,6 +118,13 @@ class PoliceRuntime:
     def _turn_loop(self) -> None:
         timeout = self._turn_timeout()
         while self._result is None:
+            # Checked at the turn boundary, never mid-turn: a pause that landed
+            # between sealing a move and sending it would leave this peer having
+            # committed to something the opponent never received.
+            self.controls.wait_if_paused()
+            if self.controls.stopped:
+                self._result = (ABORTED, None)
+                return
             incoming = self.transport.poll_turn(timeout)
             if incoming is None:
                 # Silence past the agreed watchdog. The specification treats an
@@ -117,7 +143,7 @@ class PoliceRuntime:
             # duplicate is as likely to be the transport's retry as an attack.
             self.notify({"type": "replay_ignored", "step": message.step})
             return
-        self.notify({"type": "incoming", "step": message.step})
+        self.notify({"type": "incoming", "step": message.step, "hint": message.hint})
 
         if outcome.i_won:
             self._result = (CAPTURE, "police")

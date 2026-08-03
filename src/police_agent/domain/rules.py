@@ -22,6 +22,11 @@ SURVIVAL = "survival"
 TIMEOUT = "timeout"
 TECHNICAL_LOSS = "technical_loss"
 
+# This peer's own operator stopped the sub-game from the GUI. Not a loss the
+# rules define -- nobody scores it -- but a named result so the summary and the
+# audit still describe what happened, rather than a match simply going missing.
+ABORTED = "aborted"
+
 # A revealed log that does not hash to the commitments published during play.
 # Kept distinct from a technical loss because it is not a crash or a forfeit: it
 # is evidence the opponent rewrote its history, and the honest peer wins on it

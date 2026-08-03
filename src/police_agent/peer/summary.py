@@ -13,14 +13,15 @@ prevent.
 import time
 
 from police_agent.domain.crypto import audit_records
-from police_agent.domain.rules import TAMPER_FORFEIT, TECHNICAL_LOSS
+from police_agent.domain.rules import ABORTED, TAMPER_FORFEIT, TECHNICAL_LOSS
 from police_agent.peer.protocol import AuditPayload
 
 SKIPPED_AUDIT = {"passed": False, "verified_steps": 0, "failed_steps": [], "skipped": True}
 
-# Results where there is nobody left to audit with: the opponent already went
-# silent, so asking it to reveal would only stall this peer for another timeout.
-NO_AUDIT_RESULTS = (TECHNICAL_LOSS,)
+# Results where there is nobody left to audit with, so asking for a reveal would
+# only stall this peer for another timeout: the opponent already went silent, or
+# -- having been stopped from the GUI -- this peer is the one that walked away.
+NO_AUDIT_RESULTS = (TECHNICAL_LOSS, ABORTED)
 
 
 def exchange_and_audit(runtime, result: str, winner: str | None) -> tuple[str, str | None, dict]:
