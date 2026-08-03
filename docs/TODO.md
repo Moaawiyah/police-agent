@@ -140,6 +140,82 @@ arbiter of it.
 - [x] `tests/peer/fake_transport.py`: scripted thief double, same six-method
       surface as `McpTransport`; plus a live two-port match in `tests/infra/`
 
+## SDK architecture (done)
+
+The submission guidelines require all business logic to be reachable through an
+SDK layer, with front ends delegating to it and holding none themselves. The CLI
+was the counter-example: it loaded the config, resolved the port, started the
+server, built the transport and constructed the runtime.
+
+- [x] `sdk/options.py`: `MatchOptions` — what a caller may choose about a match
+- [x] `sdk/agent.py`: `PoliceAgentSDK` — load terms, open the mailbox, play,
+      save the record. Lazy and idempotent, so reading `agent.port` binds no
+      socket and `connect()` twice opens one server. Config and transport are
+      injectable, which is what lets a match be played against
+      `tests/peer/fake_transport.py` with no sockets and no opponent process
+- [x] `__main__.py` reduced to flags in, lines out, exit code
+- [x] `police_agent.PoliceAgentSDK` re-exported lazily from the package root, so
+      `import police_agent` still costs nothing for a test that wants a board
+- [x] Wire deadlines now come from the agreed terms
+      (`network.watchdog_timeout_seconds` / `response_timeout_seconds`). The CLI
+      built `McpTransport` with neither, so both peers silently used the
+      constructor's 60 s/30 s regardless of what they had signed
+- [ ] The step-8 GUI and replay viewer must be built as front ends over this
+      object, not beside it. `listener=` is already the progress seam
+
+## Step 8 — GUI and replay (done; reporting still open)
+
+Adapted from the course reference's `gui/` package. The structure was taken —
+shared window chrome over a board canvas, a live app mirroring an event stream
+from a worker thread, a replay player feeding a log back through the pure
+domain. The code was rewritten: our runtime publishes different events, our
+config names different things, and every reference file carries an
+"all rights reserved / Educational Use EULA" header, so copying one into a
+public repository would be redistribution.
+
+- [x] `peer/view.py`: `snapshot(runtime)` — everything mutable copied at the
+      moment the event fires. The game plays on a worker thread while Tk redraws
+      on the main one, so a view holding a live `state.visited` would be iterated
+      while the game was still adding to it. Skipped entirely when no listener is
+      attached, so the headless agent builds no belief matrix it will not draw
+- [x] `peer/controls.py`: `GameControls` — pause/play/stop as `threading.Event`s,
+      checked by `runtime._turn_loop` at the **turn boundary**. A pause landing
+      between sealing a move and sending it would leave this peer committed to
+      something the opponent never received. New result `ABORTED`, and it skips
+      the audit for the same reason `TECHNICAL_LOSS` does
+- [x] `gui/palette.py` + `board_view.py`: the mandatory heatmap. Colour scales
+      against the *current peak*, not an absolute — a belief over 49 cells starts
+      at 0.02 and rarely passes 0.3, so an absolute scale would draw every
+      interesting state as a uniform white
+- [x] `gui/window.py`: chrome shared by both views, so a replay screenshot is
+      evidence about the live run (ch. 9.4.2 asks for both)
+- [x] `gui/game_mode.py`: the Table-22 verbal-game mode and model label
+- [x] `gui/live_apply.py` / `live_controls.py` / `player.py`: the live app
+- [x] `gui/replay_data.py` / `replay_controls.py` / `replay.py`: the Visual
+      Replay Player. The belief is **recomputed** from the recorded scent grids
+      and each commit re-verified as it is drawn, rather than reading
+      `audit.passed` back out of the same file a forger would have edited
+- [x] `--gui` and `--replay` on the CLI; `sdk.load_summary`; the SDK's `listener`
+      and `controls` made settable, since the window needs an SDK to build itself
+      from before it has a window to steer with
+- [x] Both windows built, driven and closed cleanly against real Tk
+- [ ] **Screenshots for the report (ch. 9.4.2) are not taken.** Needs a live
+      match against the thief peer, not a scripted log
+- [ ] **The mandatory Gmail report is not built.** Step 8's other half:
+      `[email]` sits in `game.toml.example` and nothing reads it
+- [ ] **Replay cannot show the hints this peer sent.** They are nowhere in the
+      summary — the sealed payload is the peer's *truth* and a taunt is not, and
+      the wire message is not logged. Live play shows them because the `moved`
+      event carries one. Recording them would make the log complete
+- [ ] **No sub-game selector.** The reference discovers sibling logs by a
+      `log_<game_id>_gNN.json` naming convention and this repo has none: one run
+      writes one `--summary` file. A series driver is the prerequisite, not the
+      widget
+- [ ] **No bidirectional control channel.** The reference lets one peer ask the
+      other to restart a series. `ControlMessage` and `McpTransport.poll_control`
+      already exist here and the runtime ignores both; the opponent would have to
+      agree to honour it, which is a cross-repo conversation
+
 ## Step 3 — Local playable simulation (superseded)
 
 Overtaken by the runtime above: the scripted match driver this step called for

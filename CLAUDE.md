@@ -155,7 +155,7 @@ Project requirements include:
 - minimum 85% test coverage;
 - zero Ruff violations;
 - maximum 150 lines of code per Python source/test file;
-- modular architecture;
+- modular architecture sdk archetecture;
 - no hardcoded secrets;
 - meaningful tests for new functionality.
 

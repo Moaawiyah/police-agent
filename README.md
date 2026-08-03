@@ -88,8 +88,8 @@ belief map (step 6) replaces the placeholder threat estimate._
 _Not applicable unless a reinforcement-learning agent is trained._
 
 ### 5. Screenshots
-_Pending — requires the live GUI belief map and the Replay App showing
-`Verified OK` (step 8)._
+_Pending — the windows exist and run (`--gui`, `--replay`); the screenshots
+themselves are taken from a live league match against the thief peer._
 
 ### 6. Companion repository link
 Thief agent: **https://github.com/Moaawiyah/Ai_thief**
@@ -124,9 +124,43 @@ Both peers are separate processes. Copy `game.toml.example` to `game.toml`, set
 uv run police-agent                          # uses config/police/game.toml
 uv run police-agent --port 8801 --opponent http://127.0.0.1:8802/mcp
 uv run police-agent --summary result.json    # also write the match record
+uv run police-agent --gui                    # play with the live board window
 ```
 
 The thief must be started from its own repository, as a separate process.
+
+## The windows
+
+Two of them, over the same board canvas, because a screenshot of one is only
+evidence about the other if they draw the same thing (spec ch. 9.4.2 asks for
+both). Adapted from the course reference implementation's `gui/` package — the
+structure was taken, the code was rewritten.
+
+**Live** (`--gui`) shows this peer playing: its true position, its trail, the
+declared barriers, and the belief heatmap over where the thief might be. The
+window opens idle so both peers can be started before a match begins; Start
+negotiates and plays, Pause/Play/Stop steer *this* peer only. What it cannot
+show is the thief — its position is not in this process to draw (ch. 2.4.2), and
+the red cloud is the whole answer.
+
+**Replay** opens a saved match log:
+
+```
+uv run police-agent --replay result.json
+uv run police-agent --replay result.json --opponent-log thief-result.json
+```
+
+Play/pause, single-step, jump to a step. The belief map is *recomputed* from the
+recorded scent grids by the same `BeliefGrid` the agent played with, and each
+step's SHA-256 commit is re-verified as it is drawn — so `verified OK` under the
+board is being proven in front of the viewer rather than read back out of the
+same file. Edit a payload in the log and the step turns `TAMPERED`. With the
+thief's revealed log supplied, both true positions are drawn: unknowable during
+play, plain history once both peers have revealed.
+
+Pausing is a real cost, and the banner says so. There is no referee holding the
+game while this peer thinks: the thief's watchdog keeps running, and a long
+enough pause is a technical loss.
 
 ## Layout
 
@@ -134,12 +168,14 @@ The thief must be started from its own repository, as a separate process.
 src/police_agent/
   constants.py  roles, action types, the four legal directions
   exceptions.py the deliberate-error hierarchy (a crash is a technical loss)
-  __main__.py   the `police-agent` CLI: start my server, play one sub-game
+  __main__.py   the `police-agent` CLI: a front end, no game logic of its own
+  sdk/          the public API every front end goes through (see below)
+  gui/          the live board window and the Visual Replay Player
   domain/       board geometry, actions, own state, rules, scoring, commit-reveal
   strategy/     the police brain: chase heuristic, barrier policy, threat estimate
   infra/        FastMCP server (my mailbox) and client (the opponent's URL)
   peer/         the runtime: handshake, turn loop, sealing, audit, wire protocol
-  shared/       config loading (rate limiting not implemented)
+  shared/       config loading, version (rate limiting not implemented)
 config/police/
   game.json          shared, signed terms — byte-identical with the thief's copy
   game.toml.example  template for this peer's private, uncommitted config
@@ -149,6 +185,29 @@ docs/
   TODO.md  active step and carried-forward work
 tests/
 ```
+
+### The SDK layer
+
+Every capability of this agent is reachable through one object,
+`police_agent.sdk.PoliceAgentSDK`. Front ends parse their own input and render
+what comes back; they do not load a config, resolve a port, build a transport or
+construct a runtime. The `police-agent` CLI is the first such front end and the
+step-8 GUI and replay viewer will be the next — one composition root rather than
+three that drift apart the first time a constructor changes.
+
+```python
+from police_agent.sdk import MatchOptions, PoliceAgentSDK
+
+agent = PoliceAgentSDK(MatchOptions(port=8801, opponent_url="http://127.0.0.1:8802/mcp"))
+agent.connect()  # my mailbox opens, the opponent's URL is dialled
+summary = agent.play()  # one sub-game, to a result
+agent.save_summary(summary, "result.json")
+```
+
+The layer holds no game rules. It decides *which* objects are built and with
+what settings; how the game is played stays in `domain/` and `peer/`. Both the
+transport and the config can be injected, which is what lets a whole match be
+played against a test double with no sockets and no opponent process.
 
 `README.md` and `CLAUDE.md` stay at the repository root: the specification
 (ch. 9.4.2) requires the academic report to be the root `README.md`, and
