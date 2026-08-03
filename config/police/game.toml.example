@@ -11,6 +11,18 @@ my_port         = 8801                             # MY MCP server port
 opponent_url    = "http://127.0.0.1:8802/mcp"       # the only thing I know about the opponent
 turn_timeout_seconds = 180
 
+# MY reserved ngrok domain, used by `police-agent --tunnel` (Appendix He rule 10:
+# a league match needs a public URL, because both peers sit behind NAT). Private
+# per-peer setting, NOT an agreed term -- it never belongs in game.json.
+# Reserve one at https://dashboard.ngrok.com/domains; without it ngrok hands out a
+# new random URL on every restart, and the opposing team has the old one in their
+# own opponent_url.
+# tunnel_domain = "your-reserved-name.ngrok-free.app"
+#
+# The ngrok authtoken is NOT configured here and must never be. Run this once, in
+# your own terminal, and ngrok keeps it in ~/.config/ngrok/ngrok.yml:
+#   ngrok config add-authtoken <your token>
+
 # [strategy]  -- optional: point at YOUR brain subclass (else the shipped heuristic runs)
 # police_class = "my_team.strategy:MyPoliceBrain"
 

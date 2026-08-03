@@ -12,6 +12,10 @@ Two settings have no defaults worth guessing -- the port this peer listens on
 and the URL of the opponent -- so they come from `config/police/game.toml` and
 can be overridden per run, which is what makes it practical to start both peers
 on one machine during development.
+
+That local default is why `--tunnel` is a flag rather than the norm: a league
+match needs the public URL it prints (Appendix He rule 10), and a practice match
+on this machine needs no internet at all.
 """
 
 import argparse
@@ -34,6 +38,11 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
         "--opponent-log",
         help="the thief's revealed log, so the replay can draw both agents",
     )
+    parser.add_argument(
+        "--tunnel",
+        action="store_true",
+        help="publish my server on a public ngrok URL (run `ngrok config add-authtoken` first)",
+    )
     return parser.parse_args(argv)
 
 
@@ -44,6 +53,7 @@ def _options(args: argparse.Namespace) -> MatchOptions:
         host=args.host,
         port=args.port,
         opponent_url=args.opponent,
+        tunnel=args.tunnel,
     )
 
 
@@ -70,12 +80,33 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _play_headless(agent: PoliceAgentSDK) -> dict:
-    agent.connect()  # bind first, so the line below is true when it is printed
+    agent.connect()  # bind first, so the lines below are true when they are printed
     print(
         f"police listening on {agent.host}:{agent.port}, opponent at {agent.opponent_url}",
         file=sys.stderr,
     )
+    _announce_tunnel(agent)
     return agent.play()
+
+
+def _announce_tunnel(agent: PoliceAgentSDK) -> None:
+    """Print the public address, because a human has to send it to the other team.
+
+    An ephemeral URL is called out rather than merely printed: it is a different
+    address after every restart, and the opposing team has the old one written
+    into their own config, so a silent change reads to them as a peer that has
+    gone missing.
+    """
+    if agent.public_url is None:
+        return
+    print(f"public URL (give this to the opposing team): {agent.public_url}", file=sys.stderr)
+    if agent.tunnel_domain is None:
+        print(
+            "  this URL is EPHEMERAL and changes every restart. Reserve a domain at "
+            "https://dashboard.ngrok.com/domains and set network.tunnel_domain in "
+            "config/police/game.toml to keep one address.",
+            file=sys.stderr,
+        )
 
 
 def _play_with_window(agent: PoliceAgentSDK) -> dict | None:
