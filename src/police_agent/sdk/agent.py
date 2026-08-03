@@ -23,6 +23,7 @@ from police_agent.constants import Role
 from police_agent.exceptions import ConfigError
 from police_agent.infra.mcp_client import McpTransport
 from police_agent.infra.mcp_server import start_peer_server
+from police_agent.infra.tunnel import open_tunnel
 from police_agent.peer.runtime import PoliceRuntime
 from police_agent.sdk.options import MatchOptions
 from police_agent.shared.config import load_config
@@ -44,6 +45,7 @@ class PoliceAgentSDK:
         self.config = config if config is not None else load_config(self.options.config_dir)
         self._transport = transport
         self._runtime: PoliceRuntime | None = None
+        self._tunnel = None
         # Public and reassignable, because the GUI cannot supply them at
         # construction: it needs an SDK to build its window from before it has a
         # window to listen with. Both are read once, when the runtime is built on
@@ -70,6 +72,26 @@ class PoliceAgentSDK:
         """The one thing this peer knows about its opponent."""
         return str(self.options.opponent_url or self.config.require("network.opponent_url"))
 
+    @property
+    def tunnel_domain(self) -> str | None:
+        """This peer's reserved ngrok domain, when it has one.
+
+        A private setting, so it lives in `game.toml` and not in the signed
+        `game.json`: it is mine alone, the opponent never verifies it, and a term
+        both peers must agree on byte for byte is not the place for it.
+        """
+        domain = self.config.get("network.tunnel_domain")
+        return str(domain) if domain else None
+
+    @property
+    def public_url(self) -> str | None:
+        """The MCP address the opposing team must dial, or None if I am local-only.
+
+        This is what goes in *their* `network.opponent_url`, and what the
+        pre-game declaration reports as my server's address.
+        """
+        return self._tunnel.mcp_url if self._tunnel else None
+
     def connect(self):
         """Open this peer's mailbox and the outbound link, and return the transport.
 
@@ -78,8 +100,21 @@ class PoliceAgentSDK:
         """
         if self._transport is None:
             inboxes = start_peer_server(Role.POLICE, self.host, self.port)
+            self._open_tunnel()
             self._transport = McpTransport(self.opponent_url, inboxes, **self.transport_timeouts())
         return self._transport
+
+    def _open_tunnel(self) -> None:
+        """Publish my port, if this run asked for it (Appendix He rule 10).
+
+        After the server binds, never before: ngrok starts forwarding the moment
+        it is up, and an opponent already waiting on a reserved domain would
+        otherwise have its first call refused by a port nothing is listening on.
+        The bind itself stays on 127.0.0.1 -- the ngrok agent dials us from this
+        same machine, so publishing a port never means exposing an interface.
+        """
+        if self.options.tunnel and self._tunnel is None:
+            self._tunnel = open_tunnel(self.port, self.tunnel_domain)
 
     def transport_timeouts(self) -> dict:
         """The wire deadlines, taken from the agreed terms rather than the code.

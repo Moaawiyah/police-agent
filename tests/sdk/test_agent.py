@@ -7,6 +7,7 @@ import pytest
 from police_agent.constants import Role
 from police_agent.domain.rules import ABORTED
 from police_agent.exceptions import ConfigError
+from police_agent.infra.tunnel import NgrokTunnel
 from police_agent.peer.controls import GameControls
 from police_agent.sdk import MatchOptions, PoliceAgentSDK
 from tests.conftest import CONFIG_DIR, config_with
@@ -112,6 +113,34 @@ def test_connecting_twice_opens_one_server(monkeypatch):
     assert len(opened) == 1
 
 
+def test_a_default_run_has_no_public_address_at_all(monkeypatch):
+    _record_wiring(monkeypatch)
+    agent = agent_with(transport=None)
+
+    agent.connect()
+
+    assert agent.public_url is None
+
+
+def test_the_tunnel_publishes_my_port_on_my_reserved_domain(monkeypatch):
+    """The domain is private, so it comes from game.toml: no opponent verifies it."""
+    _record_wiring(monkeypatch)
+    asked: list = []
+
+    def open_tunnel(port, domain=None):
+        asked.append((port, domain))
+        return NgrokTunnel(f"https://{domain}")
+
+    monkeypatch.setattr("police_agent.sdk.agent.open_tunnel", open_tunnel)
+    options = MatchOptions(tunnel=True)
+    agent = agent_with(transport=None, options=options, network__tunnel_domain="cops.ngrok.app")
+
+    agent.connect()
+
+    assert asked == [(8801, "cops.ngrok.app")]
+    assert agent.public_url == "https://cops.ngrok.app/mcp"  # the /mcp mount, not the origin
+
+
 def test_the_runtime_is_the_match_and_is_not_rebuilt():
     agent = agent_with()
 
@@ -187,7 +216,7 @@ def _forbidden(what: str):
 
 
 def _record_wiring(monkeypatch) -> tuple[list, list]:
-    """Replace the two socket-touching constructors with recorders."""
+    """Replace the socket-touching constructors with recorders, and ban ngrok."""
     opened: list = []
     dialled: list = []
 
@@ -201,4 +230,7 @@ def _record_wiring(monkeypatch) -> tuple[list, list]:
 
     monkeypatch.setattr("police_agent.sdk.agent.start_peer_server", start)
     monkeypatch.setattr("police_agent.sdk.agent.McpTransport", transport)
+    # Tunnelling is opt-in, so every test using this helper also proves that a
+    # default run starts no child process and publishes nothing to the internet.
+    monkeypatch.setattr("police_agent.sdk.agent.open_tunnel", _forbidden("started ngrok"))
     return opened, dialled

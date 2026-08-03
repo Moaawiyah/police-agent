@@ -110,6 +110,9 @@ Two gaps are open and both matter before a league match:
 - **The audit checks hashes, not meaning.** A rewritten opponent log is caught.
   A log that hashes correctly but contradicts the claims made during play is
   not yet re-checked. Step 5, partially done.
+- **Gmail reporting is not built.** The Gatekeeper is designed to take the
+  Gmail client without changes once it exists (`shared/gatekeeper.py`), but
+  nothing sends the mandatory signed end-of-game JSON yet (Appendix He 32/34).
 
 See [docs/PLAN.md](docs/PLAN.md) for the build order, [docs/TODO.md](docs/TODO.md)
 for what is carried forward, and [docs/PRD.md](docs/PRD.md) for the product
@@ -125,9 +128,59 @@ uv run police-agent                          # uses config/police/game.toml
 uv run police-agent --port 8801 --opponent http://127.0.0.1:8802/mcp
 uv run police-agent --summary result.json    # also write the match record
 uv run police-agent --gui                    # play with the live board window
+uv run police-agent --tunnel                 # league play: publish a public URL
 ```
 
 The thief must be started from its own repository, as a separate process.
+
+## Playing over the public internet
+
+Two peers on two different machines both sit behind NAT, so `127.0.0.1` in
+`network.opponent_url` cannot describe either of them (spec ch. 2.4, Appendix
+He rule 10). `--tunnel` wraps [ngrok](https://ngrok.com) as a subprocess and
+publishes this peer's MCP server on a public URL:
+
+```
+ngrok config add-authtoken <your token>      # once, in your own terminal
+uv run police-agent --tunnel
+```
+
+The authtoken never touches this code or this repository — ngrok keeps it in
+its own config file. The printed URL is what goes in the *opposing* team's
+`network.opponent_url`. Without a reserved domain the URL is different on
+every restart, which is fine for a one-off test but breaks a series the
+opponent has already configured against you; reserve one at
+[dashboard.ngrok.com/domains](https://dashboard.ngrok.com/domains) and set
+`network.tunnel_domain` in your private `game.toml` to keep the same address
+across restarts. See `config/police/game.toml.example` for the exact key.
+
+## The Gatekeeper and token accounting
+
+Every outbound call this peer makes to somebody else's service — today that
+is the local Ollama model behind the verbal layer — goes through one gate
+(`shared/gatekeeper.py`): a token-bucket rate limiter, a bounded FIFO queue so
+overload waits its turn instead of being dropped, retry with backoff, and a
+DOS circuit-breaker that locks the door if this process's own outbound rate
+runs ten times past the agreed limit (Appendix He rules 28/29). The five
+limits — requests/minute, concurrency, backoff, retries, queue depth — are
+already signed into `config/police/game.json` under
+`rate_limiter_gatekeeper`; a term the agreed file does not name falls back to
+the Appendix Vav example value, per its "minimum" status.
+
+The peer-to-peer MCP transport deliberately does **not** go through the gate:
+those are our own turns to the opponent, not requests against a third party's
+quota, and throttling them would trade a technical loss on the opponent's
+watchdog for a protection nobody asked for. An inbound flood detector on the
+turn loop watches the *opponent's* message rate instead, but only ever
+reports it — dropping a legal turn to defend against a suspected flood would
+forfeit the match to the very peer under suspicion.
+
+Every model call's real cost — Ollama's own `prompt_eval_count` /
+`eval_count`, never estimated — lands in a per-match ledger and is reported in
+the summary (`tokens`), alongside the gate's own counters (`gatekeeper`) and
+the inbound reading (`inbound_dos`), so the end-of-game JSON shows the rate
+limiter was actually in the path, not merely present in the config (Appendix
+He rule 54).
 
 ## The windows
 
@@ -173,9 +226,10 @@ src/police_agent/
   gui/          the live board window and the Visual Replay Player
   domain/       board geometry, actions, own state, rules, scoring, commit-reveal
   strategy/     the police brain: chase heuristic, barrier policy, threat estimate
-  infra/        FastMCP server (my mailbox) and client (the opponent's URL)
+  infra/        FastMCP server (my mailbox), client (the opponent's URL), the
+                ngrok tunnel (tunnel.py + ngrok_agent.py)
   peer/         the runtime: handshake, turn loop, sealing, audit, wire protocol
-  shared/       config loading, version (rate limiting not implemented)
+  shared/       config loading, version, the API Gatekeeper and token ledger
 config/police/
   game.json          shared, signed terms — byte-identical with the thief's copy
   game.toml.example  template for this peer's private, uncommitted config
@@ -217,7 +271,7 @@ played against a test double with no sockets and no opponent process.
 
 ```
 uv sync
-uv run pytest --cov              # 236 tests, 99% coverage (floor: 85%)
+uv run pytest --cov              # 583 tests, 100% coverage (floor: 85%)
 uv run pytest -m "not slow"      # skip the tests that bind real sockets
 uv run ruff check .
 uv run ruff format --check .
@@ -232,7 +286,7 @@ shared ones:
   byte-identical to the thief's copy; the pre-game signature exchange refuses to
   play on any mismatch.
 - **`config/police/game.toml`** — this peer's private config (ports, opponent
-  URL, strategy and LLM choices). Never committed; copy
+  URL, reserved ngrok domain, strategy and LLM choices). Never committed; copy
   `game.toml.example` to create it.
 
 Never commit credentials. `.gitignore` excludes `.env`, `*token*.json`,

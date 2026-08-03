@@ -63,9 +63,29 @@ def build_summary(runtime, result: str, winner: str | None, audit: dict) -> dict
         # How far the thief's words survived contact with its own scent trail.
         # Below 0.5 is a peer that talked its way into being disbelieved.
         "opponent_reliability": round(runtime.analyst.reliability, 3),
+        "tokens": _tokens(runtime),
+        # Evidence that the rate limiter was in the path, not merely present:
+        # the counters say how many outbound calls it admitted, queued, retried
+        # and refused, and `inbound_dos` reports how hard the opponent pushed.
+        "gatekeeper": runtime.gatekeeper.snapshot(),
+        "inbound_dos": runtime.inbound_dos.snapshot(),
         "hint_readings": runtime.handler.readings,
         "disputes": runtime.disputes,
         "records": runtime.records,
         "history": runtime.handler.history,
         "my_log": runtime.state.log,
+    }
+
+
+def _tokens(runtime) -> dict:
+    """What this sub-game consumed, against the series budget (Appendix He 54).
+
+    The series total is deliberately absent rather than guessed: a sub-game runs
+    in its own process and cannot see its siblings' spend. It is the sum of
+    `tokens_total` across the series' summaries, which is a figure the report can
+    add up from files it has -- unlike one this peer would have to invent.
+    """
+    return {
+        **runtime.tokens.snapshot(),
+        "budget_per_series": runtime.config.get("game.token_budget_per_series"),
     }

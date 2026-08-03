@@ -216,6 +216,76 @@ public repository would be redistribution.
       already exist here and the runtime ignores both; the opponent would have to
       agree to honour it, which is a cross-repo conversation
 
+## Step 5b — Gatekeeper, token accounting, public tunnelling (done)
+
+Three mandatory Appendix He rules with nothing behind them: the five
+`rate_limiter_gatekeeper` values sat signed in `game.json` unread (rules 28/29),
+no summary field reported model token spend (rule 54), and this peer could only
+ever play an opponent on `127.0.0.1` (rule 10, ch. 2.4).
+
+- [x] `shared/rate_limit.py`: `TokenBucket` (continuous refill) and
+      `DosDetector` (sliding-window anomaly, latches once tripped) — the two
+      measuring instruments, deciding nothing themselves
+- [x] `shared/admission.py`: `AdmissionQueue` — strict FIFO waiting line over the
+      bucket and a concurrency cap; only the configured depth is a hard refusal,
+      everything shorter queues rather than drops (the scorecard's "overload is
+      queued, not dropped or crashed")
+- [x] `shared/gatekeeper.py`: `Gatekeeper` — the policy built from both:
+      DOS check → queue → bucket → retry/backoff, with counters for the report.
+      **Scoped to outbound calls to a third party only.** The peer-to-peer MCP
+      transport is deliberately excluded and calls out directly
+      (`infra/mcp_client.py`): those are our own turns, there is no 429 waiting
+      on the other end, and throttling them would trade a technical loss on the
+      opponent's watchdog for a protection nobody asked for
+- [x] The inbound half is the opposite policy on the same instrument
+      (`peer/runtime.py._turn_loop`): every incoming message is counted by a
+      second `DosDetector`, but a tripped reading only ever reaches the summary
+      (`inbound_dos`) — a peer that dropped a turn to defend against a suspected
+      flood would forfeit the very match it was defending
+- [x] `shared/tokens.py`: `Usage` / `TokenLedger` — counts only what Ollama's own
+      reply reports (`prompt_eval_count`/`eval_count`), never estimated. Threaded
+      through the existing `ask(prompt, system) -> str` seam
+      (`infra/ollama.py`, `strategy/talk.py`, `strategy/bluff.py`) without
+      changing it: a plain two-argument stand-in is still a valid asker and
+      simply consumes nothing, so no test injection site needed updating
+- [x] One `Gatekeeper` and one `TokenLedger` built per `PoliceRuntime`, shared by
+      both halves of the verbal layer (hint-writing and hint-reading) — two
+      gates would let through twice the agreed rate
+- [x] `peer/summary.py`: `tokens`, `gatekeeper`, `inbound_dos` blocks in the
+      match record
+- [x] `infra/tunnel.py` + `infra/ngrok_agent.py`: wraps `ngrok` as a subprocess,
+      opt-in behind `--tunnel` so the local/two-peers-on-one-machine default is
+      unaffected. The authtoken is never read, stored or logged — ngrok supplies
+      it from its own config (`ngrok config add-authtoken`, run once by the
+      user). A reserved static domain is private config (`game.toml`, not the
+      signed `game.json`); the public URL is read back from ngrok's local agent
+      API, never parsed from its terminal output
+- [x] `sdk/agent.py`: `tunnel_domain` / `public_url` properties; `connect()`
+      opens the tunnel *after* the server binds, so an opponent already dialling
+      a reserved domain is never refused by a port nothing is listening on yet
+- [x] Verified end to end against real ngrok (unauthenticated case): the exact
+      "run `ngrok config add-authtoken`" message, correct exit code, no traceback
+- [ ] **Not yet verified against an authenticated tunnel on a reserved domain.**
+      Needs the account's authtoken configured on the machine that runs the
+      league match
+- [ ] **`max_retries` is a ceiling, not a quota** — a call's `budget` (seconds)
+      can cut it short before the ceiling is reached, deliberately, so a taunt
+      sharing its turn with the opponent's watchdog gives up rather than keeps
+      trying. Worth restating in the report: it satisfies rule 28's *minimum*,
+      not a promise to always retry that many times
+- [ ] **No quota manager (daily counter).** Ch. 9.3.1's first gate, ahead of the
+      bucket; belongs with the Gmail client, which does not exist yet. The
+      Gatekeeper's `counts` dict stands in for its ledger for now
+- [ ] **No `tokens_series` field.** A sub-game runs in its own process and
+      cannot see its siblings' spend; the series total is the sum of
+      `tokens_total` across the series' summary files, a figure the report can
+      compute — not one this peer should invent
+- [ ] **A free ngrok account allows one tunnel at a time.** Both peers cannot
+      tunnel from the same machine; the error message says so and how to clear
+      it (`pkill -f 'ngrok http'` or the ngrok dashboard)
+- [ ] **`--tunnel --gui` opens the tunnel but the window does not show the
+      public URL.** It is only printed on the headless path today
+
 ## Step 3 — Local playable simulation (superseded)
 
 Overtaken by the runtime above: the scripted match driver this step called for
