@@ -19,6 +19,7 @@ import random
 import re
 
 from police_agent.infra.ollama import DEFAULT_MODEL, DEFAULT_URL, ollama_asker
+from police_agent.shared.gatekeeper import Gatekeeper, GateLimits
 
 # The fallback, and only the fallback: Ollama is the mechanism. A model that is
 # missing, down or slow costs the banter and nothing else. These name no place.
@@ -93,12 +94,19 @@ class HintWriter:
         return f"{mood} {heard}"
 
 
-def resolve_hint_writer(config=None, rng: random.Random | None = None) -> HintWriter:
+def resolve_hint_writer(
+    config=None, rng: random.Random | None = None, gate=None, ledger=None
+) -> HintWriter:
     """Build the hint writer from this peer's private `[trash_talk]` block.
 
     Every key here is private tuning. The one agreed value it reads is
     `play.hint_max_words`, which is signed: both peers hold the same cap, so a
     longer line breaks the terms rather than merely looking greedy.
+
+    `gate` and `ledger` are passed down by the runtime so that writing a taunt
+    and reading one share a single rate limiter and a single token tally. Left
+    out, this builds its own of each, which is right for a standalone caller and
+    wrong for a match -- two gates would let through twice the agreed rate.
     """
     get = config.get if config is not None else (lambda _key, default=None: default)
     # `or` rather than a bare default throughout: a key present but empty or null
@@ -113,19 +121,25 @@ def resolve_hint_writer(config=None, rng: random.Random | None = None) -> HintWr
         # because a typo in a private config should cost banter, not the match.
         return HintWriter(None, setting, max_words, every, rng)
 
-    return HintWriter(asker_from_config(get), setting, max_words, every, rng)
+    return HintWriter(asker_from_config(get, gate, ledger), setting, max_words, every, rng)
 
 
-def asker_from_config(get):
+def asker_from_config(get, gate=None, ledger=None):
     """The local model this peer talks to, from its private `[trash_talk]` block.
 
     Shared with `strategy/bluff.py`: writing a taunt and reading one are the same
     model on the same server, and configuring them apart would only get them out
-    of step."""
+    of step. The gate is built from the *agreed* limits when none is handed down,
+    so even an asker made in isolation is behind the rate limiter.
+    """
+    timeout = float(get("trash_talk.timeout_seconds") or 5.0)
     return ollama_asker(
         model=get("trash_talk.model") or DEFAULT_MODEL,
         url=get("trash_talk.ollama_url") or DEFAULT_URL,
-        timeout=float(get("trash_talk.timeout_seconds") or 5.0),
+        timeout=timeout,
+        gate=gate or Gatekeeper(GateLimits.from_getter(get)),
+        ledger=ledger,
+        budget=float(get("trash_talk.budget_seconds") or timeout),
     )
 
 

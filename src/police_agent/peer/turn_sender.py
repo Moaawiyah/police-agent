@@ -18,6 +18,10 @@ from police_agent.peer.sealing import build_turn_message, sealed_step_record
 
 def take_turn(runtime, claim_response: dict | None = None) -> None:
     """Compute this peer's turn, commit to it locally, and hand it to the opponent."""
+    # Opens this step's token accounting (Appendix He 54). Marked before the
+    # brain runs rather than after the hint is written, so anything the turn
+    # spends on a model is attributed to the turn that spent it.
+    runtime.tokens.begin_step()
     decision = runtime.brain.decide(runtime.state, runtime.threat, runtime.barriers_max)
     if not runtime.state.apply_move(decision.action, runtime.barriers_max):
         # The brain is contractually forbidden from returning an illegal action,

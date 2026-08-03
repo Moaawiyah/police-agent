@@ -115,17 +115,21 @@ class BluffAnalyst:
             self.contradicted += 1
 
 
-def resolve_bluff_analyst(config=None) -> BluffAnalyst:
+def resolve_bluff_analyst(config=None, gate=None, ledger=None) -> BluffAnalyst:
     """Build the analyst from this peer's private config.
 
     Shares `trash_talk.provider` with `strategy/talk.py`: one switch decides
     whether this peer has a local model at all. Without one the hints are still
     read, by keyword -- worse recall, no network, and the scoring is unchanged.
+
+    It shares the rate limiter and the token ledger with the hint writer too,
+    when the runtime supplies them: reading a hint and answering it are two calls
+    to one server on one budget, and counting them apart would under-report both.
     """
     from police_agent.strategy.talk import asker_from_config
 
     get = config.get if config is not None else (lambda _key, default=None: default)
     provider = str(get("trash_talk.provider") or "ollama").lower()
     gain = float(get("bluff.gain") or DEFAULT_GAIN)
-    ask = asker_from_config(get) if provider == "ollama" else None
+    ask = asker_from_config(get, gate, ledger) if provider == "ollama" else None
     return BluffAnalyst(ask, gain)
