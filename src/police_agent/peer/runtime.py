@@ -35,6 +35,9 @@ from police_agent.peer.terms import validate_agreement
 from police_agent.peer.turn_handler import TurnHandler
 from police_agent.peer.turn_sender import take_turn
 from police_agent.peer.view import snapshot
+from police_agent.shared.gatekeeper import Gatekeeper
+from police_agent.shared.rate_limit import DosDetector
+from police_agent.shared.tokens import TokenLedger
 from police_agent.strategy import resolve_brain
 from police_agent.strategy.belief import BeliefGrid
 from police_agent.strategy.bluff import resolve_bluff_analyst
@@ -72,11 +75,29 @@ class PoliceRuntime:
         self.rules = GameRules(self.terms["max_steps"], config.require("rules.survival_threshold"))
         self.barriers_max = self.terms["barriers_max"]
 
+        # One gate and one ledger for the whole match. Every outbound call to
+        # somebody else's service leaves through the gate (Appendix He 28) and
+        # every model call this peer makes lands in the tally (Appendix He 54);
+        # building them here is what stops the two halves of the verbal layer
+        # from quietly running two rate limiters at twice the agreed rate.
+        self.gatekeeper = Gatekeeper.from_config(config)
+        self.tokens = TokenLedger()
+        # The inbound flood line, phrased as "fast enough to fill the gate's
+        # whole waiting line inside one second" so that it moves with the agreed
+        # queue depth rather than being a number somebody picked: at the shipped
+        # 100 it is 100 messages a second. A legal turn costs an HTTP round trip
+        # plus the opponent's own thinking, so a real match sits two orders of
+        # magnitude below it -- which is the point. This reading must never be
+        # able to accuse an honest peer.
+        self.inbound_dos = DosDetector(self.gatekeeper.limits.queue_depth * 60.0)
+
         self.threat = threat or BeliefGrid.from_config(self.terms, config)
         self.brain = brain or resolve_brain(config)
         self.scent = scent or ScentField.from_terms(self.terms)
-        self.hint_writer = hint_writer or resolve_hint_writer(config)
-        self.analyst = analyst or resolve_bluff_analyst(config)
+        self.hint_writer = hint_writer or resolve_hint_writer(
+            config, gate=self.gatekeeper, ledger=self.tokens
+        )
+        self.analyst = analyst or resolve_bluff_analyst(config, self.gatekeeper, self.tokens)
         self.handler = TurnHandler(self.state, self.threat, self.rules, self.analyst)
 
         self._listener = listener
@@ -132,6 +153,14 @@ class PoliceRuntime:
                 # a technical loss for the thief and not a timeout of the game.
                 self._result = (TECHNICAL_LOSS, "police")
                 return
+            # Measured, never acted on. Appendix He 29 wants a DOS detector on
+            # the network resources, and this is where every inbound message
+            # can be counted -- but dropping or delaying a turn to defend
+            # ourselves would forfeit the match to the very peer we suspected.
+            # So the reading goes in the summary and the status line, and the
+            # turn is played. The gate that can actually refuse traffic is the
+            # outbound one, where the cost of being wrong is a missing taunt.
+            self.inbound_dos.record()
             self._apply_incoming(TurnMessage.from_dict(incoming))
 
     def _apply_incoming(self, message: TurnMessage) -> None:

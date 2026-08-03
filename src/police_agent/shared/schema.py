@@ -35,6 +35,15 @@ _TRANSLATION: tuple[tuple[str, str], ...] = (
     ("network_and_league.response_timeout_sec", "network.response_timeout_seconds"),
     ("network_and_league.watchdog_timeout_sec", "network.watchdog_timeout_seconds"),
     ("network_and_league.num_games", "game.num_games"),
+    ("network_and_league.token_budget_per_series", "game.token_budget_per_series"),
+    # Appendix Vav table 19, the Gatekeeper's limits. Every one is status
+    # "minimum": absent from the agreed file, `shared/gatekeeper.py` supplies the
+    # example value rather than leaving the door unguarded.
+    ("rate_limiter_gatekeeper.requests_per_minute", "gatekeeper.requests_per_minute"),
+    ("rate_limiter_gatekeeper.concurrent_requests", "gatekeeper.concurrent_requests"),
+    ("rate_limiter_gatekeeper.retry_backoff_sec", "gatekeeper.retry_backoff_seconds"),
+    ("rate_limiter_gatekeeper.max_retries", "gatekeeper.max_retries"),
+    ("rate_limiter_gatekeeper.queue_depth", "gatekeeper.queue_depth"),
 )
 
 
