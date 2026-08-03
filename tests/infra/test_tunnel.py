@@ -15,7 +15,8 @@ from pathlib import Path
 import pytest
 
 from police_agent.exceptions import ConfigError, TransportError
-from police_agent.infra.tunnel import NgrokTunnel, _agent_tunnels, _tail, open_tunnel
+from police_agent.infra.ngrok_agent import _agent_tunnels, _tail
+from police_agent.infra.tunnel import NgrokTunnel, open_tunnel
 
 DOMAIN = "cops.ngrok-free.app"
 PUBLIC = f"https://{DOMAIN}"
