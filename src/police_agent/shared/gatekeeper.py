@@ -4,7 +4,9 @@ Appendix He 28 and 29 make the token bucket and the DOS detector mandatory, and
 ch. 11 scores the pattern itself: one central chokepoint doing rate limiting,
 queueing, retry and logging, with nothing slipping past it. Figure 13 draws the
 three gates a request crosses -- quota, bucket, anomaly detector -- and this is
-that chain, with `counts` standing in for the quota manager's ledger.
+that chain. The quota is optional because only one caller has a daily allowance
+to protect: the local Ollama server has none, and the Gmail reporter supplies its
+own (`shared/quota.py`).
 
 **What goes through it.** Outbound calls to somebody else's service. Today the
 only one is the local Ollama server behind `infra/ollama.py`; the Gmail reporting
@@ -31,6 +33,7 @@ from dataclasses import asdict, dataclass
 
 from police_agent.exceptions import PoliceAgentError
 from police_agent.shared.admission import AdmissionQueue, GatekeeperOverloadError
+from police_agent.shared.quota import QuotaExceededError
 from police_agent.shared.rate_limit import DosDetector, TokenBucket
 
 # How far above the agreed request rate our own outbound traffic must run before
@@ -39,7 +42,13 @@ from police_agent.shared.rate_limit import DosDetector, TokenBucket
 # turns are seconds apart. Nothing legitimate in this process comes close.
 DOS_ANOMALY_MULTIPLE = 10
 
-__all__ = ["GateLimits", "Gatekeeper", "GatekeeperLockedError", "GatekeeperOverloadError"]
+__all__ = [
+    "GateLimits",
+    "Gatekeeper",
+    "GatekeeperLockedError",
+    "GatekeeperOverloadError",
+    "QuotaExceededError",
+]
 
 
 class GatekeeperLockedError(PoliceAgentError):
@@ -80,8 +89,15 @@ class GateLimits:
 class Gatekeeper:
     """Admits outbound API calls one agreed rate token at a time."""
 
-    def __init__(self, limits: GateLimits | None = None, sleep=time.sleep, clock=time.monotonic):
+    def __init__(
+        self,
+        limits: GateLimits | None = None,
+        sleep=time.sleep,
+        clock=time.monotonic,
+        quota=None,
+    ):
         self.limits = limits or GateLimits()
+        self.quota = quota
         rate = self.limits.requests_per_minute
         self._bucket = TokenBucket(rate, rate / 60.0, clock)
         self._queue = AdmissionQueue(
@@ -108,6 +124,7 @@ class Gatekeeper:
         watchdog must not.
         """
         self.counts["submitted"] += 1
+        self._spend_quota()
         self._check_lock()
         deadline = None if budget is None else self._clock() + budget
         try:
@@ -126,8 +143,27 @@ class Gatekeeper:
             "limits": asdict(self.limits),
             **self.counts,
             "queued": self._queue.queued,
+            "quota": self.quota.snapshot() if self.quota is not None else None,
             "dos": self.dos.snapshot(),
         }
+
+    def _spend_quota(self) -> None:
+        """The first gate: is there any allowance left today at all (ch. 9.3.1)?
+
+        Ahead of everything else because it is the cheapest question and the one
+        with no remedy: a call the bucket delays goes out a second later, and a
+        call past the daily allowance does not go out today. Spent once per
+        submission rather than once per attempt -- the allowance counts reports,
+        and a retry of the same report is the same report; `max_retries` is what
+        bounds the calls one submission may make.
+        """
+        if self.quota is None:
+            return
+        try:
+            self.quota.spend()
+        except QuotaExceededError:
+            self.counts["rejected"] += 1
+            raise
 
     def _check_lock(self) -> None:
         """The third gate: a runaway caller loses the door entirely (ch. 9.3.1)."""
