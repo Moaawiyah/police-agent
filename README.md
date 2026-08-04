@@ -110,9 +110,11 @@ Two gaps are open and both matter before a league match:
 - **The audit checks hashes, not meaning.** A rewritten opponent log is caught.
   A log that hashes correctly but contradicts the claims made during play is
   not yet re-checked. Step 5, partially done.
-- **Gmail reporting is not built.** The Gatekeeper is designed to take the
-  Gmail client without changes once it exists (`shared/gatekeeper.py`), but
-  nothing sends the mandatory signed end-of-game JSON yet (Appendix He 32/34).
+- **The Gmail send path has never run against Google.** The whole reporting
+  chain is built and tested (`--report`, below), but only the offline half has
+  been exercised for real: the default writes a local `.eml` draft, and the
+  live send is proven against a stand-in for Google's client library rather
+  than against Google. Run it once, deliberately, before the league.
 
 See [docs/PLAN.md](docs/PLAN.md) for the build order, [docs/TODO.md](docs/TODO.md)
 for what is carried forward, and [docs/PRD.md](docs/PRD.md) for the product
@@ -127,6 +129,7 @@ Both peers are separate processes. Copy `game.toml.example` to `game.toml`, set
 uv run police-agent                          # uses config/police/game.toml
 uv run police-agent --port 8801 --opponent http://127.0.0.1:8802/mcp
 uv run police-agent --summary result.json    # also write the match record
+uv run police-agent --report                 # write the four report artifacts
 uv run police-agent --gui                    # play with the live board window
 uv run police-agent --tunnel                 # league play: publish a public URL
 ```
@@ -182,6 +185,103 @@ the inbound reading (`inbound_dos`), so the end-of-game JSON shows the rate
 limiter was actually in the path, not merely present in the config (Appendix
 He rule 54).
 
+## The step-zero declaration and the mandatory report
+
+### Before the first move
+
+Appendix He rule 24 requires a signed hardware declaration and rule 53 the
+commit hash of the code being played. Ch. 5.5 makes them one object: a
+"step-zero" record, built *before* the first move, carrying the machine spec,
+the code version, the commit, the group and the sub-game number.
+
+The chapter's point is that the declaration must be unforgeable in retrospect.
+Writing the specs into a report at the end would not be — by then the match is
+over and a peer that lost could describe whatever hardware flattered it. So the
+declaration is sealed under the same commit-reveal this repository already uses
+for turns (`peer/step_zero.py`), its digest is handed to the opponent during the
+handshake, and its nonce is not revealed until the end-of-game audit. It rides
+at `records[0]`, so a tampered declaration fails the log audit as step 0 like
+any other rewritten record.
+
+Every probe is best effort and none of them raises (`infra/hardware.py`,
+`infra/gitcommit.py`). A figure that cannot be measured is the literal
+`"unknown"`, never a guess: the declaration is signed, and an invented number in
+it would be a false statement this peer cryptographically stands behind. A dirty
+working tree is reported as its own boolean beside the hash rather than as a
+`-dirty` suffix, so `github_commit` stays something the grader can check out.
+
+### The four artifacts
+
+`--report` writes ch. 9.3.3's four JSON files under
+`logs/<your group id>/`, every filename derived from the `game_id` so files from
+two matches can never be mixed, and all four carrying one `game_uid`:
+
+```
+declaration_<game_id>.json      what holds across the whole series
+config_<game_id>_gNN.json       the agreed physics and scoring, hashed
+log_<game_id>_gNN.json          every sealed record, for the replay simulator
+result_<game_id>.json           the binding one, mailed to the lecturer
+```
+
+A fifth file, `record_<game_id>_gNN.json`, is the raw match record. It is not a
+schema artifact and `links` does not mention it: the result must cover *every*
+sub-game while a sub-game runs in its own process, so each run files its record
+and a later run picks its siblings up from there.
+
+### Mailing it
+
+Rule 32 has each team send the report itself, and rule 35 attaches the sanction:
+if either report is missing, **neither** team scores for the match, however the
+board went. Rule 34 fixes the form — structured, machine-readable JSON as an
+attached file. The body here says where the report is and carries no game data.
+
+Off by default. `email.enabled = false` and `email.mode = "draft"` in
+`game.toml`, and both have to be changed deliberately before anything leaves the
+machine. Google's libraries are an optional extra (`uv pip install
+'police-agent[gmail]'`) imported lazily, so a default run needs no Google
+account, no `credentials.json` and no network at all.
+
+Every real send crosses ch. 9.3.1's gates: a daily quota (`shared/quota.py`,
+persisted so a series of sub-games in separate processes cannot each believe it
+is the first), then the token bucket, then the anomaly detector. The mail gate is
+a separate `Gatekeeper` from the runtime's — figure 13's gates protect a
+*provider's* allowance, and Ollama's rate window is not Google's.
+
+### Where we deviate from the specification, and why
+
+1. **"Signed with a pre-supplied key" (ch. 5.5) vs. a keyless SHA-256.** The
+   course reference's per-group `signature` is a plain hash of the block, so
+   anybody who can recompute it can forge it. We emit that field for interop
+   with the opposing team's parser, and satisfy the chapter separately through
+   commit-reveal: the same declaration sealed, its digest published at the
+   handshake, its nonce withheld until the audit. That is a real
+   non-retroactive-forgery property, with no PKI the course never issues.
+2. **`gmail.send` cannot create a Gmail draft.** `users.drafts.create` needs
+   `gmail.compose`, a broader grant than rule 30 and Appendix Alef step Gimel
+   allow. So `mode = "draft"` writes a local `.eml` file. Rule 30 wins.
+3. **Appendix Alef's sample mails a free-text body; rule 34 forbids one.** The
+   report is an attachment and the body carries no game data. The rule wins.
+4. **Hardware: five fields in ch. 5.5, six in the reference block, eight
+   internally.** The artifact publishes the reference's six (`gpu_type` →
+   `gpu_model`); all eight stay in the sealed payload, which is where ch. 5.5's
+   requirement actually has to be met and where no foreign parser can object.
+5. **`mutual_agreement.sha256` is symmetric in the result and asymmetric in the
+   log.** The log's is over *this* peer's own records — it is one peer's
+   testimony, and a digest matching the opponent's would mean we had hashed
+   something other than what we are testifying to. Only `confirmed` is
+   comparable there. The result's covers the agreed outcome and both peers must
+   land on it. This looks like a bug; it is stated in both files' `_remark`.
+6. **The opponent's token spend is always `0`.** No peer can measure another's,
+   and an estimate would be a number nobody could check. It is excluded from the
+   symmetric digest so an honest zero can never cause a disagreement.
+7. **`config_sha256` is over the whole agreed `game.json`, not the handshake
+   subset.** `peer/terms.py` compares a subset on the wire on purpose (a term
+   the opponent's build does not know would fail every negotiation), but ch. 9.2
+   loads the agreed file byte-identically on both sides precisely so it can be
+   hashed consistently, and the lecturer compares files rather than handshakes.
+8. **Three unrelated `schema_version`s** — `game.json` 1.2, `game.toml` 1.10,
+   the artifacts 1.1. The artifact literal versions the artifact, not us.
+
 ## The windows
 
 Two of them, over the same board canvas, because a screenshot of one is only
@@ -227,9 +327,13 @@ src/police_agent/
   domain/       board geometry, actions, own state, rules, scoring, commit-reveal
   strategy/     the police brain: chase heuristic, barrier policy, threat estimate
   infra/        FastMCP server (my mailbox), client (the opponent's URL), the
-                ngrok tunnel (tunnel.py + ngrok_agent.py)
-  peer/         the runtime: handshake, turn loop, sealing, audit, wire protocol
-  shared/       config loading, version, the API Gatekeeper and token ledger
+                ngrok tunnel (tunnel.py + ngrok_agent.py), the Gmail reporter
+                (gmail.py + gmail_client.py), the hardware and commit probes
+  peer/         the runtime: handshake, turn loop, sealing, audit, wire protocol,
+                the sealed step-zero declaration
+  report/       the four mandatory JSON artifacts (ch. 9.3.3) and their writer
+  shared/       config loading, version, the API Gatekeeper, the daily quota and
+                the token ledger
 config/police/
   game.json          shared, signed terms — byte-identical with the thief's copy
   game.toml.example  template for this peer's private, uncommitted config
@@ -256,6 +360,9 @@ agent = PoliceAgentSDK(MatchOptions(port=8801, opponent_url="http://127.0.0.1:88
 agent.connect()  # my mailbox opens, the opponent's URL is dialled
 summary = agent.play()  # one sub-game, to a result
 agent.save_summary(summary, "result.json")
+
+paths = agent.write_artifacts(summary)  # the four mandatory JSON artifacts
+agent.email_report(paths)               # None unless [email] switches it on
 ```
 
 The layer holds no game rules. It decides *which* objects are built and with
@@ -271,7 +378,7 @@ played against a test double with no sockets and no opponent process.
 
 ```
 uv sync
-uv run pytest --cov              # 583 tests, 100% coverage (floor: 85%)
+uv run pytest --cov              # 798 tests, 100% coverage (floor: 85%)
 uv run pytest -m "not slow"      # skip the tests that bind real sockets
 uv run ruff check .
 uv run ruff format --check .
@@ -286,9 +393,16 @@ shared ones:
   byte-identical to the thief's copy; the pre-game signature exchange refuses to
   play on any mismatch.
 - **`config/police/game.toml`** — this peer's private config (ports, opponent
-  URL, reserved ngrok domain, strategy and LLM choices). Never committed; copy
-  `game.toml.example` to create it.
+  URL, reserved ngrok domain, strategy and LLM choices, and the `[email]` block:
+  the recipient, the send mode, the credential paths and the daily cap). Never
+  committed; copy `game.toml.example` to create it.
 
-Never commit credentials. `.gitignore` excludes `.env`, `*token*.json`,
-`*.credentials.json` and the private `game.toml`; a leaked secret stays in git
-history permanently even after deletion (Appendix ג).
+The `[email]` settings stay private deliberately. The recipient, the paths and
+the daily limit are this peer's own, no opponent verifies them, and adding a key
+to the signed `game.json` would break byte-identity with the thief's copy.
+
+Never commit credentials. `.gitignore` excludes `.env`, the private `game.toml`,
+and both halves of the Gmail OAuth pair by the exact names Appendix א has you
+download them under — `credentials.json` and `token.json` literally, because
+`*.credentials.json` does not match a bare `credentials.json`. A leaked secret
+stays in git history permanently even after deletion (Appendix ג).

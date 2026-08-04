@@ -201,16 +201,15 @@ public repository would be redistribution.
 - [x] Both windows built, driven and closed cleanly against real Tk
 - [ ] **Screenshots for the report (ch. 9.4.2) are not taken.** Needs a live
       match against the thief peer, not a scripted log
-- [ ] **The mandatory Gmail report is not built.** Step 8's other half:
-      `[email]` sits in `game.toml.example` and nothing reads it
+- [x] **The mandatory Gmail report.** Built in step 9 below
 - [ ] **Replay cannot show the hints this peer sent.** They are nowhere in the
       summary — the sealed payload is the peer's *truth* and a taunt is not, and
       the wire message is not logged. Live play shows them because the `moved`
       event carries one. Recording them would make the log complete
-- [ ] **No sub-game selector.** The reference discovers sibling logs by a
-      `log_<game_id>_gNN.json` naming convention and this repo has none: one run
-      writes one `--summary` file. A series driver is the prerequisite, not the
-      widget
+- [ ] **No sub-game selector.** The naming convention now exists (step 9's
+      `report/writer.py` writes `log_<game_id>_gNN.json` and discovers siblings),
+      but nothing in the replay window offers a list of them. A series driver is
+      still the prerequisite, not the widget
 - [ ] **No bidirectional control channel.** The reference lets one peer ask the
       other to restart a series. `ControlMessage` and `McpTransport.poll_control`
       already exist here and the runtime ignores both; the opponent would have to
@@ -273,18 +272,64 @@ ever play an opponent on `127.0.0.1` (rule 10, ch. 2.4).
       sharing its turn with the opponent's watchdog gives up rather than keeps
       trying. Worth restating in the report: it satisfies rule 28's *minimum*,
       not a promise to always retry that many times
-- [ ] **No quota manager (daily counter).** Ch. 9.3.1's first gate, ahead of the
-      bucket; belongs with the Gmail client, which does not exist yet. The
-      Gatekeeper's `counts` dict stands in for its ledger for now
-- [ ] **No `tokens_series` field.** A sub-game runs in its own process and
-      cannot see its siblings' spend; the series total is the sum of
-      `tokens_total` across the series' summary files, a figure the report can
-      compute — not one this peer should invent
+- [x] **Quota manager (daily counter).** Ch. 9.3.1's first gate, built in step 9
+      below as `shared/quota.py` and spent by the Gatekeeper ahead of everything
+      else. Optional, so the Ollama path is unaffected
+- [x] **The series token total.** Still absent from the per-sub-game summary, and
+      deliberately: a sub-game runs in its own process and cannot see its
+      siblings' spend. Step 9's result artifact adds it up from the filed records
+      instead (`tokens_used.total`), which is computing it rather than inventing it
 - [ ] **A free ngrok account allows one tunnel at a time.** Both peers cannot
       tunnel from the same machine; the error message says so and how to clear
       it (`pkill -f 'ngrok http'` or the ngrok dashboard)
 - [ ] **`--tunnel --gui` opens the tunnel but the window does not show the
       public URL.** It is only printed on the headless path today
+
+## Step 9 — Step-zero declaration and the reporting chain (done)
+
+Four mandatory Appendix ה rules with no code at all: the signed hardware
+declaration (24), the commit hash of the code played (53), the Gmail report of a
+mandatory JSON as an attachment under a send-only scope (30/32/34/51), and the
+daily quota ahead of the token bucket (28). Rule 35's sanction for a missing
+report is nought for **both** teams, so this was the most expensive gap open.
+
+- [x] `infra/hardware.py`: an eight-field machine spec, cached per process.
+      Every probe may fail and none may raise — a figure that cannot be measured
+      is the literal `"unknown"`, because the declaration is signed and an
+      invented number in it would be a false statement we stand behind
+- [x] `infra/gitcommit.py`: `commit_hash(config)` / `working_tree_dirty()`.
+      `rev-parse HEAD` so a detached checkout still answers; a configured
+      `game.github_commit` wins, for running from a build with no `.git`. The
+      dirty flag is its own boolean, not a `-dirty` suffix, so the hash stays
+      something the grader can check out
+- [x] `peer/step_zero.py`: rules 24 and 53 as one sealed record (ch. 5.5), built
+      in `PoliceRuntime.__init__` at `records[0]`, its digest published in the
+      handshake identity before the first move and its nonce revealed only at the
+      audit. A tampered declaration fails the log audit as step 0
+- [x] `report/`: `ids.py` (the shared `game_id`/`game_uid` and the **two**
+      non-interchangeable canonical hash forms), `facts.py`, `declaration.py`,
+      `artifacts.py` (config + log), `result.py`, `writer.py`
+- [x] `shared/quota.py`: `DailyQuota` — persisted across processes, spent by the
+      Gatekeeper before the DOS check. Optional, so Ollama is unaffected
+- [x] `infra/gmail.py` + `gmail_client.py`: `gmail.send` and nothing wider, the
+      report as an `application/json` attachment, Google's libraries an optional
+      extra imported lazily. `enabled = false` and `mode = "draft"` by default,
+      and a "draft" is a local `.eml` file — `gmail.send` cannot create a Gmail one
+- [x] `--report` / `--report-dir` on the CLI, `write_artifacts` and
+      `email_report` on the SDK, `[email]` documented in `game.toml.example`
+- [x] `.gitignore` bug fixed: `*.credentials.json` never matched a bare
+      `credentials.json`, so the file Appendix א tells you to download was not
+      actually ignored
+- [ ] **The live send has never run against Google.** Everything offline is
+      exercised; the send path is proven against a stand-in for the client
+      library. Run it once, deliberately, before the league
+- [ ] **No series driver.** `--report` writes a result over whatever sub-games
+      are filed, but nothing plays a series: each sub-game is still started by
+      hand with `game.sub_game_number` set in `game.toml`
+- [ ] **The opponent's declaration is not audited.** Its step-zero record arrives
+      in the reveal and its hash is re-verified like any other, but nothing
+      checks that the hardware it declared is plausible or that the commit it
+      names exists. Part of the same semantic audit step 5 still owes
 
 ## Step 3 — Local playable simulation (superseded)
 
