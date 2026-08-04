@@ -51,10 +51,9 @@ def _stub_machine_probes(monkeypatch):
     """
     for module in _PROBE_CONSUMERS:
         monkeypatch.setattr(f"{module}.hardware_spec", lambda: dict(STUB_SPEC), raising=False)
-        monkeypatch.setattr(
-            f"{module}.commit_hash", lambda config=None: STUB_COMMIT, raising=False
-        )
+        monkeypatch.setattr(f"{module}.commit_hash", lambda config=None: STUB_COMMIT, raising=False)
         monkeypatch.setattr(f"{module}.working_tree_dirty", lambda: False, raising=False)
+
 
 # The scent constants exactly as the specification fixes them (Appendix Vav,
 # table 16). Spelled out rather than read from the config so that a test proving

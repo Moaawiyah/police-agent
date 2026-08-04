@@ -1,7 +1,7 @@
 import pytest
 
 import police_agent
-from police_agent import domain, infra, peer, sdk, shared
+from police_agent import domain, infra, peer, report, sdk, shared
 
 
 def test_package_importable():
@@ -12,6 +12,7 @@ def test_subpackages_importable():
     assert domain is not None
     assert infra is not None
     assert peer is not None
+    assert report is not None
     assert sdk is not None
     assert shared is not None
 
