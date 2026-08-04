@@ -20,10 +20,14 @@ class FakeCommands:
     def __init__(self, monkeypatch, module, replies=None, system="Darwin") -> None:
         self.replies = replies or {}
         self.calls: list[list[str]] = []
-        monkeypatch.setattr(module.platform, "system", lambda: system)
-        monkeypatch.setattr(module.platform, "release", lambda: "1.0")
-        monkeypatch.setattr(module.platform, "processor", lambda: "generic-cpu")
-        monkeypatch.setattr(module.os, "cpu_count", lambda: 4)
+        # Only the hardware probe asks what platform it is on; the git probe
+        # imports neither, so those patches are applied when they apply.
+        if hasattr(module, "platform"):
+            monkeypatch.setattr(module.platform, "system", lambda: system)
+            monkeypatch.setattr(module.platform, "release", lambda: "1.0")
+            monkeypatch.setattr(module.platform, "processor", lambda: "generic-cpu")
+        if hasattr(module, "os"):
+            monkeypatch.setattr(module.os, "cpu_count", lambda: 4)
         monkeypatch.setattr(module.subprocess, "run", self._run)
 
     def _run(self, command, **_kwargs):
@@ -37,8 +41,12 @@ class FakeCommands:
 
     @staticmethod
     def key(command) -> str:
-        """`sysctl -n hw.memsize` keys on the leaf; everything else on the binary."""
-        return command[-1] if command[0] == "sysctl" else command[0]
+        """Whatever names the probe: the sysctl leaf, the git subcommand, or the binary."""
+        if command[0] == "sysctl":
+            return command[-1]
+        if command[0] == "git":
+            return command[3]  # git -C <root> <subcommand> ...
+        return command[0]
 
     def ran(self, binary: str) -> bool:
         return any(call[0] == binary for call in self.calls)
