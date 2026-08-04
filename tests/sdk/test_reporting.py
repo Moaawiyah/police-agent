@@ -10,6 +10,7 @@ this agent does not really have.
 import json
 
 from police_agent import __main__ as cli
+from police_agent.infra.gmail import draft_path
 from police_agent.sdk import DEFAULT_REPORT_DIR, PoliceAgentSDK
 from tests.conftest import config_with
 from tests.peer.fake_transport import FakeTransport, thief_turn
@@ -58,6 +59,28 @@ class TestTheSdkWritesTheReport:
         assert DEFAULT_REPORT_DIR == "logs"
 
 
+class TestTheSdkMailsTheReport:
+    def test_a_default_run_mails_nobody(self, tmp_path):
+        """`email.enabled` is false in the shipped settings: a practice match must
+        not report itself to the lecturer."""
+        agent = _agent()
+
+        assert agent.email_report(agent.write_artifacts(agent.play(), tmp_path)) is None
+
+    def test_the_result_is_the_artifact_that_gets_sent(self, tmp_path):
+        """Picked here so no caller can mail the wrong one of the four."""
+        agent = _agent(email__enabled=True, email__quota_file=str(tmp_path / "quota.json"))
+        paths = agent.write_artifacts(agent.play(), tmp_path)
+
+        note = agent.email_report(paths)
+
+        assert str(draft_path(paths["result"])) in note
+        assert draft_path(paths["result"]).is_file()
+
+    def test_nothing_is_mailed_when_no_report_was_written(self):
+        assert _agent().email_report({}) is None
+
+
 class TestTheCliFlag:
     def test_report_writes_the_artifacts_where_the_flag_says(self, tmp_path, monkeypatch):
         agent = _StubAgent()
@@ -83,14 +106,32 @@ class TestTheCliFlag:
 
         assert agent.reported == [DEFAULT_REPORT_DIR]
 
+    def test_it_says_so_when_mailing_is_switched_off(self, monkeypatch, capsys):
+        """Silence would read exactly like a report that was sent -- rule 35's
+        one failure mode is a report nobody noticed never went."""
+        monkeypatch.setattr(cli, "PoliceAgentSDK", lambda options: _StubAgent())
+
+        cli.main(["--report"])
+
+        assert "email reporting is off" in capsys.readouterr().err
+
+    def test_it_prints_where_a_sent_report_went(self, monkeypatch, capsys):
+        agent = _StubAgent(mailed="sent to them@example.test as message msg-1")
+        monkeypatch.setattr(cli, "PoliceAgentSDK", lambda options: agent)
+
+        cli.main(["--report"])
+
+        assert "msg-1" in capsys.readouterr().err
+
 
 class _StubAgent:
     """The SDK's reporting surface only, so the CLI test opens no socket."""
 
     host, port, opponent_url, public_url = "127.0.0.1", 8801, "http://elsewhere/mcp", None
 
-    def __init__(self) -> None:
+    def __init__(self, mailed: str | None = None) -> None:
         self.reported: list[str] = []
+        self.mailed = mailed
 
     def connect(self) -> None:
         return None
@@ -100,8 +141,13 @@ class _StubAgent:
 
     def write_artifacts(self, summary: dict, base) -> dict:
         self.reported.append(str(base))
-        return {}
+        return {"result": f"{base}/result.json"}
+
+    def email_report(self, paths: dict) -> str | None:
+        return self.mailed
 
 
-def _agent() -> PoliceAgentSDK:
-    return PoliceAgentSDK(config=config_with(), transport=FakeTransport(incoming=[thief_turn(1)]))
+def _agent(**overrides) -> PoliceAgentSDK:
+    return PoliceAgentSDK(
+        config=config_with(**overrides), transport=FakeTransport(incoming=[thief_turn(1)])
+    )

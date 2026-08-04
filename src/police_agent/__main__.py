@@ -103,9 +103,16 @@ def _report(agent: PoliceAgentSDK, summary: dict, base: str) -> None:
     Printed rather than silent because the result file is the one a human then
     has to see arrive at the lecturer (rule 32), and a report nobody can find is
     the same as a report nobody sent.
+
+    Mailing is attempted straight afterwards and is inert unless `[email]` in
+    `game.toml` switches it on -- the shipped settings write a local draft at
+    most, so a practice match never mails anybody.
     """
-    for role, path in sorted(agent.write_artifacts(summary, base).items()):
+    paths = agent.write_artifacts(summary, base)
+    for role, path in sorted(paths.items()):
         print(f"{role}: {path}", file=sys.stderr)
+    mailed = agent.email_report(paths)
+    print(mailed or "email reporting is off (set email.enabled in game.toml)", file=sys.stderr)
 
 
 def _play_headless(agent: PoliceAgentSDK) -> dict:

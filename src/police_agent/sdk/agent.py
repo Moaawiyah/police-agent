@@ -21,6 +21,7 @@ from pathlib import Path
 
 from police_agent.constants import Role
 from police_agent.exceptions import ConfigError
+from police_agent.infra.gmail import gmail_reporter
 from police_agent.infra.mcp_client import McpTransport
 from police_agent.infra.mcp_server import start_peer_server
 from police_agent.infra.tunnel import open_tunnel
@@ -188,3 +189,15 @@ class PoliceAgentSDK:
         needs the signed scoring table to turn outcomes into league points.
         """
         return write_artifacts(summary, base, self.config)
+
+    def email_report(self, paths: dict) -> str | None:
+        """Mail the binding result artifact to the lecturer (rules 32/34/35).
+
+        Takes the whole path set `write_artifacts` returned and picks the result
+        out of it, because that is the one artifact the specification requires to
+        be sent and picking it here means no caller can send the wrong file.
+
+        Returns None when reporting is switched off, which is the shipped state.
+        """
+        report = paths.get("result")
+        return gmail_reporter(self.config)(report) if report else None

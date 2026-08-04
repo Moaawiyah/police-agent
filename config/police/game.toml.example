@@ -58,6 +58,19 @@ step_seconds = 0.0             # pause after each of my moves; replay defaults t
 model = "claude-opus-4-8[1m]"    # MY choice; the opponent may differ
 step_deadline_seconds = 30       # hard cap on LLM thinking per step
 
+# The mandatory end-of-game report (Appendix He rules 30/32/34/35, ch. 9.3.3).
+# The result artifact is mailed to the lecturer as a JSON ATTACHMENT; the body
+# never carries game data, because a free-text report is rejected (rule 34).
+# Private per-peer settings: the recipient, the paths and the daily cap are mine
+# alone and never belong in the signed game.json.
 [email]
+enabled = false                        # a real API call is opt-in, always
 recipient = "rmisegal+uoh26finalgame@gmail.com"
+# draft = write a local .eml file and call nobody | send = the Gmail API.
+# "draft" is NOT a Gmail draft: creating one needs the gmail.compose scope, and
+# rule 30 fixes this agent's scope at gmail.send, which cannot.
 mode = "draft"
+credentials_file = "credentials.json"  # downloaded per Appendix Alef; gitignored
+token_file = "token.json"              # written by the one-time consent flow; gitignored
+daily_limit = 20                       # ch. 9.3.1's first gate, ahead of the token bucket
+quota_file = "logs/.mail_quota.json"   # where that daily count is remembered across runs

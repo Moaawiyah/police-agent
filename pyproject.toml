@@ -11,6 +11,15 @@ dependencies = [
     "fastmcp>=3.4.5",
 ]
 
+# Needed only to actually send the end-of-game report over the Gmail API. Kept
+# out of the base install so a default run -- reporting off, or writing a local
+# .eml draft -- needs no Google account and touches no network.
+[project.optional-dependencies]
+gmail = [
+    "google-api-python-client>=2.0",
+    "google-auth-oauthlib>=1.0",
+]
+
 [project.scripts]
 police-agent = "police_agent:main"
 
