@@ -22,7 +22,13 @@ import argparse
 import sys
 
 from police_agent.exceptions import PoliceAgentError
-from police_agent.sdk import DEFAULT_CONFIG_DIR, DEFAULT_HOST, MatchOptions, PoliceAgentSDK
+from police_agent.sdk import (
+    DEFAULT_CONFIG_DIR,
+    DEFAULT_HOST,
+    DEFAULT_REPORT_DIR,
+    MatchOptions,
+    PoliceAgentSDK,
+)
 
 
 def _parse_args(argv: list[str] | None) -> argparse.Namespace:
@@ -32,6 +38,16 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--port", type=int, help="overrides network.my_port")
     parser.add_argument("--opponent", help="overrides network.opponent_url")
     parser.add_argument("--summary", help="write the match summary to this JSON file")
+    parser.add_argument(
+        "--report",
+        action="store_true",
+        help="write the four mandatory report artifacts (ch. 9.3.3)",
+    )
+    parser.add_argument(
+        "--report-dir",
+        default=DEFAULT_REPORT_DIR,
+        help=f"where --report writes; files land in <dir>/<group_id>/ (default: {DEFAULT_REPORT_DIR})",
+    )
     parser.add_argument("--gui", action="store_true", help="play with the live board window")
     parser.add_argument("--replay", help="replay a saved match log instead of playing")
     parser.add_argument(
@@ -76,7 +92,20 @@ def main(argv: list[str] | None = None) -> int:
     print(f"result={summary['result']} winner={summary['winner']} steps={summary['steps']}")
     if args.summary:
         agent.save_summary(summary, args.summary)
+    if args.report:
+        _report(agent, summary, args.report_dir)
     return 0
+
+
+def _report(agent: PoliceAgentSDK, summary: dict, base: str) -> None:
+    """Write the four artifacts and say where they went.
+
+    Printed rather than silent because the result file is the one a human then
+    has to see arrive at the lecturer (rule 32), and a report nobody can find is
+    the same as a report nobody sent.
+    """
+    for role, path in sorted(agent.write_artifacts(summary, base).items()):
+        print(f"{role}: {path}", file=sys.stderr)
 
 
 def _play_headless(agent: PoliceAgentSDK) -> dict:
