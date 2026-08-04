@@ -21,6 +21,11 @@ config/police/*.local.toml
 
 # Secrets / credentials
 .env
+# The Gmail OAuth pair, by the exact names Appendix A tells you to download.
+# `*.credentials.json` does NOT match a bare `credentials.json` -- the glob needs
+# something before the dot -- so the literal name has to be listed as well.
+credentials.json
+token.json
 *.credentials.json
 *token*.json
 
@@ -35,3 +40,6 @@ police_thief_p2p.pdf
 
 # Agent worktrees created during multi-agent development sessions
 .claude/worktrees/
+
+# Personal course notes, kept local-only
+hw.md
