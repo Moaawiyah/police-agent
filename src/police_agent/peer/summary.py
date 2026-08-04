@@ -14,7 +14,10 @@ import time
 
 from police_agent.domain.crypto import audit_records
 from police_agent.domain.rules import ABORTED, TAMPER_FORFEIT, TECHNICAL_LOSS
+from police_agent.peer.handshake import identity_from_config
 from police_agent.peer.protocol import AuditPayload
+from police_agent.peer.sealing import now_iso
+from police_agent.peer.step_zero import step_zero_of
 
 SKIPPED_AUDIT = {"passed": False, "verified_steps": 0, "failed_steps": [], "skipped": True}
 
@@ -56,9 +59,16 @@ def build_summary(runtime, result: str, winner: str | None, audit: dict) -> dict
         "unique_cells": runtime.state.unique_cells,
         "barriers_used": runtime.state.my_barriers,
         "started_at": runtime.started_at,
+        "ended_at": now_iso(),
         "duration_seconds": round(time.monotonic() - runtime.started_monotonic, 1),
         "group_name": runtime.config.get("game.group_name", "unnamed"),
         "peer_identity": runtime.peer_identity,
+        # The four report artifacts (ch. 9.3.3) are rebuilt from this file alone,
+        # and they need what was agreed, who we said we were, and what we
+        # declared before moving -- none of which is derivable from the turns.
+        "terms": runtime.terms,
+        "identity": identity_from_config(runtime.config, runtime.records[0]["commit"]),
+        "step_zero": step_zero_of(runtime.records),
         "audit": audit,
         # How far the thief's words survived contact with its own scent trail.
         # Below 0.5 is a peer that talked its way into being disbelieved.

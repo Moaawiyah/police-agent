@@ -81,5 +81,12 @@ def test_the_shipped_config_satisfies_the_agreement(config):
     assert terms["cop_start"] == [0, 0]
 
 
-def test_identity_falls_back_when_the_private_config_is_absent(config):
-    assert identity_from_config(config)["group_id"] == "unknown-group"
+def test_identity_falls_back_when_the_private_config_is_absent():
+    """`config_with` reads only the shared game.json, which is the stated case.
+
+    The `config` fixture cannot express it: it loads the real config directory,
+    so on a machine that has a private `game.toml` -- every developer's -- the
+    group id is present and this test was asserting the opposite of what it ran.
+    It passed only on a clean checkout.
+    """
+    assert identity_from_config(config_with())["group_id"] == "unknown-group"

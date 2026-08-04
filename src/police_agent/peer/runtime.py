@@ -30,6 +30,7 @@ from police_agent.peer.controls import GameControls
 from police_agent.peer.handshake import identity_from_config, negotiate
 from police_agent.peer.protocol import TurnMessage
 from police_agent.peer.sealing import now_iso
+from police_agent.peer.step_zero import sealed_step_zero
 from police_agent.peer.summary import build_summary, exchange_and_audit
 from police_agent.peer.terms import validate_agreement
 from police_agent.peer.turn_handler import TurnHandler
@@ -102,7 +103,9 @@ class PoliceRuntime:
 
         self._listener = listener
         self.controls = controls or GameControls()
-        self.records: list[dict] = []
+        # The declaration heads the log, sealed before anything is played, so its
+        # digest can go out with the handshake below (Appendix He 24/53).
+        self.records: list[dict] = [sealed_step_zero(config)]
         self.disputes: list[str] = []
         self.peer_identity: dict = {}
         self.started_at = now_iso()
@@ -123,8 +126,13 @@ class PoliceRuntime:
 
     def run(self) -> dict:
         """Play one sub-game to a result and return the match summary."""
+        # Handing over the declaration's digest here is what makes it binding:
+        # the opponent holds it before the first move and can recompute it from
+        # the payload and nonce revealed at the audit.
         self.peer_identity = negotiate(
-            self.terms, identity_from_config(self.config), self.transport
+            self.terms,
+            identity_from_config(self.config, self.records[0]["commit"]),
+            self.transport,
         )
         self.started_monotonic = time.monotonic()  # the clock starts at agreement
         self.notify({"type": "negotiated", "peer": self.peer_identity})

@@ -16,6 +16,46 @@ from police_agent.shared.schema import put, translate_shared
 
 CONFIG_DIR = Path(__file__).resolve().parents[1] / "config" / "police"
 
+# What the probes answer in the suite. Every runtime now seals a step-zero
+# declaration, so without this the whole suite would shell out to sysctl and git
+# and a test's result could depend on which machine ran it.
+STUB_SPEC = {
+    "os": "TestOS 1.0",
+    "cpu_type": "Test CPU",
+    "cpu_cores": 4,
+    "cpu_freq_mhz": 2400,
+    "ram_gb": 16.0,
+    "gpu_type": "Test GPU",
+    "gpu_cores_or_cuda": 8,
+    "vram_gb": 4.0,
+}
+STUB_COMMIT = "0" * 40
+
+# Patched at the point of *use*, not at the source module: both consumers
+# `from`-import these names, which binds them at import time, so replacing the
+# attribute on `infra.hardware` would never reach them.
+_PROBE_CONSUMERS = ("police_agent.peer.step_zero", "police_agent.peer.handshake")
+
+
+@pytest.fixture(autouse=True)
+def _stub_machine_probes(monkeypatch):
+    """Pin the machine and the commit for every test that seals a declaration.
+
+    Every runtime now builds a step-zero record, so without this the suite would
+    shell out to sysctl, system_profiler and git on each construction -- slow,
+    and it would make a test's result depend on which machine ran it.
+
+    `tests/infra/test_hardware.py` and `test_gitcommit.py` are unaffected: they
+    import the real functions directly and install their own subprocess fakes,
+    which is exactly what a test *about* the probes should do.
+    """
+    for module in _PROBE_CONSUMERS:
+        monkeypatch.setattr(f"{module}.hardware_spec", lambda: dict(STUB_SPEC), raising=False)
+        monkeypatch.setattr(
+            f"{module}.commit_hash", lambda config=None: STUB_COMMIT, raising=False
+        )
+        monkeypatch.setattr(f"{module}.working_tree_dirty", lambda: False, raising=False)
+
 # The scent constants exactly as the specification fixes them (Appendix Vav,
 # table 16). Spelled out rather than read from the config so that a test proving
 # what a 0.9 centre looks like cannot be quietly rewritten by editing a file.
