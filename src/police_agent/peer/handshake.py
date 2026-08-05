@@ -16,6 +16,9 @@ import secrets
 
 from police_agent.domain.crypto import NONCE_BYTES, CommitReveal
 from police_agent.exceptions import CryptoError, ProtocolError
+from police_agent.infra.gitcommit import commit_hash
+from police_agent.infra.hardware import hardware_spec
+from police_agent.shared.version import CODE_VERSION
 
 
 class Negotiation:
@@ -55,17 +58,34 @@ class Negotiation:
         self.peer_identity = message.get("identity", {})
 
 
-def identity_from_config(config) -> dict:
+def identity_from_config(config, step_zero_commit: str | None = None) -> dict:
     """This peer's public identity, exchanged so each side can name the other.
 
     Per-group rather than per-role: the specification alternates roles across a
     series, so the group is the stable thing to identify.
+
+    It carries the declaration fields too -- hardware, model, code version,
+    commit -- because the pre-game declaration artifact has to describe *both*
+    groups (ch. 9.3.3) and this exchange is the only moment either peer learns
+    anything about the other. `step_zero_commit` is the digest of the sealed
+    declaration: publishing it here, before the first move, is what stops the
+    payload revealed at the audit from being a later invention.
+
+    Safe to grow, unlike `peer/terms.py`. Identity is explicitly never compared
+    (see `verify_peer`), so an added key cannot fail a handshake; an added
+    *term* would fail every one against a peer that did not add it too.
     """
     return {
         "group_id": config.get("game.group_id", "unknown-group"),
         "group_name": config.get("game.group_name", "unnamed"),
         "members": config.get("game.members", []),
         "repos": config.get("game.repos", {}),
+        "mcp_servers": config.get("game.mcp_servers", {}),
+        "llm_model": config.get("llm.model", "none"),
+        "code_version": CODE_VERSION,
+        "hardware_spec": hardware_spec(),
+        "github_commit": commit_hash(config),
+        "step_zero_commit": step_zero_commit or "",
     }
 
 

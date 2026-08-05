@@ -26,11 +26,19 @@ from police_agent.exceptions import CryptoError
 NONCE_BYTES = 16
 
 
-def _canonical(payload: dict[str, Any]) -> str:
+def canonical_json(payload: dict[str, Any]) -> str:
     """Key-order-independent JSON, so two peers hash the same bytes.
 
     Without sorted keys an honest peer could fail its own audit purely because
     its dict happened to be built in a different order.
+
+    The separators are **compact** and that is load-bearing, not styling: this
+    is the exact byte sequence every commitment is taken over, so a stray space
+    would change every digest this repository has ever published. The report
+    layer needs a second, *spacier* canonical form for the artifact signatures
+    the opposing team computes -- see `report/ids.py`, which keeps the two apart
+    and explains which field uses which. Public rather than private because that
+    module has to reach it; it was always what the docstring above called it.
     """
     return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
 
@@ -40,7 +48,7 @@ class CommitReveal:
 
     @staticmethod
     def commit_of(payload: dict[str, Any], nonce: str) -> str:
-        return hashlib.sha256(f"{_canonical(payload)}|{nonce}".encode()).hexdigest()
+        return hashlib.sha256(f"{canonical_json(payload)}|{nonce}".encode()).hexdigest()
 
     @classmethod
     def seal(cls, payload: dict[str, Any]) -> dict[str, str]:

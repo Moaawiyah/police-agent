@@ -21,12 +21,19 @@ from pathlib import Path
 
 from police_agent.constants import Role
 from police_agent.exceptions import ConfigError
+from police_agent.infra.gmail import gmail_reporter
 from police_agent.infra.mcp_client import McpTransport
 from police_agent.infra.mcp_server import start_peer_server
 from police_agent.infra.tunnel import open_tunnel
 from police_agent.peer.runtime import PoliceRuntime
+from police_agent.report.writer import write_artifacts
 from police_agent.sdk.options import MatchOptions
 from police_agent.shared.config import load_config
+
+# Where the four report artifacts land when the caller names no directory. One
+# level above the per-group folder the writer creates, and already this project's
+# home for match logs.
+DEFAULT_REPORT_DIR = "logs"
 
 # Fallbacks for the two transport deadlines, used only when the agreed
 # `game.json` names neither. Both are in the shipped file (Appendix Vav), so
@@ -173,3 +180,24 @@ class PoliceAgentSDK:
         destination = Path(path)
         destination.write_text(json.dumps(summary, indent=2), encoding="utf-8")
         return destination
+
+    def write_artifacts(self, summary: dict, base: str | Path = DEFAULT_REPORT_DIR) -> dict:
+        """Write ch. 9.3.3's four JSON artifacts and return where each landed.
+
+        The agreed config goes with them, because the config artifact hashes the
+        whole signed `game.json` rather than the handshake subset, and the result
+        needs the signed scoring table to turn outcomes into league points.
+        """
+        return write_artifacts(summary, base, self.config)
+
+    def email_report(self, paths: dict) -> str | None:
+        """Mail the binding result artifact to the lecturer (rules 32/34/35).
+
+        Takes the whole path set `write_artifacts` returned and picks the result
+        out of it, because that is the one artifact the specification requires to
+        be sent and picking it here means no caller can send the wrong file.
+
+        Returns None when reporting is switched off, which is the shipped state.
+        """
+        report = paths.get("result")
+        return gmail_reporter(self.config)(report) if report else None

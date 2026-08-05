@@ -2,10 +2,24 @@
 
 import pytest
 
-from police_agent.domain.crypto import CommitReveal, audit_records
+from police_agent.domain.crypto import CommitReveal, audit_records, canonical_json
 from police_agent.exceptions import CryptoError
 
 PAYLOAD = {"step": 1, "position": [2, 3], "move": "MOVE:S"}
+
+
+def test_the_canonical_form_is_sorted_and_compact():
+    """Every commitment is taken over these exact bytes.
+
+    Pinned as a literal rather than recomputed: widening the separators would
+    still round-trip through `json.loads`, so nothing else in the suite would
+    notice, while every digest this peer has ever published would change.
+    """
+    assert canonical_json({"b": 2, "a": [1, 2]}) == '{"a":[1,2],"b":2}'
+
+
+def test_the_canonical_form_does_not_depend_on_key_order():
+    assert canonical_json({"a": 1, "b": 2}) == canonical_json({"b": 2, "a": 1})
 
 
 def test_a_sealed_payload_verifies_against_its_own_nonce():

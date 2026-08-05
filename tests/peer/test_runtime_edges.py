@@ -4,6 +4,7 @@ from police_agent.constants import Direction, MoveType
 from police_agent.domain.actions import barrier, move
 from police_agent.domain.rules import CAPTURE, SURVIVAL
 from police_agent.peer.runtime import PoliceRuntime
+from police_agent.peer.step_zero import turn_records
 from police_agent.peer.summary import SKIPPED_AUDIT
 from police_agent.strategy.decision import Decision
 from tests.conftest import config_with
@@ -26,8 +27,8 @@ def test_an_illegal_action_from_the_strategy_becomes_a_hold():
     summary = PoliceRuntime(config_with(), transport, brain=FixedBrain(move(Direction.N))).run()
 
     assert summary["my_log"][0]["position"] == [0, 0]  # it did not move
-    assert "illegal action" in summary["records"][0]["payload"]["rationale"]
-    assert summary["records"][0]["payload"]["move"] == "HOLD:-"
+    assert "illegal action" in turn_records(summary["records"])[0]["payload"]["rationale"]
+    assert turn_records(summary["records"])[0]["payload"]["move"] == "HOLD:-"
 
 
 def test_a_held_turn_is_still_sealed_and_still_sent():
@@ -100,5 +101,5 @@ def test_a_non_move_action_type_is_reported_faithfully_in_the_record():
     transport = FakeTransport(incoming=[thief_turn(1)])
     summary = PoliceRuntime(config_with(), transport, brain=FixedBrain(barrier(Direction.S))).run()
 
-    assert summary["records"][0]["payload"]["barrier"] == [1, 0]
-    assert MoveType.BARRIER.value in summary["records"][0]["payload"]["move"]
+    assert turn_records(summary["records"])[0]["payload"]["barrier"] == [1, 0]
+    assert MoveType.BARRIER.value in turn_records(summary["records"])[0]["payload"]["move"]

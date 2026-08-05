@@ -13,6 +13,7 @@ open its own would be evidence of nothing.
 
 from police_agent.domain.crypto import CommitReveal
 from police_agent.exceptions import CryptoError
+from police_agent.peer.step_zero import step_zero_of, turn_records
 
 VERIFIED = "verified OK"
 TAMPERED = "TAMPERED"
@@ -27,8 +28,14 @@ def normalize_log(log_data: dict) -> dict:
     the part that carries weight, and it does not need the scent to run.
     """
     body = log_data.get("summary") if isinstance(log_data.get("summary"), dict) else log_data
+    records = body.get("records") or log_data.get("records") or []
     return {
-        "records": body.get("records") or log_data.get("records") or [],
+        # Turns only. The player walks `records` alongside `my_log`, and the
+        # step-zero declaration at the head is not a move -- leaving it in would
+        # label every step with the previous step's commit. Filtered by reading
+        # the payload, so an opponent's log with a declaration is handled too.
+        "records": turn_records(records),
+        "step_zero": step_zero_of(records),
         "history": body.get("history", []),
         "my_log": body.get("my_log", []),
         "role": body.get("role", "police"),

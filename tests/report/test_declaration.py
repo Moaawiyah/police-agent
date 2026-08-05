@@ -1,0 +1,183 @@
+"""The pre-game declaration: what holds across the whole series, and only that.
+
+Two properties are worth defending here. The first is that the artifact describes
+*both* groups, because the lecturer's tooling joins the two teams' files on it and
+a declaration that only knew itself would be half a document. The second is that
+nothing which changes between sub-games leaks in -- roles alternate, so a role or
+a sub-game number in this file would be false for half the series.
+"""
+
+from police_agent.report.declaration import (
+    DECLARATION_TYPE,
+    UNKNOWN,
+    build_declaration,
+    declared_hardware,
+    group_block,
+)
+from police_agent.report.facts import facts_from
+from police_agent.report.ids import SCHEMA_VERSION, consensus_signature
+from tests.conftest import STUB_SPEC
+
+POLICE, THIEF = "police-team", "thief-team"
+
+OUR_IDENTITY = {
+    "group_id": POLICE,
+    "group_name": "Police Team",
+    "members": ["id-1001", "id-1002"],
+    "repos": {"cop": "https://example.test/cop", "thief": "https://example.test/thief"},
+    "mcp_servers": {"cop": "https://cops.ngrok.app/mcp"},
+    "llm_model": "qwen3:4b",
+    "code_version": "1.00",
+    "hardware_spec": STUB_SPEC,
+    "github_commit": "0" * 40,
+}
+THEIR_IDENTITY = {**OUR_IDENTITY, "group_id": THIEF, "group_name": "Thief Team"}
+
+
+class TestWhatTheChapterPinsBeforeTheSeries:
+    def test_it_names_itself_and_the_schema_it_follows(self):
+        artifact = _declaration()
+
+        assert artifact["declaration_type"] == DECLARATION_TYPE
+        assert artifact["schema_version"] == SCHEMA_VERSION
+
+    def test_it_carries_the_identifiers_the_four_files_are_joined_on(self):
+        facts = facts_from(_summary())
+
+        artifact = build_declaration(facts, _summary())
+
+        assert artifact["game_id"] == facts.game_id
+        assert artifact["game_uid"] == facts.game_uid
+
+    def test_it_carries_the_links_block_so_a_reader_can_find_the_others(self):
+        artifact = _declaration()
+
+        assert artifact["links"]["result"] == f"result_{artifact['game_id']}.json"
+
+    def test_it_pins_the_series_length_the_ceiling_and_the_clock(self):
+        artifact = _declaration()
+
+        assert artifact["num_sub_games"] == 3
+        assert artifact["max_tokens_per_game"] == 200000
+        assert artifact["game_started_at"] == "2026-08-05T09:00:00+00:00"
+        assert artifact["game_ended_at"] == "2026-08-05T09:02:00+00:00"
+        assert artifact["timezone"]
+
+    def test_nothing_that_changes_between_sub_games_appears(self):
+        """Roles alternate across the series, so either would be false by game 2.
+
+        The prose `_schema` note says the same thing in words, so this looks at
+        the keys rather than the rendered file.
+        """
+        artifact = _declaration()
+        keys = set(artifact) | set(artifact["groups"]["group_1"])
+
+        assert not keys & {"role", "sub_game_number", "result", "winner"}
+
+
+class TestBothGroupsAreDescribed:
+    def test_group_one_is_us_and_group_two_is_the_opponent(self):
+        groups = _declaration()["groups"]
+
+        assert groups["group_1"]["group_id"] == POLICE
+        assert groups["group_2"]["group_id"] == THIEF
+
+    def test_the_opponent_is_described_from_what_it_sent_at_the_handshake(self):
+        """The only moment either peer learns anything at all about the other."""
+        block = _declaration()["groups"]["group_2"]
+
+        assert block["group_name"] == "Thief Team"
+        assert block["repos"] == THEIR_IDENTITY["repos"]
+        assert block["mcp_servers"] == THEIR_IDENTITY["mcp_servers"]
+        assert block["llm_model"] == "qwen3:4b"
+
+    def test_an_opponent_that_declared_nothing_is_reported_unknown_not_guessed(self):
+        """Its rule-24 problem. Inventing plausible hardware would make it ours."""
+        artifact = build_declaration(facts_from({"identity": OUR_IDENTITY}), {})
+
+        block = artifact["groups"]["group_2"]
+        assert block["group_name"] == UNKNOWN
+        assert block["llm_model"] == UNKNOWN
+        assert set(block["hardware_spec"].values()) == {UNKNOWN}
+
+    def test_an_absent_group_still_has_the_schemas_shape(self):
+        """A parser on the other side should not have to branch on our silence."""
+        block = group_block({})
+
+        assert block["members"] == []
+        assert block["repos"] == {}
+        assert len(block["hardware_spec"]) == 6
+
+
+class TestTheHardwareProjection:
+    def test_it_publishes_the_six_fields_the_schema_names(self):
+        spec = declared_hardware(STUB_SPEC)
+
+        assert list(spec) == [
+            "cpu_type",
+            "cpu_freq_mhz",
+            "cpu_cores",
+            "ram_gb",
+            "gpu_model",
+            "vram_gb",
+        ]
+
+    def test_the_schemas_gpu_model_is_our_gpu_type(self):
+        """A rename, not a second probe: the two names describe one measurement."""
+        assert declared_hardware(STUB_SPEC)["gpu_model"] == STUB_SPEC["gpu_type"]
+
+    def test_the_two_fields_the_schema_omits_survive_in_the_sealed_payload(self):
+        """`os` and the GPU core count are dropped here and kept there, which is
+        where ch. 5.5's requirement actually has to be met."""
+        spec = declared_hardware(STUB_SPEC)
+
+        assert "os" not in spec
+        assert "gpu_cores_or_cuda" not in spec
+        assert STUB_SPEC["os"] and STUB_SPEC["gpu_cores_or_cuda"]
+
+    def test_a_probe_that_answered_nothing_becomes_unknown_not_absent(self):
+        assert declared_hardware({"cpu_type": "Test CPU"})["ram_gb"] == UNKNOWN
+
+    def test_junk_where_a_spec_was_expected_is_survived(self):
+        assert set(declared_hardware(None).values()) == {UNKNOWN}
+        assert set(declared_hardware("not a spec").values()) == {UNKNOWN}
+
+
+class TestThePerGroupSignature:
+    def test_it_is_recomputed_by_dropping_the_key_and_hashing_the_rest(self):
+        """Exactly what a verifier on the other side does with the file."""
+        block = _declaration()["groups"]["group_1"]
+        signed = {key: value for key, value in block.items() if key != "signature"}
+
+        assert block["signature"] == consensus_signature(signed)
+
+    def test_restating_the_hardware_changes_it(self):
+        honest = group_block(OUR_IDENTITY)
+        flattering = group_block({**OUR_IDENTITY, "hardware_spec": {**STUB_SPEC, "cpu_cores": 128}})
+
+        assert honest["signature"] != flattering["signature"]
+
+    def test_it_uses_the_spacious_form_the_opposing_parser_expects(self):
+        """The trap `report/ids.py` exists to keep visible: the compact form here
+        would hash plausibly, pass every local test, and disagree with them."""
+        block = group_block({})
+
+        assert block["signature"] == consensus_signature(
+            {key: value for key, value in block.items() if key != "signature"}
+        )
+
+
+def _declaration() -> dict:
+    summary = _summary()
+    return build_declaration(facts_from(summary), summary)
+
+
+def _summary() -> dict:
+    return {
+        "identity": OUR_IDENTITY,
+        "peer_identity": THEIR_IDENTITY,
+        "terms": {"board_size": 7, "num_games": 3},
+        "started_at": "2026-08-05T09:00:00+00:00",
+        "ended_at": "2026-08-05T09:02:00+00:00",
+        "tokens": {"budget_per_series": 200000},
+    }
