@@ -362,7 +362,7 @@ summary = agent.play()  # one sub-game, to a result
 agent.save_summary(summary, "result.json")
 
 paths = agent.write_artifacts(summary)  # the four mandatory JSON artifacts
-agent.email_report(paths)               # None unless [email] switches it on
+agent.email_report(paths)  # None unless [email] switches it on
 ```
 
 The layer holds no game rules. It decides *which* objects are built and with
