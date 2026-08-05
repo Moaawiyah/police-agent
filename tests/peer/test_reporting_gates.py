@@ -7,7 +7,6 @@ likes, but a turn it disliked must still be played, because a peer that dropped
 a legal turn to defend itself would forfeit the match it was defending.
 """
 
-from police_agent.domain.rules import CAPTURE
 from police_agent.peer.runtime import PoliceRuntime
 from police_agent.shared.tokens import Usage
 from tests.conftest import config_with
@@ -138,5 +137,5 @@ class TestTheInboundFloodDetector:
 
         summary = subject.run()
 
-        assert (summary["result"], summary["winner"]) == (CAPTURE, "police")
+        assert (summary["result"], summary["winner"]) == ("technical_loss", "police")
         assert summary["inbound_dos"]["tripped"] is True

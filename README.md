@@ -102,14 +102,7 @@ Thief agent: **https://github.com/Moaawiyah/Ai_thief**
 moves and the end-of-game audit all work over real MCP sockets against a
 separate process.
 
-Two gaps are open and both matter before a league match:
-
-- **Scent emission is a no-op.** The police broadcasts an empty `smell_grid`,
-  so an opponent receives no signal from it. The match completes correctly; it
-  is not yet a fair contest. Step 6.
-- **The audit checks hashes, not meaning.** A rewritten opponent log is caught.
-  A log that hashes correctly but contradicts the claims made during play is
-  not yet re-checked. Step 5, partially done.
+One operational check remains before a league match:
 - **The Gmail send path has never run against Google.** The whole reporting
   chain is built and tested (`--report`, below), but only the offline half has
   been exercised for real: the default writes a local `.eml` draft, and the
@@ -131,7 +124,8 @@ uv run police-agent --port 8801 --opponent http://127.0.0.1:8802/mcp
 uv run police-agent --summary result.json    # also write the match record
 uv run police-agent --report                 # write the four report artifacts
 uv run police-agent --gui                    # play with the live board window
-uv run police-agent --tunnel                 # league play: publish a public URL
+uv run police-agent --tunnel                 # publish a public URL
+uv run police-agent --league --tunnel        # enforce the league tunnel profile
 ```
 
 The thief must be started from its own repository, as a separate process.
@@ -156,6 +150,24 @@ opponent has already configured against you; reserve one at
 [dashboard.ngrok.com/domains](https://dashboard.ngrok.com/domains) and set
 `network.tunnel_domain` in your private `game.toml` to keep the same address
 across restarts. See `config/police/game.toml.example` for the exact key.
+
+`--league` is intentionally stricter than `--tunnel`: it requires a configured
+reserved domain, an HTTPS public opponent URL (never localhost or a private IP),
+and uses only the signed watchdog/response deadlines. Gmail reporting remains
+optional. Local practice mode keeps working without either flag.
+
+## Thief integration contract
+
+The thief repository is not modified here, but its audit implementation must
+reveal one sealed record for each accepted turn. Each record must expose the
+same committed `step`, `position`, and `move` sent under that turn's `commit`.
+Steps are contiguous from 1; moves are one legal orthogonal move or `HOLD:-`.
+It must echo the exact police `capture_claim` in its next `claim_response`,
+report `caught` truthfully from its revealed prior position, and stop after a
+capture. A valid police barrier on the revealed thief cell, or one that leaves
+the thief no legal move, is a police capture even if the thief reports another
+outcome. League runs on that side must apply the same public HTTPS tunnel and
+signed-timeout requirements.
 
 ## The Gatekeeper and token accounting
 

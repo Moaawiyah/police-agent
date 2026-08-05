@@ -16,10 +16,10 @@ still invent something.
 """
 
 import random
-import re
 
 from police_agent.infra.ollama import DEFAULT_MODEL, DEFAULT_URL, ollama_asker
 from police_agent.shared.gatekeeper import Gatekeeper, GateLimits
+from police_agent.strategy.talk_text import _cap, _clean
 
 # The fallback, and only the fallback: Ollama is the mechanism. A model that is
 # missing, down or slow costs the banter and nothing else. These name no place.
@@ -29,16 +29,6 @@ _FALLBACK_LINES = (
     "I have your scent now, and this town has nowhere left to hide.",
     "Sooner or later you turn a corner and I am there.",
 )
-
-_THINK_BLOCK = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
-_OPEN_THINK = re.compile(r"<think>.*", re.DOTALL | re.IGNORECASE)
-# A board reference rather than a place. Landmarks with digits in their names
-# ("5th Avenue") are left alone: a street number is a name, not a coordinate.
-_COORDINATES = re.compile(
-    r"\(?\b\d+\s*,\s*\d+\b\)?|\b(?:row|column|col|cell|square|tile|grid)\s*#?\s*\d+",
-    re.IGNORECASE,
-)
-
 
 class HintWriter:
     """Writes one taunt per turn, with a local model when there is one."""
@@ -141,24 +131,3 @@ def asker_from_config(get, gate=None, ledger=None):
         ledger=ledger,
         budget=float(get("trash_talk.budget_seconds") or timeout),
     )
-
-
-def _clean(reply: str, max_words: int) -> str:
-    """Turn whatever the model said into something that may go on the wire.
-
-    An empty return reads as "use a canned line". A coordinate counts as nothing
-    usable: cutting it out leaves a hole ("You are at near Harlem"), and a model
-    that wrote one ignored an instruction, so the rest has not earned trust.
-    """
-    text = _THINK_BLOCK.sub(" ", str(reply))
-    text = _OPEN_THINK.sub(" ", text)  # thinking that ran out of tokens mid-block
-    if _COORDINATES.search(text):
-        return ""
-    line = next((part.strip() for part in text.splitlines() if part.strip()), "")
-    return _cap(line.strip("\"'` ").replace("*", ""), max_words)
-
-
-def _cap(hint: str, max_words: int) -> str:
-    """Enforce the agreed word limit. A hint is a signed term's worth of words."""
-    words = hint.split()
-    return " ".join(words[:max_words])

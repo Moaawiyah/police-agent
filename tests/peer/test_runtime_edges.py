@@ -2,7 +2,6 @@
 
 from police_agent.constants import Direction, MoveType
 from police_agent.domain.actions import barrier, move
-from police_agent.domain.rules import CAPTURE, SURVIVAL
 from police_agent.peer.runtime import PoliceRuntime
 from police_agent.peer.step_zero import turn_records
 from police_agent.peer.summary import SKIPPED_AUDIT
@@ -60,24 +59,24 @@ def test_the_strategy_walls_a_cornered_thief_over_the_real_loop():
     assert transport.sent_turns[0]["barrier_placed"] == [0, 1]
 
 
-def test_reaching_the_ceiling_at_the_threshold_is_a_survival():
+def test_ceiling_survival_without_a_reveal_becomes_a_technical_win():
     transport = FakeTransport(incoming=thief_turns(6))
     summary = PoliceRuntime(
         config_with(rules__max_steps=2, rules__survival_threshold=2), transport
     ).run()
 
-    assert (summary["result"], summary["winner"]) == (SURVIVAL, "thief")
+    assert (summary["result"], summary["winner"]) == ("technical_loss", "police")
 
 
-def test_an_opponent_that_never_reveals_leaves_the_board_result_standing():
-    """Nothing is proven either way, so a capture is not upgraded or thrown away."""
+def test_an_opponent_that_never_reveals_forfeits_technically():
     transport = FakeTransport(
         incoming=[thief_turn(1), thief_turn(2, claim_response={"caught": True})], audit=None
     )
     summary = PoliceRuntime(config_with(), transport).run()
 
-    assert (summary["result"], summary["winner"]) == (CAPTURE, "police")
-    assert summary["audit"] == SKIPPED_AUDIT
+    assert (summary["result"], summary["winner"]) == ("technical_loss", "police")
+    assert summary["audit"]["passed"] is False
+    assert summary["audit"]["semantic_passed"] is False
     assert summary["audit"]["skipped"] is True
 
 

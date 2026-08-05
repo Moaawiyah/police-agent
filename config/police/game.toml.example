@@ -9,7 +9,6 @@ repos = { cop = "https://github.com/you/repo", thief = "https://github.com/you/r
 [network]
 my_port         = 8801                             # MY MCP server port
 opponent_url    = "http://127.0.0.1:8802/mcp"       # the only thing I know about the opponent
-turn_timeout_seconds = 180
 
 # MY reserved ngrok domain, used by `police-agent --tunnel` (Appendix He rule 10:
 # a league match needs a public URL, because both peers sit behind NAT). Private
