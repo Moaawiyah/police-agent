@@ -32,3 +32,4 @@ class MatchOptions:
     port: int | None = None
     opponent_url: str | None = None
     tunnel: bool = False
+    league: bool = False

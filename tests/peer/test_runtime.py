@@ -2,7 +2,7 @@
 
 import pytest
 
-from police_agent.domain.rules import CAPTURE, SURVIVAL, TAMPER_FORFEIT, TECHNICAL_LOSS, TIMEOUT
+from police_agent.domain.rules import SURVIVAL, TAMPER_FORFEIT, TECHNICAL_LOSS
 from police_agent.peer.protocol import AuditPayload, TurnMessage
 from police_agent.peer.runtime import PoliceRuntime
 from police_agent.peer.step_zero import turn_records
@@ -25,12 +25,12 @@ def test_the_police_waits_before_it_moves():
     assert transport.agreement_sent is not None  # but the handshake did happen
 
 
-def test_a_confirmed_capture_claim_ends_the_game():
+def test_a_confirmed_capture_without_a_reveal_becomes_a_technical_win():
     summary, _ = run_against(
         [thief_turn(1), thief_turn(2, claim_response={"claim": [1, 0], "caught": True})]
     )
 
-    assert (summary["result"], summary["winner"]) == (CAPTURE, "police")
+    assert (summary["result"], summary["winner"]) == (TECHNICAL_LOSS, "police")
 
 
 def test_the_police_claims_the_cell_it_stepped_onto():
@@ -55,14 +55,14 @@ def test_a_silent_opponent_forfeits():
     assert (summary["result"], summary["winner"]) == (TECHNICAL_LOSS, "police")
 
 
-def test_a_survival_claim_at_the_threshold_is_honoured():
+def test_a_survival_claim_without_a_reveal_becomes_a_technical_win():
     summary, _ = run_against(
         [thief_turn(3, win_claim={"type": "survival"})],
         rules__max_steps=3,
         rules__survival_threshold=3,
     )
 
-    assert (summary["result"], summary["winner"]) == (SURVIVAL, "thief")
+    assert (summary["result"], summary["winner"]) == (TECHNICAL_LOSS, "police")
 
 
 def test_an_early_survival_claim_is_disputed_not_conceded():
@@ -76,10 +76,10 @@ def test_an_early_survival_claim_is_disputed_not_conceded():
     assert "survival claimed at step 1" in summary["disputes"][0]
 
 
-def test_reaching_the_ceiling_short_of_the_threshold_expires():
+def test_a_timeout_without_a_reveal_becomes_a_technical_win():
     summary, _ = run_against(thief_turns(4), rules__max_steps=2, rules__survival_threshold=99)
 
-    assert (summary["result"], summary["winner"]) == (TIMEOUT, None)
+    assert (summary["result"], summary["winner"]) == (TECHNICAL_LOSS, "police")
 
 
 def test_a_forged_opponent_log_forfeits_the_game():
@@ -96,6 +96,16 @@ def test_a_forged_opponent_log_forfeits_the_game():
 
     assert (summary["result"], summary["winner"]) == (TAMPER_FORFEIT, "police")
     assert summary["audit"]["passed"] is False
+
+
+def test_a_malformed_opponent_audit_forfeits_the_game():
+    summary, _ = run_against(
+        [thief_turn(1), thief_turn(2, claim_response={"caught": True})],
+        audit={"sender": "thief"},
+    )
+
+    assert (summary["result"], summary["winner"]) == (TAMPER_FORFEIT, "police")
+    assert summary["audit"]["semantic_failures"] == ["malformed audit reveal"]
 
 
 def test_the_police_seals_one_record_per_turn_it_played():

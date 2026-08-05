@@ -9,19 +9,22 @@ from the process's own output, which is a redrawing terminal UI and not a
 format anything should be parsing.
 """
 
-import json
 import os
 import shutil
 import subprocess
 import tempfile
 import time
-import urllib.error
-import urllib.request
 from pathlib import Path
 
 from police_agent.exceptions import ConfigError, PoliceAgentError, TransportError
+from police_agent.infra.ngrok_api import (
+    _agent_tunnels,
+    _tail,
+)
+from police_agent.infra.ngrok_api import (
+    published_url as _published_url,
+)
 
-API_URL = "http://127.0.0.1:4040/api/tunnels"
 _POLL_INTERVAL = 0.5
 
 _AUTH_MARKERS = ("err_ngrok_4018", "authtoken")
@@ -126,35 +129,5 @@ def _startup_failure(log: str, domain: str | None) -> PoliceAgentError:
 
 
 def published_url(port: int) -> str | None:
-    """The URL of a tunnel already forwarding to `port`, if ngrok reports one.
-
-    Matched on the port alone: ngrok echoes the address back as `localhost:8801`
-    where we asked for 8801, and a stricter comparison would miss its own work.
-    """
-    urls = [
-        str(one["public_url"])
-        for one in _agent_tunnels()
-        if one.get("public_url") and _forwards_to(one, port)
-    ]
-    return next((url for url in urls if url.startswith("https://")), urls[0] if urls else None)
-
-
-def _forwards_to(tunnel: dict, port: int) -> bool:
-    return str(tunnel.get("config", {}).get("addr", "")).endswith(f":{port}")
-
-
-def _agent_tunnels() -> list[dict]:
-    """What ngrok says it is publishing; an empty list when it is not running."""
-    try:
-        with urllib.request.urlopen(API_URL, timeout=2.0) as response:  # noqa: S310 - local API
-            body = json.loads(response.read())
-    except (urllib.error.URLError, TimeoutError, OSError, ValueError):
-        return []
-    return [one for one in body.get("tunnels") or [] if isinstance(one, dict)]
-
-
-def _tail(log: Path, lines: int = 8) -> str:
-    try:
-        return "\n".join(log.read_text(encoding="utf-8", errors="replace").splitlines()[-lines:])
-    except OSError:
-        return ""
+    """Return the HTTPS tunnel forwarding to this peer's port."""
+    return _published_url(port, _agent_tunnels)

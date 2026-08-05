@@ -20,7 +20,6 @@ Inference, not decision-making, and not the scent mechanism either. It answers
 `most_likely()` and nothing above knows how, so it holds no opinion about
 compass directions, landmarks or who is lying.
 """
-
 from police_agent.constants import Cell
 
 # The weight a scent reading carries against the prior. Not an agreed term: it

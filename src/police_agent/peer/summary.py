@@ -13,13 +13,22 @@ prevent.
 import time
 
 from police_agent.domain.crypto import audit_records
-from police_agent.domain.rules import ABORTED, TAMPER_FORFEIT, TECHNICAL_LOSS
+from police_agent.domain.rules import ABORTED, CAPTURE, TAMPER_FORFEIT, TECHNICAL_LOSS
+from police_agent.domain.semantic_audit import audit_semantics
+from police_agent.exceptions import ProtocolError
 from police_agent.peer.handshake import identity_from_config
 from police_agent.peer.protocol import AuditPayload
 from police_agent.peer.sealing import now_iso
 from police_agent.peer.step_zero import step_zero_of
 
-SKIPPED_AUDIT = {"passed": False, "verified_steps": 0, "failed_steps": [], "skipped": True}
+SKIPPED_AUDIT = {
+    "passed": False,
+    "verified_steps": 0,
+    "failed_steps": [],
+    "semantic_passed": False,
+    "semantic_failures": ["audit was not exchanged"],
+    "skipped": True,
+}
 
 # Results where there is nobody left to audit with, so asking for a reveal would
 # only stall this peer for another timeout: the opponent already went silent, or
@@ -35,13 +44,32 @@ def exchange_and_audit(runtime, result: str, winner: str | None) -> tuple[str, s
     mine = AuditPayload(sender="police", records=runtime.records, result_claim=result)
     theirs = runtime.transport.exchange_audit(mine.to_dict())
     if theirs is None:
-        # Our reveal may well have landed; theirs never came. Nothing is proven
-        # either way, so the board result stands and the report says so.
-        return result, winner, SKIPPED_AUDIT
-
-    audit = audit_records(AuditPayload.from_dict(theirs).records)
-    if not audit["passed"]:
+        audit = {**SKIPPED_AUDIT, "semantic_failures": ["opponent did not reveal its audit"]}
+        return TECHNICAL_LOSS, "police", audit
+    try:
+        revealed = AuditPayload.from_dict(theirs)
+    except (ProtocolError, TypeError, ValueError, KeyError):
+        audit = {**SKIPPED_AUDIT, "skipped": False, "semantic_failures": ["malformed audit reveal"]}
         return TAMPER_FORFEIT, "police", audit
+    audit = audit_records(revealed.records)
+    audit.update(
+        audit_semantics(
+            revealed.records,
+            runtime.handler.history,
+            runtime.records,
+            runtime.state.log,
+            runtime.rules,
+            runtime.terms["board_size"],
+            runtime.terms["thief_start"],
+            runtime.terms["cop_start"],
+            revealed.result_claim,
+        )
+    )
+    if not audit["passed"] or not audit["semantic_passed"]:
+        return TAMPER_FORFEIT, "police", audit
+    terminal = audit.get("terminal")
+    if terminal and terminal["result"] == CAPTURE and terminal["reason"] in {"barrier", "confinement"}:
+        return CAPTURE, "police", audit
     return result, winner, audit
 
 
