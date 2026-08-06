@@ -327,6 +327,27 @@ Pausing is a real cost, and the banner says so. There is no referee holding the
 game while this peer thinks: the thief's watchdog keeps running, and a long
 enough pause is a technical loss.
 
+### Exporting a replay as a GIF or MP4
+
+```
+uv run police-agent --replay result.json --export results/match.gif
+uv run police-agent --replay result.json --export results/match.mp4
+```
+
+No window opens at all -- this runs with no display, over SSH or in CI. Every
+step is drawn with the same colours and layout as the live/replay windows
+(`gui/palette.py`), so a screenshot from either source is directly comparable.
+GIF export needs nothing beyond Pillow; MP4 shells out to `ffmpeg` and names it
+by name if it is not on `PATH`.
+
+Each match summary also carries a `belief_log`: one entry per Bayes-filter
+update, `{"step", "smell_grid", "belief"}` -- the scent this peer actually
+received and the posterior it produced, police-only (the thief's belief, if it
+keeps one, never crosses the wire). `--export` uses that recorded posterior
+directly when the log has one; the live **Replay** window above always
+recomputes it from the scent trail instead, which doubles as a standing proof
+that the recorded picture and the algorithm still agree.
+
 ## Layout
 
 ```
