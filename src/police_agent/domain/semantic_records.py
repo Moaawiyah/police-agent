@@ -44,6 +44,26 @@ def match_messages(remote, received, failures):
             failures.append(f"turn {record[0]} commitment does not match the received message")
 
 
+def split_trailing_claim(remote, received_messages):
+    """A capture confirmation can arrive as an extra, unrecorded terminal
+    message: the peer that sends it never opens a new sealed step for it, so
+    it reuses the last remote step's number and has no counterpart in
+    `remote`. Pull a message shaped like one out of the *raw* list, before
+    `messages()` ever sees it -- its own step-contiguity check would read the
+    reused step as a duplicate, and the per-turn correspondence check that
+    follows expects `remote` and `received` to pair up 1:1. Any other length
+    or shape is still a real failure.
+    """
+    source = list(received_messages or [])
+    if remote and len(source) == len(remote) + 1:
+        message = source[-1]
+        step = message.get("step") if isinstance(message, dict) else None
+        response = message.get("claim_response") if isinstance(message, dict) else None
+        if step == remote[-1][0] and isinstance(response, dict) and response.get("caught") is True:
+            return source[:-1], (step, message)
+    return source, None
+
+
 def check_local_coverage(local, log_by_step, failures):
     if len(local) != len(log_by_step):
         failures.append("local sealed record count does not match the move log")

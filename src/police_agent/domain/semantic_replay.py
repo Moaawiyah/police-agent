@@ -9,6 +9,7 @@ from police_agent.domain.semantic_records import (
     match_messages,
     messages,
     result,
+    split_trailing_claim,
     turns,
 )
 
@@ -32,6 +33,7 @@ def replay_audit(
     if thief is None or police is None or not board.in_bounds(thief) or not board.in_bounds(police):
         return result(["agreed starting positions are invalid"], corrections, None)
     remote, local = turns(revealed_records, "revealed", failures), turns(local_records, "local", failures)
+    received_messages, trailing_claim = split_trailing_claim(remote, received_messages)
     received = messages(received_messages, failures)
     match_messages(remote, received, failures)
     local_by_step = {step: payload for step, payload, _ in local}
@@ -60,6 +62,15 @@ def replay_audit(
         response = message.get("claim_response")
         if isinstance(response, dict) and response.get("caught") and terminal is None:
             terminal = {"result": CAPTURE, "winner": "police", "step": step, "reason": "claim"}
+    if terminal is None and trailing_claim is not None:
+        claim_step, claim_message = trailing_claim
+        before = len(failures)
+        # Same validator as the in-band case (echoes the real claim, on the real
+        # cell) -- just fed the one message that never opened a sealed step of
+        # its own, so it answers as if it had (claim_step + 1, looked up via -1).
+        claim_response(claim_step + 1, claim_message, local_by_step, positions, failures)
+        if len(failures) == before:
+            terminal = {"result": CAPTURE, "winner": "police", "step": claim_step, "reason": "claim"}
     check_local_coverage(local, log_by_step, failures)
     expected = terminal or _ceiling_result(local, rules)
     _check_reported(expected, reported_result, corrections, failures)

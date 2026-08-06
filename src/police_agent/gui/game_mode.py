@@ -29,9 +29,12 @@ def mode_and_model(config) -> tuple[str, str]:
     is the literal "None" under the template mode rather than an empty string,
     so the window never leaves a blank where a model name would go.
     """
-    read = config.get if config is not None else (lambda key, default=None: default)
-    provider = str(read("trash_talk.provider", "template") or "template").lower()
-    model = str(read("trash_talk.model", "") or "")
+    if config is None:
+        return TEMPLATE_MODE, NO_MODEL
+    # Matches strategy/talk.py's own default: an unset key means ollama, not
+    # template -- the label must report what the hint writer actually does.
+    provider = str(config.get("trash_talk.provider", "ollama") or "ollama").lower()
+    model = str(config.get("trash_talk.model", "") or "")
     if provider == "ollama":
         return OLLAMA_MODE, model or DEFAULT_OLLAMA_MODEL
     if provider == "template":
@@ -39,7 +42,7 @@ def mode_and_model(config) -> tuple[str, str]:
     # Any other provider is something this peer was configured with but this
     # module has not been taught to name. Reporting it as a remote model is the
     # cautious reading: it says a model is involved without inventing which.
-    return REMOTE_MODE, model or str(read("llm.model", "") or provider)
+    return REMOTE_MODE, model or str(config.get("llm.model", "") or provider)
 
 
 def mode_from_recorded_model(model: str) -> tuple[str, str]:

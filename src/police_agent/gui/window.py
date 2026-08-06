@@ -18,10 +18,10 @@ from police_agent.shared.version import CODE_VERSION, PROJECT_TITLE, REPOSITORY_
 MY_TURN_COLOR = "#2ecc71"
 WAITING_COLOR = "#95a5a6"
 
-# (key, caption) in display order. The set is what our runtime can actually
-# report: no token counters, because the shipped verbal layer is a local Ollama
-# model with no budget to spend, and the specification's token ceiling applies
-# to peers that call a metered API.
+# (key, caption) in display order. No live-ticking counter mid-game -- the
+# shipped verbal layer is a free local Ollama model, so there is no per-call
+# budget worth watching turn by turn -- but the total (Appendix He 54) is
+# worth showing once the match ends, alongside the audit line.
 PANEL_ROWS = (
     ("step", "Step"),
     ("mode", "Verbal mode"),
@@ -33,6 +33,7 @@ PANEL_ROWS = (
     ("commit", "My commit (sealed)"),
     ("reliability", "Thief reliability"),
     ("status", "Status"),
+    ("tokens", "Tokens used"),
 )
 
 

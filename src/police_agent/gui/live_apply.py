@@ -68,6 +68,20 @@ def _apply_game_over(window, event: dict) -> None:
     window.set_turn(False, f"GAME OVER: {summary['result']} - winner {winner.upper()}")
     window.set_label("status", _audit_line(audit, summary))
     window.set_label("reliability", _reliability_line(summary))
+    window.set_label("tokens", _tokens_line(summary))
+
+
+def _tokens_line(summary: dict) -> str:
+    """The series-mandatory total (Appendix He 54), shown once at game over --
+    not live, since the shipped model is free and there is nothing to meter."""
+    tokens = summary.get("tokens") or {}
+    calls = tokens.get("model_calls", 0)
+    if not calls:
+        return "0 (no model calls)"
+    return (
+        f"{tokens.get('tokens_total', 0)} across {calls} call{'s' if calls != 1 else ''} "
+        f"({tokens.get('prompt_tokens', 0)} prompt / {tokens.get('completion_tokens', 0)} completion)"
+    )
 
 
 def _audit_line(audit: dict, summary: dict) -> str:
