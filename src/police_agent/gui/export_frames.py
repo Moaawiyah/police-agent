@@ -12,13 +12,18 @@ still advanced every step regardless, so a log with only a partial
 """
 
 from police_agent.gui.replay_data import frozen_message, normalize_log, opponent_positions
-from police_agent.strategy.belief import BeliefGrid
+from police_agent.strategy.belief import DEFAULT_LEAK, DEFAULT_SMELL_POWER, BeliefGrid
 
 __all__ = ["build_views"]
 
 
 def build_views(
-    log_data: dict, opponent_log: dict | None, board_size: int, smell_trust: float
+    log_data: dict,
+    opponent_log: dict | None,
+    board_size: int,
+    smell_trust: float,
+    smell_power: float = DEFAULT_SMELL_POWER,
+    leak: float = DEFAULT_LEAK,
 ) -> list[dict]:
     view = normalize_log(log_data)
     my_log, history = view["my_log"], view["history"]
@@ -27,7 +32,7 @@ def build_views(
         entry["step"]: entry["belief"] for entry in view.get("belief_log") or [] if "step" in entry
     }
 
-    belief = BeliefGrid(board_size, smell_trust)
+    belief = BeliefGrid(board_size, smell_trust, smell_power, leak)
     visited: set = set()
     barriers: set = set()
     frames: list[dict] = []

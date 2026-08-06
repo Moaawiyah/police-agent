@@ -120,3 +120,17 @@ class TestConstruction:
         belief = BeliefGrid.from_config(terms_from_config(config), config)
 
         assert belief._smell_trust == 4.0
+
+    def test_power_and_leak_also_default_to_the_shipped_values(self, config):
+        belief = BeliefGrid.from_config(terms_from_config(config), config)
+
+        assert belief._smell_power == 2.0
+        assert belief._leak == 0.03
+
+    def test_power_and_leak_are_overridable_from_the_private_file(self):
+        config = config_with(belief__smell_power=3.0, belief__leak=0.1)
+
+        belief = BeliefGrid.from_config(terms_from_config(config), config)
+
+        assert belief._smell_power == 3.0
+        assert belief._leak == 0.1
