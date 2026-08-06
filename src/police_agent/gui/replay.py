@@ -4,7 +4,12 @@ from police_agent.gui import replay_actions
 from police_agent.gui.replay_controls import build_controls
 from police_agent.gui.replay_data import normalize_log, opponent_positions
 from police_agent.gui.window import PeerWindow
-from police_agent.strategy.belief import DEFAULT_SMELL_TRUST, BeliefGrid
+from police_agent.strategy.belief import (
+    DEFAULT_LEAK,
+    DEFAULT_SMELL_POWER,
+    DEFAULT_SMELL_TRUST,
+    BeliefGrid,
+)
 
 DEFAULT_STEP_SECONDS = 0.5
 
@@ -15,6 +20,8 @@ class ReplayApp:
     def __init__(self, config, log_data: dict, opponent_log: dict | None = None, window=None):
         self._size = int(config.require("board.size"))
         self._trust = float(config.get("belief.smell_trust", DEFAULT_SMELL_TRUST))
+        self._power = float(config.get("belief.smell_power", DEFAULT_SMELL_POWER))
+        self._leak = float(config.get("belief.leak", DEFAULT_LEAK))
         view = normalize_log(log_data)
         self._records, self._history = view["records"], view["history"]
         self._my_log, self._role = view["my_log"], view["role"]
@@ -38,7 +45,7 @@ class ReplayApp:
         return window
 
     def _reset_state(self) -> None:
-        self._belief = BeliefGrid(self._size, self._trust)
+        self._belief = BeliefGrid(self._size, self._trust, self._power, self._leak)
         self._barriers: set = set()
         self._visited: set = set()
         self._index = 0

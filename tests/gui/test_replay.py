@@ -68,9 +68,12 @@ def test_the_belief_is_rebuilt_from_the_recorded_scent_not_read_back():
 def test_a_log_with_no_scent_still_predicts_but_observes_nothing():
     """A log missing its smell history must open rather than refuse: the commit
     re-verification is the part that carries weight. What is left is the predict
-    step alone, which is the same thing the agent's own belief did that turn."""
+    step plus an empty observation, which is the same thing the agent's own
+    belief did that turn (turn_handler always calls observe_smell, even on an
+    empty grid, and the leak inside it still applies)."""
     expected = BeliefGrid(config_with().require("board.size"))
     expected.diffuse()
+    expected.observe_smell({})
     app, window = player(log_of(2))
 
     app.advance()
