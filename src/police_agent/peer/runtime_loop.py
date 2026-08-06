@@ -3,7 +3,7 @@
 from police_agent.domain.rules import ABORTED, CAPTURE, SURVIVAL, TECHNICAL_LOSS, TIMEOUT
 from police_agent.peer.protocol import TurnMessage
 from police_agent.peer.turn_sender import take_turn
-from police_agent.peer.view import snapshot
+from police_agent.peer.view import belief_matrix, snapshot
 
 
 def notify(runtime, event: dict) -> None:
@@ -32,6 +32,17 @@ def apply_incoming(runtime, message: TurnMessage) -> None:
     if outcome.replayed:
         notify(runtime, {"type": "replay_ignored", "step": message.step})
         return
+    # One Bayes-filter update happened inside `handler.process` above (diffuse
+    # then observe_smell): the scent that drove it and the posterior it left
+    # behind, so the report can show the calculation instead of only its
+    # eventual effect on where the police walked.
+    runtime.belief_log.append(
+        {
+            "step": message.step,
+            "smell_grid": message.smell_grid,
+            "belief": belief_matrix(runtime.threat, runtime.state.board.size),
+        }
+    )
     notify(runtime, {"type": "incoming", "step": message.step, "hint": message.hint})
     if outcome.i_won:
         runtime._result = (CAPTURE, "police")

@@ -107,6 +107,7 @@ class PoliceRuntime:
         # digest can go out with the handshake below (Appendix He 24/53).
         self.records: list[dict] = [sealed_step_zero(config)]
         self.disputes: list[str] = []
+        self.belief_log: list[dict] = []  # one entry per Bayes-filter update
         self.peer_identity: dict = {}
         self.started_at = now_iso()
         self.started_monotonic = time.monotonic()
