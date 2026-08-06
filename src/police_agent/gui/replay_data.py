@@ -38,6 +38,7 @@ def normalize_log(log_data: dict) -> dict:
         "step_zero": step_zero_of(records),
         "history": body.get("history", []),
         "my_log": body.get("my_log", []),
+        "belief_log": body.get("belief_log", []),
         "role": body.get("role", "police"),
         "result": body.get("result", UNKNOWN),
         "winner": body.get("winner") or "nobody",

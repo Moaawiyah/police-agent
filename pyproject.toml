@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "fastmcp>=3.4.5",
+    "pillow>=11.0",
 ]
 
 # Needed only to actually send the end-of-game report over the Gmail API. Kept

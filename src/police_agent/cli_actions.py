@@ -42,8 +42,20 @@ def play_with_window(agent):
 
 
 def replay(agent, args) -> int:
+    opponent = agent.load_summary(args.opponent_log) if args.opponent_log else None
+    log_data = agent.load_summary(args.replay)
+    if args.export:
+        return _export_replay(agent, log_data, opponent, args.export)
     from police_agent.gui.replay import ReplayApp
 
-    opponent = agent.load_summary(args.opponent_log) if args.opponent_log else None
-    ReplayApp(agent.config, agent.load_summary(args.replay), opponent_log=opponent).run()
+    ReplayApp(agent.config, log_data, opponent_log=opponent).run()
+    return 0
+
+
+def _export_replay(agent, log_data: dict, opponent: dict | None, out_path: str) -> int:
+    """No Tk anywhere on this path -- runs headless, over SSH or in CI."""
+    from police_agent.gui.export import export_replay
+
+    written = export_replay(agent.config, log_data, opponent, out_path)
+    print(f"exported: {written}", file=sys.stderr)
     return 0

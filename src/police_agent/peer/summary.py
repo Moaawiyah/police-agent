@@ -68,7 +68,11 @@ def exchange_and_audit(runtime, result: str, winner: str | None) -> tuple[str, s
     if not audit["passed"] or not audit["semantic_passed"]:
         return TAMPER_FORFEIT, "police", audit
     terminal = audit.get("terminal")
-    if terminal and terminal["result"] == CAPTURE and terminal["reason"] in {"barrier", "confinement"}:
+    if (
+        terminal
+        and terminal["result"] == CAPTURE
+        and terminal["reason"] in {"barrier", "confinement"}
+    ):
         return CAPTURE, "police", audit
     return result, winner, audit
 
@@ -112,6 +116,10 @@ def build_summary(runtime, result: str, winner: str | None, audit: dict) -> dict
         "records": runtime.records,
         "history": runtime.handler.history,
         "my_log": runtime.state.log,
+        # Per-step scent grid + Bayesian posterior (police-only): what the
+        # belief filter saw and concluded at each update, for analysis and for
+        # a faithful (rather than merely re-derived) replay.
+        "belief_log": runtime.belief_log,
     }
 
 

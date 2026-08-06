@@ -35,6 +35,10 @@ token.json
 # Logs and replays
 logs/
 
+# Generated match output: exported GIF/MP4 and the report artifacts, all
+# reproducible from a run (--export / --report). Kept local like logs/.
+results/
+
 # Course spec PDF - copyrighted material, kept local-only
 police_thief_p2p.pdf
 
