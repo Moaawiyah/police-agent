@@ -19,6 +19,7 @@ import time
 from police_agent.domain.own_state import OwnGameState
 from police_agent.domain.rules import GameRules
 from police_agent.domain.scent import ScentField
+from police_agent.peer.control_link import ControlLink
 from police_agent.peer.controls import GameControls
 from police_agent.peer.handshake import identity_from_config, negotiate
 from police_agent.peer.protocol import TurnMessage
@@ -58,6 +59,7 @@ class PoliceRuntime:
         listener=None,
         controls=None,
         league: bool = False,
+        link=None,
     ) -> None:
         # Validated before anything else: a missing agreed term is far cheaper to
         # discover here than three turns into a match against another group.
@@ -68,11 +70,9 @@ class PoliceRuntime:
 
         size = self.terms["board_size"]
         self.state = OwnGameState(tuple(self.terms["cop_start"]), size)
-        # The survival threshold is deliberately not a signed term: the reference
-        # does not sign it, and matching its term list exactly is what lets the
-        # handshake succeed against anyone who followed it. It still comes from
-        # the shared, byte-identical game.json, so both peers agree. `require`
-        # makes a missing one a config error rather than a crash mid-match.
+        # survival_threshold is deliberately not a signed term (matching the
+        # reference's term list is what lets the handshake succeed), but still
+        # comes from the shared game.json, so both peers agree in practice.
         self.rules = GameRules(self.terms["max_steps"], config.require("rules.survival_threshold"))
         self.barriers_max = self.terms["barriers_max"]
 
@@ -83,13 +83,9 @@ class PoliceRuntime:
         # from quietly running two rate limiters at twice the agreed rate.
         self.gatekeeper = Gatekeeper.from_config(config)
         self.tokens = TokenLedger()
-        # The inbound flood line, phrased as "fast enough to fill the gate's
-        # whole waiting line inside one second" so that it moves with the agreed
-        # queue depth rather than being a number somebody picked: at the shipped
-        # 100 it is 100 messages a second. A legal turn costs an HTTP round trip
-        # plus the opponent's own thinking, so a real match sits two orders of
-        # magnitude below it -- which is the point. This reading must never be
-        # able to accuse an honest peer.
+        # Fast enough to fill the gate's whole queue depth inside a second (100
+        # msg/s shipped) -- two orders of magnitude above a real turn's rate, so
+        # this reading must never be able to accuse an honest peer.
         self.inbound_dos = DosDetector(self.gatekeeper.limits.queue_depth * 60.0)
 
         self.threat = threat or BeliefGrid.from_config(self.terms, config)
@@ -103,6 +99,10 @@ class PoliceRuntime:
 
         self._listener = listener
         self.controls = controls or GameControls()
+        # Opt-in bidirectional signalling (enable/status/restart/quit). Advisory
+        # only -- see control_link.py -- so building it here, unconditionally,
+        # commits this peer to nothing until the GUI's checkbox turns it on.
+        self.link = link or ControlLink("police", self.transport, self.controls, self.notify)
         # The declaration heads the log, sealed before anything is played, so its
         # digest can go out with the handshake below (Appendix He 24/53).
         self.records: list[dict] = [sealed_step_zero(config)]

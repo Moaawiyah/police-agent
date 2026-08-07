@@ -13,6 +13,8 @@ import queue
 import threading
 import time
 
+from police_agent.exceptions import RestartRequested
+from police_agent.gui import live_restart
 from police_agent.gui.game_mode import mode_and_model
 from police_agent.gui.live_apply import apply_event
 from police_agent.gui.live_controls import LiveControls
@@ -37,6 +39,7 @@ class LivePeerApp:
         self._events: queue.Queue = queue.Queue()
         self._summary: dict | None = None
         self._started_at: float | None = None
+        self._in_progress = False  # whether a worker thread currently owns _agent
         self._title = self._build_title()
         self._window = PeerWindow(
             self._title,
@@ -68,6 +71,7 @@ class LivePeerApp:
     def start(self) -> None:
         """Open the link and play. Nothing has touched the network before this."""
         self._bar.mark_started()
+        self._in_progress = True
         self._started_at = time.monotonic()
         self._window.set_turn(False, "STARTING - negotiating terms...")
         threading.Thread(target=self._worker, daemon=True, name="police-runtime").start()
@@ -93,19 +97,18 @@ class LivePeerApp:
         self._window.root.after(QUIT_GRACE_MS, self._window.root.destroy)
 
     def restart(self) -> None:
-        """Play a fresh sub-game: a new handshake and a new runtime, never a
-        re-armed one -- only reachable once the last game has finished (the
-        button locks in `start`), so there is nothing still in flight to race.
-        """
-        self._agent.restart()
-        self._controls = GameControls()
-        self._agent.controls = self._controls
-        self._summary = None
-        self.start()
+        live_restart.restart(self)
+
+    def toggle_bidirectional(self) -> None:
+        live_restart.toggle_bidirectional(self)
 
     def _worker(self) -> None:
         try:
             self._summary = self._agent.play()
+        except RestartRequested:
+            # agent.play() has already unwound on this thread -- never two
+            # runtimes racing. Dispatched via `after`: Tk is not thread-safe.
+            self._window.root.after(0, lambda: live_restart.rebuild_and_start(self))
         except Exception as exc:  # noqa: BLE001 - a dead thread would show nothing
             # The window is the only place a background failure can surface. A
             # traceback into a daemon thread's stderr is invisible to whoever is
@@ -129,6 +132,7 @@ class LivePeerApp:
             apply_event(self._window, event)
             if event["type"] in ("game_over", "error"):
                 self._started_at = None  # the clock stops with the game
+                self._in_progress = False
                 self._bar.mark_finished()
         self._window.root.after(DRAIN_INTERVAL_MS, self._drain)
 

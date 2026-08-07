@@ -4,11 +4,13 @@ The window opens idle. Nothing touches the network until Start is pressed, which
 is what makes it usable in a demonstration: both peers can be opened, the boards
 inspected, and the match begun when someone is watching.
 
-Every button here steers *this* peer and only this peer, and Restart is no
-exception: it plays a brand-new local sub-game against the same opponent, not a
-signal sent to it. There is no channel to coordinate a restart over -- the
-protocol carries turns and audits, and a control message the thief never agreed
-to read would be a pause (or a restart) that only one side observed.
+Restart is available at every stage, mid-game included: it requests a fresh
+sub-game through the control channel (`peer/control_link.py`) so the running
+turn loop can abandon this one cleanly before rebuilding, rather than only
+ever restarting a match that has already ended. "Bidirectional control" is
+what turns that request into something the opponent also honours -- the
+channel activates only once BOTH peers have checked it, so restarting alone
+never binds the other side to anything it did not agree to.
 """
 
 import tkinter as tk
@@ -30,25 +32,30 @@ class LiveControls:
         self.stop.pack(side="left")
         self.quit = tk.Button(bar, text="Quit", command=app.quit, state="normal")
         self.quit.pack(side="left", padx=(8, 0))
-        self.restart = tk.Button(bar, text="Restart", command=app.restart, state="disabled")
+        self.restart = tk.Button(bar, text="Restart", command=app.restart)
         self.restart.pack(side="left", padx=(8, 0))
+        self.bidi_var = tk.BooleanVar(value=False)
+        self.bidi_check = tk.Checkbutton(
+            bar,
+            text="Bidirectional control",
+            variable=self.bidi_var,
+            command=app.toggle_bidirectional,
+        )
+        self.bidi_check.pack(side="left", padx=(8, 0))
 
     def mark_started(self) -> None:
         """Lock Start and release the live steers. Start is not re-armable.
 
         A second Start would negotiate a second handshake on a runtime that has
         already agreed its terms, so the button is spent once pressed. Restart
-        exists for exactly this reason: it builds a fresh runtime rather than
-        re-arming this one, so it locks here too -- there is nothing to restart
-        until the sub-game it would replace has actually finished.
+        is different: it never re-arms this runtime, it tears it down and
+        builds a fresh one, which is exactly why it stays live here too.
         """
         self.start.config(state="disabled")
-        self.restart.config(state="disabled")
         for button in (self.pause, self.play, self.stop):
             button.config(state="normal")
 
     def mark_finished(self) -> None:
-        """The game is over: nothing is left to steer, but a restart now makes sense."""
+        """The game is over: nothing is left to steer but Restart and Quit."""
         for button in (self.pause, self.play, self.stop):
             button.config(state="disabled")
-        self.restart.config(state="normal")

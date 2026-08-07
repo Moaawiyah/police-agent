@@ -6,10 +6,9 @@ URL's MCP tools; everything it receives arrives asynchronously in the inboxes of
 its own server (`mcp_server.py`) and is read back here. Which is why the polling
 methods never touch the network at all.
 
-The method surface below -- exchange_agreement / send_turn / poll_turn /
-exchange_audit / poll_control / drain_inboxes -- is intentionally small and
-carries plain dicts, so the game loop can be driven in tests by a FakeTransport
-implementing the same six methods without a socket in sight.
+The method surface below is intentionally small and carries plain dicts, so
+the game loop can be driven in tests by a FakeTransport implementing the same
+methods without a socket in sight.
 
 Every timeout is a constructor argument, defaulted from config/police/game.json
 (`response_timeout_sec` = 30, `watchdog_timeout_sec` = 60), so no policy is
@@ -39,6 +38,7 @@ class McpTransport:
         reply_timeout: float = 30.0,
         audit_send_timeout: float = 10.0,
         call_timeout: float = 10.0,
+        control_send_timeout: float = 3.0,
     ) -> None:
         self._url = opponent_url
         self._inboxes = inboxes
@@ -47,19 +47,19 @@ class McpTransport:
         self._reply_timeout = reply_timeout
         self._audit_send_timeout = audit_send_timeout
         self._call_timeout = call_timeout
+        self._control_send_timeout = control_send_timeout
 
-    def _call(self, tool: str, arguments: dict) -> None:
+    def _call(self, tool: str, arguments: dict, timeout: float | None = None) -> None:
         """One MCP call: connect, invoke, disconnect.
 
         A fresh session per call keeps no state to go stale across the long,
         human-speed gaps between turns; the cost is one handshake per message,
         which is nothing next to a turn.
         """
+        budget = self._call_timeout if timeout is None else timeout
 
         async def invoke() -> None:
-            async with Client(
-                self._url, timeout=self._call_timeout, init_timeout=self._call_timeout
-            ) as client:
+            async with Client(self._url, timeout=budget, init_timeout=budget) as client:
                 await client.call_tool(tool, arguments)
 
         asyncio.run(invoke())
@@ -112,6 +112,13 @@ class McpTransport:
             return self._inboxes.controls.get_nowait()
         except queue.Empty:
             return None
+
+    def send_control(self, message: dict) -> None:
+        """Best-effort control send: a short timeout and swallowed errors, since
+        this is advisory only and must never stall the game the way a missed
+        turn or audit reveal would."""
+        with contextlib.suppress(Exception):
+            self._call("receive_control", {"message": message}, timeout=self._control_send_timeout)
 
     def exchange_audit(self, payload: dict) -> dict | None:
         """Reveal my sealed records and collect the opponent's, if it still answers.

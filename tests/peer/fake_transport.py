@@ -13,12 +13,14 @@ from police_agent.peer.sealing import now_iso
 class FakeTransport:
     """Replays a fixed script of thief turns and records everything sent."""
 
-    def __init__(self, incoming=None, agreement=None, audit=None) -> None:
+    def __init__(self, incoming=None, agreement=None, audit=None, incoming_controls=None) -> None:
         self.incoming = list(incoming or [])
         self._agreement = agreement
         self._audit = audit
+        self._incoming_controls = list(incoming_controls or [])
         self.sent_turns: list[dict] = []
         self.sent_audits: list[dict] = []
+        self.sent_controls: list[dict] = []
         self.agreement_sent: dict | None = None
 
     def exchange_agreement(self, signed: dict) -> dict:
@@ -41,7 +43,10 @@ class FakeTransport:
         return self._audit
 
     def poll_control(self) -> dict | None:
-        return None
+        return self._incoming_controls.pop(0) if self._incoming_controls else None
+
+    def send_control(self, message: dict) -> None:
+        self.sent_controls.append(message)
 
     def drain_inboxes(self) -> None:
         pass

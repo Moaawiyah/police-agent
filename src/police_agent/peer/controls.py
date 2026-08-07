@@ -13,6 +13,10 @@ because a demonstration needs it, not because the game tolerates it.
 Stopping abandons the sub-game. The runtime returns a result either way, so a
 stopped game still produces a summary and still gets audited -- an agent that
 simply vanished would be indistinguishable from one that crashed.
+
+Restart, quit and enable extend the same object to the opt-in bidirectional
+control channel (`peer/control_link.py`): a session-level signal, never part
+of the sealed record, so none of it can influence a score.
 """
 
 import threading
@@ -27,6 +31,11 @@ class GameControls:
         self._resume = threading.Event()
         self._resume.set()  # running unless something pauses it
         self._stop = threading.Event()
+        self._restart = threading.Event()  # request a fresh sub-game
+        self._quit = threading.Event()  # clean quit (also notifies the opponent)
+        self._enable = threading.Event()  # opt in to the bidirectional control channel
+        self._status_lock = threading.Lock()
+        self._status = "READY"
 
     @property
     def paused(self) -> bool:
@@ -35,6 +44,18 @@ class GameControls:
     @property
     def stopped(self) -> bool:
         return self._stop.is_set()
+
+    @property
+    def restart_requested(self) -> bool:
+        return self._restart.is_set()
+
+    @property
+    def quit_requested(self) -> bool:
+        return self._quit.is_set()
+
+    @property
+    def enable_requested(self) -> bool:
+        return self._enable.is_set()
 
     def pause(self) -> None:
         """Hold the runtime before its next turn."""
@@ -52,6 +73,31 @@ class GameControls:
         """
         self._stop.set()
         self._resume.set()
+
+    def request_restart(self) -> None:
+        """Ask the active turn loop to abandon this sub-game and rebuild a fresh
+        one. Also releases any pause, for the same reason `stop` does."""
+        self._restart.set()
+        self._resume.set()
+
+    def clear_restart(self) -> None:
+        self._restart.clear()
+
+    def request_quit(self) -> None:
+        self._quit.set()
+        self._resume.set()
+
+    def request_enable(self) -> None:
+        self._enable.set()
+
+    def set_status(self, status: str) -> None:
+        with self._status_lock:
+            self._status = status
+
+    @property
+    def status(self) -> str:
+        with self._status_lock:
+            return self._status
 
     def wait_if_paused(self) -> None:
         """Block while paused, returning at once when playing -- or when stopped.
