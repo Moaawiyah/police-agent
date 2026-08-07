@@ -13,10 +13,16 @@ class TestPointThreat:
         threat = PointThreat((0, 0))
         assert threat.most_likely() == threat.most_likely()
 
+    def test_a_known_target_counts_as_evidence(self):
+        assert PointThreat((0, 0)).has_scent() is True
+
 
 class TestUniformThreat:
     def test_flat_prior_points_at_the_board_centre(self):
         assert UniformThreat(7).most_likely() == (3, 3)
+
+    def test_an_untouched_prior_is_not_evidence(self):
+        assert UniformThreat(7).has_scent() is False
 
     def test_even_boards_round_toward_the_low_corner(self):
         assert UniformThreat(8).most_likely() == (3, 3)
@@ -49,6 +55,9 @@ class TestProtocol:
 
             def most_likely(self):
                 return (4, 4)
+
+            def has_scent(self):
+                return True
 
         assert isinstance(FakeBelief(), ThreatEstimate)
 

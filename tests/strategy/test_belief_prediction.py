@@ -44,6 +44,29 @@ def test_a_ruled_out_cell_has_no_mass_to_spread():
     assert total(belief) == 1.0
 
 
+def test_a_barrier_stops_mass_from_spreading_through_it():
+    """A blocked neighbour gets none of the concentrated mass, only ambient leak."""
+    belief = BeliefGrid(7)
+    belief.observe_smell({"3,3": 0.9})
+
+    belief.diffuse(barriers={(2, 3)})
+    matrix = belief.as_matrix()
+
+    assert matrix[2][3] < matrix[4][3]  # the open, symmetric neighbour got it instead
+
+
+def test_mass_is_conserved_even_when_every_target_is_blocked():
+    """Walled in on every side, including staying put: mass has nowhere to go but stay."""
+    belief = BeliefGrid(7)
+    belief.observe_smell({"3,3": 0.9})
+    barriers = {(3, 3), (2, 3), (4, 3), (3, 2), (3, 4)}
+
+    belief.diffuse(barriers=barriers)
+
+    assert total(belief) == 1.0
+    assert belief.as_matrix()[3][3] > 0.0
+
+
 def test_ties_resolve_the_same_way_every_time():
     """The strategy above this is deterministic and needs a deterministic input."""
     answers = set()

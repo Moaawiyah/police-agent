@@ -1,33 +1,24 @@
 """The Bayesian belief map: where the police thinks the thief is.
 
-The police never observes the thief's cell (domain/rules.py); each turn it
-`diffuse()`s (mass spreads, thief moved) then `observe_smell()`s (fresh
-readings multiply favoured cells, normalising restores a distribution) --
-ch. 6.4's `b(s) = P(thief = s | observations)`. That order matters:
-sharpening then blurring would throw evidence away the turn it arrived.
-`scale()` opens the same update to non-scent evidence (`strategy/bluff.py`).
-
-Inference only: it answers `most_likely()` and holds no opinion about
-directions or who is lying.
+The police never observes the thief's cell (domain/rules.py); each turn it `diffuse()`s (mass
+spreads, thief moved) then `observe_smell()`s (fresh readings multiply favoured cells,
+normalising restores a distribution) -- ch. 6.4's `b(s) = P(thief = s | observations)`.
+That order matters: sharpening then blurring would throw evidence away the turn it
+arrived. `scale()` opens the same update to non-scent evidence (`strategy/bluff.py`).
+Inference only, holding no opinion about directions or who is lying.
 """
 from police_agent.constants import Cell
 
-# Weight a scent reading carries against the prior -- private judgement, lives
-# in game.toml, not an agreed term.
+# Weight a scent reading carries against the prior -- private, lives in game.toml, not agreed.
 DEFAULT_SMELL_TRUST = 4.0
 
-# Convexity of the intensity->likelihood curve. Above 1, a faint stale trail
-# cell is starved much harder than a fresh strong one -- linear barely tells
-# the two apart, and the belief ends up shaped like the whole trail.
+# Convexity of intensity->likelihood curve; above 1 a faint trail is starved harder than fresh.
 DEFAULT_SMELL_POWER = 2.0
 
-# Sliver of the posterior re-mixed to uniform each observation. Consecutive
-# scent readings are the same decaying trail sampled again, not independent
-# evidence, so without this a cell stays overweighted after the thief leaves.
+# Sliver of the posterior re-mixed to uniform each observation. Consecutive scent readings
+# are the same decaying trail sampled again -- without this a cell stays overweighted.
 DEFAULT_LEAK = 0.03
-
-# Below this the distribution has collapsed, not merely got small; dividing
-# through would amplify float noise into a confident answer.
+# Below this the distribution has collapsed; dividing through would amplify float noise.
 _EPSILON = 1e-9
 
 
@@ -50,6 +41,7 @@ class BeliefGrid:
         self._smell_trust = smell_trust
         self._smell_power = smell_power
         self._leak = leak
+        self._observed = False  # real evidence vs. an unstarted, still-uniform prior
         uniform = 1.0 / (board_size * board_size)  # flat prior: nothing known yet
         self._probs = [[uniform] * board_size for _ in range(board_size)]
 
@@ -68,13 +60,16 @@ class BeliefGrid:
         for key, value in (cells or {}).items():
             cell = self._parse(key)
             if cell is not None and isinstance(value, int | float):
-                boost = 1.0 + self._smell_trust * float(value) ** self._smell_power
+                intensity = min(1.0, max(0.0, float(value)))  # negative here can turn complex
+                boost = 1.0 + self._smell_trust * intensity**self._smell_power
                 self._probs[cell[0]][cell[1]] *= boost
+                self._observed = True
         self._normalize()
         self._leak_toward_uniform()
 
-    def diffuse(self) -> None:
-        """Predict: the thief moved one step, so spread each cell's mass over its reach."""
+    def diffuse(self, barriers: set[Cell] | None = None) -> None:
+        """Predict: spread mass over reach; a barrier target is skipped -- impassable."""
+        blocked = barriers or set()
         fresh = [[0.0] * self._size for _ in range(self._size)]
         for row in range(self._size):
             for col in range(self._size):
@@ -85,7 +80,10 @@ class BeliefGrid:
                     (row + d_row, col + d_col)
                     for d_row, d_col in self._OFFSETS
                     if self._in_bounds((row + d_row, col + d_col))
+                    and (row + d_row, col + d_col) not in blocked
                 ]
+                if not targets:
+                    targets = [(row, col)]  # walled in on every side: mass stays put
                 share = mass / len(targets)
                 for target_row, target_col in targets:
                     fresh[target_row][target_col] += share
@@ -118,6 +116,9 @@ class BeliefGrid:
         """A copy of the distribution, for the heatmap and the game log."""
         return [row[:] for row in self._probs]
 
+    def has_scent(self) -> bool:
+        return self._observed
+
     def _normalize(self) -> None:
         total = sum(sum(row) for row in self._probs)
         if total < _EPSILON:
@@ -127,8 +128,7 @@ class BeliefGrid:
         self._probs = [[prob / total for prob in row] for row in self._probs]
 
     def _leak_toward_uniform(self) -> None:
-        """Only `observe_smell` calls this -- the others already normalise once
-        per turn, and leaking there too would double it in one turn."""
+        """Only observe_smell leaks -- others already normalise; twice would double it."""
         if self._leak <= 0.0:
             return
         uniform = 1.0 / (self._size * self._size)

@@ -52,10 +52,10 @@ def _advance(belief, my_log, history, visited, barriers, index, recorded) -> lis
     if index >= len(history):
         return belief.as_matrix()
     message = history[index]
-    belief.diffuse()
-    belief.observe_smell(message.get("smell_grid"))
     if message.get("barrier_placed"):
         barriers.add(tuple(message["barrier_placed"]))
+    belief.diffuse(barriers)
+    belief.observe_smell(message.get("smell_grid"))
     step = message.get("step", index + 1)
     return recorded.get(step, belief.as_matrix())
 

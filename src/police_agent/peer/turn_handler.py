@@ -74,7 +74,7 @@ class TurnHandler:
         # One step of the belief filter, and the order is the substance of it:
         # the message is proof the thief moved, so the belief spreads *before*
         # the scent that arrived with it is allowed to sharpen it again.
-        self.threat.diffuse()
+        self.threat.diffuse(self.state.barriers)
         believed = self.threat.most_likely()  # where the hint gets measured from
         self._weigh_hint(message, believed)
         self.threat.observe_smell(message.smell_grid)

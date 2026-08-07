@@ -116,8 +116,9 @@ arbiter of it.
 
 - [x] `strategy/brain.py`: `PoliceBrainBase` seam + shipped `PoliceBrain`
       (minimise Manhattan distance, tie-break toward unvisited)
-- [x] `strategy/barrier.py`: deterministic placement — wall only when it leaves
-      the believed thief ≤ 1 escape, never when it would confine the police (3.4)
+- [x] `strategy/barrier.py`: deterministic placement — wall any reachable step
+      that takes an escape from the believed thief, never when it would confine
+      the police (3.4)
 - [x] `strategy/threat.py`: `ThreatEstimate` Protocol + `PointThreat` /
       `UniformThreat` stand-ins until the belief map lands
 - [x] `strategy/__init__.py`: `resolve_brain` reading `strategy.police_class`
