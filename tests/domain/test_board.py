@@ -69,3 +69,35 @@ class TestBarriers:
         targets = Board(size=7).barrier_targets((3, 3), barriers={(3, 3)})
         assert (3, 3) not in targets
         assert len(targets) == 4
+
+
+class TestReachableArea:
+    def test_open_board_reaches_every_cell(self):
+        assert Board(size=3).reachable_area((0, 0)) == 9
+
+    def test_a_wall_shrinks_the_pocket(self):
+        # Sealing both neighbours of the corner strands it alone.
+        board = Board(size=7)
+        assert board.reachable_area((0, 0), barriers={(0, 1), (1, 0)}) == 1
+
+    def test_limit_stops_the_fill_early(self):
+        board = Board(size=7)
+        assert board.reachable_area((3, 3), limit=5) == 5
+
+
+class TestShortestPathLength:
+    def test_same_cell_is_zero(self):
+        assert Board(size=7).shortest_path_length((3, 3), (3, 3)) == 0
+
+    def test_matches_manhattan_on_an_open_board(self):
+        board = Board(size=7)
+        assert board.shortest_path_length((0, 0), (2, 3)) == 5
+
+    def test_a_wall_can_lengthen_the_real_path(self):
+        # Manhattan distance stays 2; the real path must detour around the wall.
+        board = Board(size=7)
+        assert board.shortest_path_length((0, 0), (0, 2), barriers={(0, 1)}) == 4
+
+    def test_none_when_the_goal_is_sealed_off(self):
+        board = Board(size=3)
+        assert board.shortest_path_length((0, 0), (2, 2), barriers={(0, 1), (1, 0)}) is None

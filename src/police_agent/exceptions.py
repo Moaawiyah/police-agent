@@ -29,3 +29,8 @@ class MoveError(PoliceAgentError):
 
 class CryptoError(PoliceAgentError):
     """A commitment did not match what was revealed, or terms were not signed."""
+
+
+class RestartRequested(PoliceAgentError):  # noqa: N818 - a control-flow signal, not a failure
+    """Control-channel signal: abandon the current sub-game and rebuild a fresh
+    one (auto-approved once bidirectional control is active on both sides)."""

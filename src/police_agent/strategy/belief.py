@@ -7,13 +7,15 @@ That order matters: sharpening then blurring would throw evidence away the turn 
 arrived. `scale()` opens the same update to non-scent evidence (`strategy/bluff.py`).
 Inference only, holding no opinion about directions or who is lying.
 """
+
 from police_agent.constants import Cell
 
 # Weight a scent reading carries against the prior -- private, lives in game.toml, not agreed.
 DEFAULT_SMELL_TRUST = 4.0
 
-# Convexity of intensity->likelihood curve; above 1 a faint trail is starved harder than fresh.
-DEFAULT_SMELL_POWER = 2.0
+# Convexity of intensity->likelihood curve; above 1 a faint (relative to this reading's own
+# peak) cell is starved harder than a fresh one.
+DEFAULT_SMELL_POWER = 3.0
 
 # Sliver of the posterior re-mixed to uniform each observation. Consecutive scent readings
 # are the same decaying trail sampled again -- without this a cell stays overweighted.
@@ -54,14 +56,24 @@ class BeliefGrid:
         return cls(terms["board_size"], trust, power, leak)
 
     def observe_smell(self, cells: dict | None) -> None:
-        """`1 + trust*intensity**power` per smelly cell, normalise, then leak
+        """`1 + trust*reading**power` per smelly cell, where `reading` is that
+        cell's intensity relative to THIS snapshot's own peak, not an absolute
+        value. A field that has broadly faded (lag, distance, time since the
+        last deposit) still has a relatively freshest cell, and that is the one
+        evidence should concentrate on -- an absolute reading would starve it
+        just because the whole field is dim right now. Then normalise and leak
         toward uniform. No reading leaves a cell alone, not ruled out -- silence
         is not evidence of absence. Malformed entries are skipped, not fatal."""
+        parsed: dict = {}
         for key, value in (cells or {}).items():
             cell = self._parse(key)
             if cell is not None and isinstance(value, int | float):
-                intensity = min(1.0, max(0.0, float(value)))  # negative here can turn complex
-                boost = 1.0 + self._smell_trust * intensity**self._smell_power
+                parsed[cell] = min(1.0, max(0.0, float(value)))  # negative here can turn complex
+        peak = max(parsed.values(), default=0.0)
+        if peak > 0.0:
+            for cell, intensity in parsed.items():
+                reading = intensity / peak
+                boost = 1.0 + self._smell_trust * reading**self._smell_power
                 self._probs[cell[0]][cell[1]] *= boost
                 self._observed = True
         self._normalize()

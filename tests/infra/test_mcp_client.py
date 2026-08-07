@@ -27,7 +27,7 @@ class Recorder:
         self.calls: list[tuple[str, dict]] = []
         self._failures = failures
 
-    def __call__(self, tool: str, arguments: dict) -> None:
+    def __call__(self, tool: str, arguments: dict, timeout: float | None = None) -> None:
         self.calls.append((tool, arguments))
         if len(self.calls) <= self._failures:
             raise OSError("connection refused")

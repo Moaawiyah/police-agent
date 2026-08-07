@@ -43,12 +43,14 @@ class TestWhenItWalls:
         assert (0, 1) in state.barriers
         assert state.position == (1, 1)  # walling forgoes the step (3.4)
 
-    def test_walls_even_when_the_thief_still_has_several_escapes(self):
-        # (0, 2) is two cells from the believed (2, 2) in a straight line, so
-        # (1, 2) is a barrier target that is also one of its four open escapes.
-        decision = choose_barrier(police(start=(0, 2)), (2, 2), barriers_max=5)
+    def test_walls_a_side_escape_for_free_even_with_several_left(self):
+        # (1, 1) is diagonally two cells from the believed (2, 2): two equally
+        # short paths exist (via (2, 1) or via (1, 2)), so sealing one of them
+        # costs no detour at all, even though two more escapes stay open.
+        decision = choose_barrier(police(start=(1, 1)), (2, 2), barriers_max=5)
         assert decision is not None
         assert decision.action.move_type is MoveType.BARRIER
+        assert decision.action.direction is Direction.S  # (2, 1)
 
 
 class TestWhenItRefuses:
@@ -64,6 +66,13 @@ class TestWhenItRefuses:
     def test_never_walls_a_thief_it_cannot_reach(self):
         # (0, 0) is cornered, but three cells away no wall of ours can touch it.
         assert choose_barrier(police(start=(2, 1)), (0, 0), barriers_max=5) is None
+
+    def test_refuses_a_costly_wall_when_several_escapes_remain(self):
+        """(0, 2) is two cells from the believed (2, 2) in a straight line, so
+        the only reachable escape, (1, 2), sits on the sole shortest path --
+        sealing it would turn a 2-step approach into a 4-step detour. With
+        three more escapes still open, closing the gap wins instead."""
+        assert choose_barrier(police(start=(0, 2)), (2, 2), barriers_max=5) is None
 
     def test_never_walls_when_the_thief_is_already_out_of_escapes(self):
         state = police(start=(1, 1), barriers=[(0, 1), (1, 0)])
@@ -125,3 +134,36 @@ class TestDeterminism:
         first = choose_barrier(police(start=(1, 1)), (0, 0), barriers_max=2)
         second = choose_barrier(police(start=(1, 1)), (0, 0), barriers_max=2)
         assert first == second
+
+
+class TestWideRangeFallsBackToEncirclement:
+    # Doorway (4, 0) is the sole connection between the open board and a
+    # 14-cell room filling rows 5-6 (matches test_encirclement.py's fixture).
+    _ROOM_BARRIERS = [(4, 1), (4, 2), (4, 3), (4, 4), (4, 5), (4, 6)]
+
+    def test_seals_a_pocket_past_the_close_range_bound(self):
+        state = police(start=(3, 0), board_size=7, barriers=self._ROOM_BARRIERS)
+        decision = choose_barrier(state, believed=(3, 3), barriers_max=5)
+        assert decision is not None
+        assert decision.action.direction is Direction.S  # (4, 0), one step south
+        assert "shrinks the pocket" in decision.rationale
+
+    def test_still_refuses_past_wide_reach(self):
+        state = police(start=(0, 0), board_size=7, barriers=self._ROOM_BARRIERS)
+        assert choose_barrier(state, believed=(6, 6), barriers_max=5) is None
+
+
+class TestEndgameRelaxationFlowsThrough:
+    def test_an_open_board_wide_range_wall_is_refused_by_default(self):
+        state = police(start=(0, 0), board_size=7)
+        assert choose_barrier(state, believed=(0, 3), barriers_max=5) is None
+
+    def test_the_same_wall_qualifies_once_rounds_left_enters_the_endgame(self):
+        """An unused barrier scores nothing at game end, so `choose_barrier`
+        passes `rounds_left` straight through to `wide_placement`, which is
+        what turns this exact refusal into a placement."""
+        state = police(start=(0, 0), board_size=7)
+        decision = choose_barrier(state, believed=(0, 3), barriers_max=5, rounds_left=10)
+        assert decision is not None
+        assert decision.action.move_type is MoveType.BARRIER
+        assert "shrinks the pocket" in decision.rationale

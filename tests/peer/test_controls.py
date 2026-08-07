@@ -80,3 +80,57 @@ def test_an_abandoned_game_does_not_ask_the_opponent_to_reveal():
 
     assert transport.sent_audits == []
     assert summary["audit"]["skipped"] is True
+
+
+def test_restart_and_quit_start_unrequested():
+    controls = GameControls()
+
+    assert not controls.restart_requested
+    assert not controls.quit_requested
+    assert not controls.enable_requested
+
+
+def test_requesting_restart_sets_the_flag_and_releases_a_pause():
+    controls = GameControls()
+    controls.pause()
+
+    controls.request_restart()
+
+    assert controls.restart_requested
+    assert not controls.paused
+
+
+def test_clearing_restart_is_a_one_shot_consume():
+    controls = GameControls()
+    controls.request_restart()
+
+    controls.clear_restart()
+
+    assert not controls.restart_requested
+
+
+def test_requesting_quit_sets_the_flag_and_releases_a_pause():
+    controls = GameControls()
+    controls.pause()
+
+    controls.request_quit()
+
+    assert controls.quit_requested
+    assert not controls.paused
+
+
+def test_requesting_enable_sets_the_flag():
+    controls = GameControls()
+
+    controls.request_enable()
+
+    assert controls.enable_requested
+
+
+def test_status_defaults_to_ready_and_is_settable():
+    controls = GameControls()
+    assert controls.status == "READY"
+
+    controls.set_status("THINKING")
+
+    assert controls.status == "THINKING"

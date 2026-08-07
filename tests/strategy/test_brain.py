@@ -77,17 +77,33 @@ class TestNeverIllegal:
 
 
 class TestDeterminism:
-    def test_two_differently_seeded_brains_agree(self):
-        """No coin flip in the move path: the seed cannot change the sealed move."""
+    def test_the_same_seed_always_yields_the_same_decision(self):
+        """Determinism now lives in the seed, not in the absence of one: two
+        brains built from identically-seeded generators must still agree."""
         state, threat = police(start=(3, 1)), PointThreat((1, 4))
-        first = PoliceBrain(random.Random(1)).decide(state, threat, 5)
-        second = PoliceBrain(random.Random(999)).decide(state, threat, 5)
+        first = PoliceBrain(random.Random(7)).decide(state, threat, 5)
+        second = PoliceBrain(random.Random(7)).decide(state, threat, 5)
         assert first == second
 
-    def test_repeated_calls_on_the_same_state_agree(self):
-        state, threat = police(start=(0, 3)), PointThreat((4, 0))
-        brain = PoliceBrain()
-        assert brain.decide(state, threat, 5) == brain.decide(state, threat, 5)
+    def test_a_genuine_tie_can_resolve_differently_across_seeds(self):
+        """(3, 1) -> believed (1, 4): N and E both sit at distance 4, both
+        unvisited -- a real tie the old fixed-order tie-break always broke
+        toward N. Enough seeds must reach both, or nothing is actually being
+        randomized among the tied candidates."""
+        state, threat = police(start=(3, 1)), PointThreat((1, 4))
+        directions = {
+            PoliceBrain(random.Random(seed)).decide(state, threat, 5).action.direction
+            for seed in range(30)
+        }
+        assert directions == {Direction.N, Direction.E}
+
+    def test_randomness_never_costs_movement_quality(self):
+        """(4, 4) -> believed (0, 4): only N minimises the gap, no tie at all.
+        No seed may ever pick anything else."""
+        state, threat = police(start=(4, 4)), PointThreat((0, 4))
+        for seed in range(20):
+            decision = PoliceBrain(random.Random(seed)).decide(state, threat, 5)
+            assert decision.action.direction is Direction.N
 
 
 class TestExtensionSeam:

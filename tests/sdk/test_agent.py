@@ -227,6 +227,26 @@ def test_the_runtime_is_the_match_and_is_not_rebuilt():
     assert agent.runtime is agent.runtime
 
 
+def test_restart_drops_the_runtime_so_the_next_access_builds_a_fresh_one():
+    agent = agent_with()
+    first = agent.runtime
+
+    agent.restart()
+
+    assert agent.runtime is not first
+
+
+def test_restart_reuses_the_same_transport_rather_than_reconnecting():
+    """Rebinding the port the old server still holds would fail outright."""
+    agent = agent_with()
+    transport = agent.connect()
+
+    agent.restart()
+
+    assert agent.connect() is transport
+    assert agent.runtime.transport is transport
+
+
 def test_play_returns_the_match_summary():
     agent = agent_with(transport=FakeTransport(incoming=[thief_turn(1)]))
 

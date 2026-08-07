@@ -16,7 +16,7 @@ class FixedBrain:
     def __init__(self, action) -> None:
         self.action = action
 
-    def decide(self, state, threat, barriers_max):
+    def decide(self, state, threat, barriers_max, rounds_left=None):
         return Decision(self.action, "fixed for the test")
 
 
@@ -48,15 +48,33 @@ def test_placing_a_barrier_makes_no_capture_claim():
     assert sent["barrier_placed"] == [0, 1]  # declared in the clear, as it must be
 
 
-def test_the_strategy_walls_a_cornered_thief_over_the_real_loop():
-    """End to end: scent puts the thief in a corner, the shipped brain walls it."""
+def test_the_strategy_closes_distance_over_a_costly_wall_in_the_real_loop():
+    """End to end: scent puts the thief in a corner, but the only reachable
+    wall there would cost a detour while two escapes remain open -- the
+    shipped brain closes the gap instead of paying for a partial seal."""
     transport = FakeTransport(
         incoming=[thief_turn(1, smell_grid={"0,0": 0.9})],
     )
     summary = PoliceRuntime(config_with(positions__cop_start=[0, 2]), transport).run()
 
+    assert summary["barriers_used"] == 0
+    assert summary["my_log"][0]["position"] == [0, 1]  # stepped toward it instead
+
+
+def test_the_real_loop_computes_rounds_left_and_reaches_the_endgame_wall():
+    """End to end: the same open-board wide-range wall that a mid-game turn
+    would refuse (see test_barrier.py's TestEndgameRelaxationFlowsThrough)
+    fires here because turn_sender.take_turn computed rounds_left = max_steps
+    - step_number = 10 on the very first turn, landing exactly on the
+    endgame boundary."""
+    transport = FakeTransport(
+        incoming=[thief_turn(1, smell_grid={"0,3": 0.9})],
+    )
+    summary = PoliceRuntime(
+        config_with(positions__cop_start=[0, 0], rules__max_steps=10), transport
+    ).run()
+
     assert summary["barriers_used"] == 1
-    assert transport.sent_turns[0]["barrier_placed"] == [0, 1]
 
 
 def test_ceiling_survival_without_a_reveal_becomes_a_technical_win():

@@ -1,6 +1,7 @@
 """Turn-loop operations delegated by :class:`PoliceRuntime`."""
 
 from police_agent.domain.rules import ABORTED, CAPTURE, SURVIVAL, TECHNICAL_LOSS, TIMEOUT
+from police_agent.peer import runtime_control
 from police_agent.peer.protocol import TurnMessage
 from police_agent.peer.turn_sender import take_turn
 from police_agent.peer.view import belief_matrix, snapshot
@@ -14,6 +15,13 @@ def notify(runtime, event: dict) -> None:
 def turn_loop(runtime) -> None:
     timeout = runtime._turn_timeout()
     while runtime._result is None:
+        # Pumped once per round rather than continuously: a restart or quit is
+        # noticed at the same cadence a real opponent's turn would arrive at,
+        # which is the same responsiveness the reference's own design accepts.
+        runtime_control.pump(runtime, runtime_control.WAITING)
+        runtime_control.check(runtime)  # may raise RestartRequested
+        if runtime._result is not None:
+            return
         runtime.controls.wait_if_paused()
         if runtime.controls.stopped:
             runtime._result = (ABORTED, None)
