@@ -67,13 +67,57 @@ class TestObserving:
 
         assert belief.most_likely() == (1, 1)
 
-    def test_readings_accumulate_instead_of_replacing_each_other(self):
-        """This is the whole difference from the argmax placeholder it replaced."""
+    def test_older_evidence_is_not_erased_by_a_new_reading(self):
+        """This is the whole difference from the argmax placeholder it replaced:
+        a second, unrelated reading must not reset the distribution -- the first
+        cell's mass should still beat an untouched cell's, even once it is no
+        longer the most likely."""
         belief = BeliefGrid(7)
         belief.observe_smell({"0,0": 0.9})
-        belief.observe_smell({"5,5": 0.1})
+        belief.observe_smell({"5,5": 0.9})
 
-        assert belief.most_likely() == (0, 0)
+        matrix = belief.as_matrix()
+        assert matrix[0][0] > matrix[3][3]  # (3, 3) was never observed at all
+
+    def test_a_fresh_reading_is_trusted_by_its_own_peak_not_absolute_scale(self):
+        """`reading = scent / peak` is normalised WITHIN each packet, so a
+        reading's strongest cell is always fully trusted however faint it is in
+        absolute terms -- a decaying trail's last surviving cell reads the same
+        as a reading straight off a fresh emission. That is the deliberate
+        trade for tracking a moving thief: the newest evidence is never starved
+        just because the whole field has faded."""
+        belief = BeliefGrid(7)
+        belief.observe_smell({"0,0": 0.9})  # a strong, fresh reading
+        belief.observe_smell({"5,5": 0.1})  # faint in absolute terms, but its own peak
+
+        assert belief.most_likely() == (5, 5)
+
+    def test_relative_weighting_within_one_reading_is_unaffected(self):
+        """Normalisation is per-packet, not per-cell -- two cells in the SAME
+        reading still rank by their relative intensity."""
+        belief = BeliefGrid(7)
+        belief.observe_smell({"0,0": 0.9, "6,6": 0.3})
+
+        matrix = belief.as_matrix()
+        assert matrix[0][0] > matrix[6][6]
+
+    def test_an_empty_grid_is_safe_and_leaves_belief_unobserved(self):
+        belief = BeliefGrid(7)
+        belief.observe_smell({})
+
+        assert total(belief) == 1.0
+        assert belief.has_scent() is False
+
+    def test_an_all_zero_grid_is_safe_and_boosts_nothing(self):
+        """A zero peak means there is nothing to normalise against -- not a
+        division by zero, and not evidence either."""
+        belief = BeliefGrid(7)
+        belief.observe_smell({"0,0": 0.0, "1,1": 0.0})
+
+        assert total(belief) == 1.0
+        matrix = belief.as_matrix()
+        assert len({round(p, 12) for row in matrix for p in row}) == 1  # still flat
+        assert belief.has_scent() is False
 
     def test_a_trail_is_still_remembered_a_turn_after_it_went_quiet(self):
         belief = BeliefGrid(7)
@@ -132,7 +176,7 @@ class TestConstruction:
     def test_power_and_leak_also_default_to_the_shipped_values(self, config):
         belief = BeliefGrid.from_config(terms_from_config(config), config)
 
-        assert belief._smell_power == 2.0
+        assert belief._smell_power == 3.0
         assert belief._leak == 0.03
 
     def test_power_and_leak_are_overridable_from_the_private_file(self):
