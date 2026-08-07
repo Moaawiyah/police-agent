@@ -58,3 +58,52 @@ class Board:
         walled = barriers or set()
         here = [origin] if self.in_bounds(origin) and origin not in walled else []
         return here + self.neighbors(origin, barriers)
+
+    def reachable_area(
+        self, start: Cell, barriers: set[Cell] | None = None, limit: int | None = None
+    ) -> int:
+        """How many cells `start` can still reach -- a flood fill, not a distance.
+
+        `distance` is Manhattan and blind to barriers; this is what a barrier
+        placement actually shrinks. `limit` stops the fill early once it no
+        longer matters (`strategy/encirclement.py` only cares whether an area is
+        "small" or "large", not its exact size once it is clearly large).
+        """
+        seen = {start}
+        frontier = [start]
+        while frontier and (limit is None or len(seen) < limit):
+            nxt = []
+            for cell in frontier:
+                for neighbor in self.neighbors(cell, barriers):
+                    if neighbor not in seen:
+                        seen.add(neighbor)
+                        nxt.append(neighbor)
+            frontier = nxt
+        return len(seen)
+
+    def shortest_path_length(
+        self, start: Cell, goal: Cell, barriers: set[Cell] | None = None
+    ) -> int | None:
+        """BFS distance honouring `barriers`, or None if `goal` is unreachable.
+
+        `distance` (Manhattan) is a lower bound only; once barriers exist the
+        true remaining chase can be longer, or the target can be cut off
+        entirely -- something a barrier's own evaluation must be able to see.
+        """
+        if start == goal:
+            return 0
+        seen = {start}
+        frontier = [start]
+        steps = 0
+        while frontier:
+            steps += 1
+            nxt = []
+            for cell in frontier:
+                for neighbor in self.neighbors(cell, barriers):
+                    if neighbor == goal:
+                        return steps
+                    if neighbor not in seen:
+                        seen.add(neighbor)
+                        nxt.append(neighbor)
+            frontier = nxt
+        return None

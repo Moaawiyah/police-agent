@@ -17,11 +17,14 @@ from police_agent.domain.actions import barrier
 from police_agent.domain.board import Board
 from police_agent.domain.own_state import OwnGameState
 from police_agent.strategy.decision import Decision
+from police_agent.strategy.encirclement import WIDE_REACH, wide_placement
 
 # A barrier can only ever touch the thief when the two are at most two cells
 # apart: the police walls a cell one step from itself, and the thief steps one
-# cell from where it stands. Past that a wall is geometrically incapable of
-# taking anything away from it, so there is nothing to evaluate.
+# cell from where it stands. Past that, no candidate can overlap both, so the
+# escape-removal check below has nothing to evaluate -- see `encirclement.py`
+# for how a wall past this range is judged instead (by pocket size, not by a
+# single immediate escape).
 BARRIER_REACH = 2
 
 
@@ -46,23 +49,35 @@ def choose_barrier(
     artifact, not the thief -- so `choose_barrier` refuses until real evidence
     exists. `PoliceBrain` supplies this from the belief's own `has_scent()`;
     direct callers default to `True`, matching a known target in a unit test.
+
+    Two ranges, two different questions. Within `BARRIER_REACH` the question is
+    geometric and exact: does this wall remove one of `believed`'s immediate
+    escapes? Beyond it and out to `encirclement.WIDE_REACH`, no wall can touch an
+    immediate escape at all, so the question becomes whether it shrinks the
+    thief's whole reachable pocket by enough to be worth a turn -- see
+    `encirclement.wide_placement` for why that bar is set where it is.
     """
     if not has_evidence:
         return None
     if state.my_barriers >= barriers_max:
         return None
-    if state.board.distance(state.position, believed) > BARRIER_REACH:
-        return None
-    escapes = {target for _, target in state.board.legal_moves(believed, state.barriers)}
-    if not escapes:
-        return None
-    cell = _best_placement(state, escapes)
-    if cell is None:
-        return None
-    return Decision(
-        barrier(direction_to(state.position, cell)),
-        f"wall {cell}: leaves the believed thief at {believed} {len(escapes) - 1} step(s)",
-    )
+    gap = state.board.distance(state.position, believed)
+    if gap <= BARRIER_REACH:
+        escapes = {target for _, target in state.board.legal_moves(believed, state.barriers)}
+        cell = _best_placement(state, escapes) if escapes else None
+        if cell is not None:
+            return Decision(
+                barrier(direction_to(state.position, cell)),
+                f"wall {cell}: leaves the believed thief at {believed} {len(escapes) - 1} step(s)",
+            )
+    if gap <= WIDE_REACH:
+        cell = wide_placement(state.board, state.position, state.barriers, believed)
+        if cell is not None:
+            return Decision(
+                barrier(direction_to(state.position, cell)),
+                f"seal {cell}: shrinks the pocket around the believed thief at {believed}",
+            )
+    return None
 
 
 def _best_placement(state: OwnGameState, escapes: set[Cell]) -> Cell | None:
