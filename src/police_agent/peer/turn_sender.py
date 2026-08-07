@@ -22,7 +22,10 @@ def take_turn(runtime, claim_response: dict | None = None) -> None:
     # brain runs rather than after the hint is written, so anything the turn
     # spends on a model is attributed to the turn that spent it.
     runtime.tokens.begin_step()
-    decision = runtime.brain.decide(runtime.state, runtime.threat, runtime.barriers_max)
+    rounds_left = runtime.rules.max_steps - runtime.state.step_number
+    decision = runtime.brain.decide(
+        runtime.state, runtime.threat, runtime.barriers_max, rounds_left
+    )
     if not runtime.state.apply_move(decision.action, runtime.barriers_max):
         # The brain is contractually forbidden from returning an illegal action,
         # so reaching this is a bug in the strategy, not a game event. Holding

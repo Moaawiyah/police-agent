@@ -29,7 +29,11 @@ BARRIER_REACH = 2
 
 
 def choose_barrier(
-    state: OwnGameState, believed: Cell, barriers_max: int, has_evidence: bool = True
+    state: OwnGameState,
+    believed: Cell,
+    barriers_max: int,
+    has_evidence: bool = True,
+    rounds_left: int | None = None,
 ) -> Decision | None:
     """Return the barrier placement worth making this turn, or None to move instead.
 
@@ -56,6 +60,11 @@ def choose_barrier(
     immediate escape at all, so the question becomes whether it shrinks the
     thief's whole reachable pocket by enough to be worth a turn -- see
     `encirclement.wide_placement` for why that bar is set where it is.
+
+    `rounds_left`, when the caller has it, only ever loosens the wide-range
+    bar in the match's closing rounds (`encirclement.ENDGAME_ROUNDS`) -- an
+    unused barrier scores nothing at game end, so the tempo this would have
+    cost earlier is no longer being protected for anything.
     """
     if not has_evidence:
         return None
@@ -64,14 +73,14 @@ def choose_barrier(
     gap = state.board.distance(state.position, believed)
     if gap <= BARRIER_REACH:
         escapes = {target for _, target in state.board.legal_moves(believed, state.barriers)}
-        cell = _best_placement(state, escapes) if escapes else None
+        cell = _best_placement(state, believed, escapes) if escapes else None
         if cell is not None:
             return Decision(
                 barrier(direction_to(state.position, cell)),
                 f"wall {cell}: leaves the believed thief at {believed} {len(escapes) - 1} step(s)",
             )
     if gap <= WIDE_REACH:
-        cell = wide_placement(state.board, state.position, state.barriers, believed)
+        cell = wide_placement(state.board, state.position, state.barriers, believed, rounds_left)
         if cell is not None:
             return Decision(
                 barrier(direction_to(state.position, cell)),
@@ -80,19 +89,33 @@ def choose_barrier(
     return None
 
 
-def _best_placement(state: OwnGameState, escapes: set[Cell]) -> Cell | None:
-    """The first reachable cell that takes an escape away without trapping us.
+def _best_placement(state: OwnGameState, believed: Cell, escapes: set[Cell]) -> Cell | None:
+    """The first reachable cell that takes an escape away without trapping us
+    or costing ground -- unless the escape it takes is the thief's last one,
+    in which case sealing it *is* the capture and the cost no longer matters.
 
     Candidates come from the board in its fixed N/S/E/W order, so the same state
     always yields the same placement. Any candidate that would leave the police
     with no legal step is rejected outright: 3.4 warns that a greedily placed
-    barrier "may imprison the police itself behind the wall it built".
+    barrier "may imprison the police itself behind the wall it built". Past
+    that, closing the gap always beats a partial, costly seal when the chase
+    can simply continue -- so a wall that is not the final escape must not
+    lengthen the police's own path to `believed` either.
     """
+    sealing_the_last_escape = len(escapes) == 1
+    before_gap = None
+    if not sealing_the_last_escape:
+        before_gap = state.board.shortest_path_length(state.position, believed, state.barriers)
     for cell in state.board.barrier_targets(state.position, state.barriers):
         if cell == state.position or cell not in escapes:
             continue
-        if _would_confine(state.board, state.position, state.barriers | {cell}):
+        trial = state.barriers | {cell}
+        if _would_confine(state.board, state.position, trial):
             continue
+        if before_gap is not None:
+            after_gap = state.board.shortest_path_length(state.position, believed, trial)
+            if after_gap is None or after_gap > before_gap:
+                continue
         return cell
     return None
 
