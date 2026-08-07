@@ -36,15 +36,17 @@ def test_a_confirmed_capture_without_a_reveal_becomes_a_technical_win():
 def test_the_police_claims_the_cell_it_stepped_onto():
     """From (0,0) with no scent yet, the chase heads for the board centre.
 
-    N and W are off-board and S and E are equidistant from (3,3), so the fixed
-    N/S/E/W tie-break takes S to (1,0) -- and the claim must be that same cell,
-    not the one it came from.
+    N and W are off-board and S and E are equidistant from (3,3), so either is
+    a legal first step -- which one is no longer fixed (movement ties are now
+    broken randomly, see strategy/brain.py). What must hold regardless is that
+    the claim names wherever the police actually stepped, not the cell it left.
     """
     summary, transport = run_against([thief_turn(1)])
 
     sent = TurnMessage.from_dict(transport.sent_turns[0])
-    assert sent.capture_claim == [1, 0]
-    assert summary["my_log"][0]["position"] == [1, 0]
+    stepped_to = summary["my_log"][0]["position"]
+    assert stepped_to in ([1, 0], [0, 1])  # S or E: the only two legal ties from (0,0)
+    assert sent.capture_claim == stepped_to
     assert (sent.sender, sent.step) == ("police", 1)
 
 
