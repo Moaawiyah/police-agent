@@ -92,6 +92,17 @@ class LivePeerApp:
         self._window.set_turn(False, "QUITTING...")
         self._window.root.after(QUIT_GRACE_MS, self._window.root.destroy)
 
+    def restart(self) -> None:
+        """Play a fresh sub-game: a new handshake and a new runtime, never a
+        re-armed one -- only reachable once the last game has finished (the
+        button locks in `start`), so there is nothing still in flight to race.
+        """
+        self._agent.restart()
+        self._controls = GameControls()
+        self._agent.controls = self._controls
+        self._summary = None
+        self.start()
+
     def _worker(self) -> None:
         try:
             self._summary = self._agent.play()

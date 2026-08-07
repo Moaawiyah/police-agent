@@ -1,13 +1,14 @@
-"""The live control bar: Start, Pause, Play, Stop, Quit.
+"""The live control bar: Start, Pause, Play, Stop, Quit, Restart.
 
 The window opens idle. Nothing touches the network until Start is pressed, which
 is what makes it usable in a demonstration: both peers can be opened, the boards
 inspected, and the match begun when someone is watching.
 
-Every button here steers *this* peer and only this peer. There is no button that
-does anything to the opponent, because there is no channel to do it over -- the
+Every button here steers *this* peer and only this peer, and Restart is no
+exception: it plays a brand-new local sub-game against the same opponent, not a
+signal sent to it. There is no channel to coordinate a restart over -- the
 protocol carries turns and audits, and a control message the thief never agreed
-to read would be a pause that only one side observed.
+to read would be a pause (or a restart) that only one side observed.
 """
 
 import tkinter as tk
@@ -29,18 +30,25 @@ class LiveControls:
         self.stop.pack(side="left")
         self.quit = tk.Button(bar, text="Quit", command=app.quit, state="normal")
         self.quit.pack(side="left", padx=(8, 0))
+        self.restart = tk.Button(bar, text="Restart", command=app.restart, state="disabled")
+        self.restart.pack(side="left", padx=(8, 0))
 
     def mark_started(self) -> None:
         """Lock Start and release the live steers. Start is not re-armable.
 
         A second Start would negotiate a second handshake on a runtime that has
-        already agreed its terms, so the button is spent once pressed.
+        already agreed its terms, so the button is spent once pressed. Restart
+        exists for exactly this reason: it builds a fresh runtime rather than
+        re-arming this one, so it locks here too -- there is nothing to restart
+        until the sub-game it would replace has actually finished.
         """
         self.start.config(state="disabled")
+        self.restart.config(state="disabled")
         for button in (self.pause, self.play, self.stop):
             button.config(state="normal")
 
     def mark_finished(self) -> None:
-        """The game is over: nothing is left to steer, but the window stays open."""
+        """The game is over: nothing is left to steer, but a restart now makes sense."""
         for button in (self.pause, self.play, self.stop):
             button.config(state="disabled")
+        self.restart.config(state="normal")

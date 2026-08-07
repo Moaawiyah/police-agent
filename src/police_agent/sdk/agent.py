@@ -110,6 +110,18 @@ class PoliceAgentSDK:
     def play(self) -> dict:
         return self.runtime.run()
 
+    def restart(self) -> None:
+        """Drop the finished runtime so the next `play()` builds a fresh one.
+
+        The transport (and the server bound to this port) is left untouched
+        and reused -- rebinding it would race the port the old one still
+        holds. Only the game state is new: a fresh `PoliceRuntime` negotiates
+        its own handshake in `run()`, so this never re-arms a runtime that has
+        already agreed its terms (`gui/live_controls.py`'s Start button is
+        deliberately not re-armable for that exact reason).
+        """
+        self._runtime = None
+
     def load_summary(self, path: str | Path) -> dict:
         return load_summary(path)
 
