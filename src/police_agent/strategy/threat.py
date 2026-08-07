@@ -28,7 +28,7 @@ class ThreatEstimate(Protocol):
     it must not import or subclass anything from this package.
     """
 
-    def diffuse(self) -> None:
+    def diffuse(self, barriers: set[Cell] | None = None) -> None:
         """The thief has moved. Spread the belief over where it could now be."""
         ...
 
@@ -44,6 +44,10 @@ class ThreatEstimate(Protocol):
         """The cell the thief is currently believed most likely to occupy."""
         ...
 
+    def has_scent(self) -> bool:
+        """Whether a real reading has ever been folded in, not just diffusion."""
+        ...
+
 
 class PointThreat:
     """A belief collapsed onto one cell -- "the thief is right there".
@@ -57,7 +61,7 @@ class PointThreat:
     def __init__(self, cell: Cell) -> None:
         self.cell = cell
 
-    def diffuse(self) -> None:
+    def diffuse(self, barriers: set[Cell] | None = None) -> None:
         """A fixed target does not drift; the point of it is that it holds still."""
 
     def observe_smell(self, cells: dict | None) -> None:
@@ -68,6 +72,10 @@ class PointThreat:
 
     def most_likely(self) -> Cell:
         return self.cell
+
+    def has_scent(self) -> bool:
+        """Known outright, which is at least as good as a real reading."""
+        return True
 
 
 class UniformThreat:
@@ -84,7 +92,7 @@ class UniformThreat:
             raise ValueError(f"Board size must be positive, got {board_size}")
         self.board_size = board_size
 
-    def diffuse(self) -> None:
+    def diffuse(self, barriers: set[Cell] | None = None) -> None:
         """A flat prior is already maximally spread; diffusing it changes nothing."""
 
     def observe_smell(self, cells: dict | None) -> None:
@@ -96,3 +104,7 @@ class UniformThreat:
     def most_likely(self) -> Cell:
         middle = (self.board_size - 1) // 2
         return (middle, middle)
+
+    def has_scent(self) -> bool:
+        """This is the exact "before any scent" state the name promises."""
+        return False

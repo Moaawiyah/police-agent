@@ -45,6 +45,14 @@ class TestAbsorb:
         assert scent.intensity_at((2, 2)) == 0.7
         assert scent.intensity_at((5, 5)) == 0.2
 
+    def test_a_negative_or_oversized_value_is_clamped_to_the_agreed_range(self):
+        """The other side's number, unchecked, could poison this peer's own view."""
+        scent = scent_field()
+        scent.absorb({"2,2": -5.0, "5,5": 99.0})
+
+        assert scent.intensity_at((2, 2)) == 0.0
+        assert scent.intensity_at((5, 5)) == 1.0
+
     @pytest.mark.parametrize(
         "grid",
         [

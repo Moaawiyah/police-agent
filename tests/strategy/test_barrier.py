@@ -6,7 +6,7 @@ from police_agent.constants import Direction, MoveType
 from police_agent.domain.own_state import OwnGameState
 from police_agent.strategy.barrier import choose_barrier, direction_to
 from police_agent.strategy.brain import PoliceBrain
-from police_agent.strategy.threat import PointThreat
+from police_agent.strategy.threat import PointThreat, UniformThreat
 
 
 def police(start, board_size=5, barriers=()):
@@ -43,6 +43,13 @@ class TestWhenItWalls:
         assert (0, 1) in state.barriers
         assert state.position == (1, 1)  # walling forgoes the step (3.4)
 
+    def test_walls_even_when_the_thief_still_has_several_escapes(self):
+        # (0, 2) is two cells from the believed (2, 2) in a straight line, so
+        # (1, 2) is a barrier target that is also one of its four open escapes.
+        decision = choose_barrier(police(start=(0, 2)), (2, 2), barriers_max=5)
+        assert decision is not None
+        assert decision.action.move_type is MoveType.BARRIER
+
 
 class TestWhenItRefuses:
     def test_never_walls_without_quota(self):
@@ -53,10 +60,6 @@ class TestWhenItRefuses:
         state.apply_move(PoliceBrain().decide(state, PointThreat((0, 0)), 1).action, 1)
         assert state.my_barriers == 1
         assert choose_barrier(state, (0, 0), barriers_max=1) is None
-
-    def test_never_walls_a_thief_that_still_has_open_board(self):
-        # From the middle of a 5x5 the believed thief has four ways out.
-        assert choose_barrier(police(start=(2, 3)), (2, 2), barriers_max=5) is None
 
     def test_never_walls_a_thief_it_cannot_reach(self):
         # (0, 0) is cornered, but three cells away no wall of ours can touch it.
@@ -79,6 +82,18 @@ class TestWhenItRefuses:
         decision = PoliceBrain().decide(state, PointThreat((0, 2)), barriers_max=5)
         assert decision.action.move_type is MoveType.MOVE
         assert state.apply_move(decision.action, barriers_max=5)
+
+    def test_never_walls_without_real_evidence_yet(self):
+        # Same geometry as test_walls_the_last_but_one_escape_of_a_cornered_thief,
+        # but nothing has been smelled: an opening diffusion artifact must not spend a wall.
+        state = police(start=(1, 1))
+        assert choose_barrier(state, (0, 0), barriers_max=2, has_evidence=False) is None
+
+    def test_the_brain_chases_instead_of_walling_an_unstarted_prior(self):
+        # UniformThreat.has_scent() is False by construction -- "before any scent".
+        state = police(start=(1, 1))
+        decision = PoliceBrain().decide(state, UniformThreat(5), barriers_max=2)
+        assert decision.action.move_type is MoveType.MOVE
 
     def test_never_walls_the_cell_underfoot(self):
         # Standing next to the cornered thief, our own cell is its only escape --

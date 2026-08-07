@@ -76,10 +76,10 @@ belief map (step 6) replaces the placeholder threat estimate._
   remaining move count once diagonals are illegal — breaking ties toward
   unvisited cells, which the scoring table credits.
 - **Barrier.** A barrier costs a fixed quota slot *and* that turn's step, so it
-  is placed only when it provably corners: the believed thief within reach, the
-  wall landing on one of its own legal steps, and at most one escape left after
-  it. Placements that would leave the police itself with no legal step are
-  rejected outright (spec 3.4).
+  is placed whenever a reachable wall genuinely takes a legal step away from
+  the believed thief -- not only once it is already cornered, since every
+  escape removed narrows the chase. Placements that would leave the police
+  itself with no legal step are rejected outright (spec 3.4).
 - **Determinism.** No random draw sits in the move path. Moves are sealed and
   re-checked against the revealed logs in the end-of-game audit, so a decision
   that turned on a coin flip could not be recomputed from a replayed log.

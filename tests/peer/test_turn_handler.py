@@ -20,7 +20,7 @@ class RecordingThreat:
     def __init__(self) -> None:
         self.calls: list[str] = []
 
-    def diffuse(self) -> None:
+    def diffuse(self, barriers=None) -> None:
         self.calls.append("diffuse")
 
     def observe_smell(self, cells) -> None:
@@ -126,6 +126,17 @@ def test_a_declared_barrier_is_recorded_even_from_the_thief():
     process(subject, barrier_placed=[2, 2])
 
     assert (2, 2) in subject.state.barriers
+
+
+def test_the_recorded_barrier_is_respected_by_the_next_prediction():
+    """A barrier declared this turn must already block the diffuse it triggers."""
+    subject = handler()
+    process(subject, step=1, smell_grid={"3,3": 0.9})
+
+    process(subject, step=2, barrier_placed=[2, 3])
+
+    matrix = subject.threat.as_matrix()
+    assert matrix[2][3] < matrix[4][3]  # blocked neighbour lost out to the open one
 
 
 def test_every_message_is_kept_for_the_replay():

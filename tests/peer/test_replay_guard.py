@@ -26,7 +26,7 @@ class RecordingThreat:
     def __init__(self) -> None:
         self.calls: list[str] = []
 
-    def diffuse(self) -> None:
+    def diffuse(self, barriers=None) -> None:
         self.calls.append("diffuse")
 
     def observe_smell(self, cells) -> None:

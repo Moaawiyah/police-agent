@@ -36,10 +36,10 @@ def apply_opponent_step(app, index: int) -> None:
     if index >= len(app._history):
         return
     message = app._history[index]
-    app._belief.diffuse()
-    app._belief.observe_smell(message.get("smell_grid"))
     if message.get("barrier_placed"):
         app._barriers.add(tuple(message["barrier_placed"]))
+    app._belief.diffuse(app._barriers)
+    app._belief.observe_smell(message.get("smell_grid"))
     app._window.set_label("hint_in", f"step {index + 1}: {message.get('hint') or '(silent)'}")
 
 

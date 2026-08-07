@@ -99,11 +99,13 @@ class ScentField:
         Malformed entries are skipped, not raised on: the grid comes from
         another team's implementation, and forfeiting a match over one
         unparseable key would throw away a game still perfectly playable.
-        """
+        Values are clamped to `[0, 1]` too -- a stray negative or oversized number
+        should not be able to poison this peer's own view."""
         for key, value in (cells or {}).items():
             cell = self._parse(key)
             if cell is not None and isinstance(value, int | float):
-                self._values[cell] = max(self._values.get(cell, 0.0), float(value))
+                intensity = min(1.0, max(0.0, float(value)))
+                self._values[cell] = max(self._values.get(cell, 0.0), intensity)
 
     def decay_all(self) -> None:
         """One full turn of fading: every trail keeps `1 - rho` of its strength.

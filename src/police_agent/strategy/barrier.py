@@ -1,9 +1,10 @@
 """When the police should spend a barrier, and where.
 
 A barrier is expensive twice over: the quota is fixed for the whole sub-game,
-and placing one costs the police its step for that turn (3.4). So the policy
-here is not "wall sometimes" but "wall only when the wall provably corners the
-thief" -- every other turn is better spent closing the distance.
+and placing one costs the police its step for that turn (3.4). The policy walls
+any turn a reachable placement genuinely takes an escape away from the believed
+thief -- not just once it is already nearly cornered -- since every escape
+removed narrows tomorrow's chase, and a barrier held back earns nothing.
 
 The decision is deterministic. Sealed moves are re-checked against the revealed
 logs in the end-of-game audit, so a placement has to be recomputable from the
@@ -23,14 +24,10 @@ from police_agent.strategy.decision import Decision
 # taking anything away from it, so there is nothing to evaluate.
 BARRIER_REACH = 2
 
-# Wall only when the placement leaves the believed thief at most this many legal
-# steps. Leaving it one step, or none at all, is what makes the wall worth the
-# forgone turn: no legal step at all is the capture the thief must declare about
-# itself (Appendix He 47).
-TRAPPED_ESCAPES = 1
 
-
-def choose_barrier(state: OwnGameState, believed: Cell, barriers_max: int) -> Decision | None:
+def choose_barrier(
+    state: OwnGameState, believed: Cell, barriers_max: int, has_evidence: bool = True
+) -> Decision | None:
     """Return the barrier placement worth making this turn, or None to move instead.
 
     Two placements the board allows are deliberately never used. The cell
@@ -41,13 +38,23 @@ def choose_barrier(state: OwnGameState, believed: Cell, barriers_max: int) -> De
     is evaluated against a sealed, simultaneous move, and stepping onto the same
     cell is a capture attempt that costs no quota, so the ambiguous option is
     never the only one on offer.
+
+    `has_evidence` guards against walling on the opening, unstarted belief: one
+    diffuse() over a flat prior is not uniform (corner cells have fewer targets
+    to spread into), so `believed` can land somewhere with a wallable escape
+    before a single real scent reading has ever arrived. That is a diffusion
+    artifact, not the thief -- so `choose_barrier` refuses until real evidence
+    exists. `PoliceBrain` supplies this from the belief's own `has_scent()`;
+    direct callers default to `True`, matching a known target in a unit test.
     """
+    if not has_evidence:
+        return None
     if state.my_barriers >= barriers_max:
         return None
     if state.board.distance(state.position, believed) > BARRIER_REACH:
         return None
     escapes = {target for _, target in state.board.legal_moves(believed, state.barriers)}
-    if not escapes or len(escapes) - 1 > TRAPPED_ESCAPES:
+    if not escapes:
         return None
     cell = _best_placement(state, escapes)
     if cell is None:

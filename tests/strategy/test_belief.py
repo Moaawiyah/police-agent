@@ -92,6 +92,14 @@ class TestObserving:
         assert belief.most_likely() == (2, 4)
         assert total(belief) == 1.0
 
+    def test_a_negative_reading_with_a_fractional_power_does_not_go_complex(self):
+        """Untrusted wire data, clamped before `**smell_power` (belief.py's own note)."""
+        belief = BeliefGrid(2, smell_power=1.5)
+        belief.observe_smell({"0,0": -0.9})
+
+        assert isinstance(belief.as_matrix()[0][0], float)
+        assert total(belief) == 1.0
+
     def test_excluding_a_cell_rules_it_out_entirely(self):
         belief = BeliefGrid(7)
         belief.observe_smell({"2,2": 0.9})
