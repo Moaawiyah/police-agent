@@ -371,9 +371,12 @@ config/police/
   game.json          shared, signed terms — byte-identical with the thief's copy
   game.toml.example  template for this peer's private, uncommitted config
 docs/
-  PRD.md   product requirements
-  PLAN.md  incremental build order
-  TODO.md  active step and carried-forward work
+  PRD.md          product requirements
+  PLAN.md         incremental build order
+  TODO.md         active step and carried-forward work
+  ARCHITECTURE.md wire-protocol and per-turn decision diagrams
+  PROMPTS.md      every LLM prompt this agent sends, verbatim
+  mechanisms/     one dedicated PRD per central algorithm
 tests/
 ```
 
@@ -411,10 +414,18 @@ played against a test double with no sockets and no opponent process.
 
 ```
 uv sync
-uv run pytest --cov              # 798 tests, 100% coverage (floor: 85%)
+uv run pytest --cov              # 929 tests, ~98% coverage (floor: 85%)
 uv run pytest -m "not slow"      # skip the tests that bind real sockets
 uv run ruff check .
 uv run ruff format --check .
+```
+
+Persisted test reports, for a grader who wants an artifact rather than terminal
+output (neither is committed -- both are gitignored, generated on demand):
+
+```
+uv run pytest --cov --cov-report=html   # htmlcov/index.html
+uv run pytest --junit-xml=results/junit.xml
 ```
 
 ## Configuration

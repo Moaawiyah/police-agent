@@ -57,3 +57,15 @@ capture a thief whose position it never directly observes.
 A full match against another group's thief agent completes without protocol
 violation, the audit reports `Verified OK` on both sides, the result JSON is
 accepted, and the report email is delivered.
+
+## 7. Mechanism-level PRDs
+
+The three central algorithms each have their own dedicated requirements
+document, one level more specific than this project-wide one:
+
+- [`mechanisms/PRD-belief-scent.md`](mechanisms/PRD-belief-scent.md) — the
+  pheromone field and the Bayesian belief map (F9).
+- [`mechanisms/PRD-barrier-strategy.md`](mechanisms/PRD-barrier-strategy.md)
+  — barrier placement, close-range and wide-range (F2–F4).
+- [`mechanisms/PRD-commit-reveal.md`](mechanisms/PRD-commit-reveal.md) — the
+  cryptographic seal-and-audit protocol (F7, F8).

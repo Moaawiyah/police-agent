@@ -1,17 +1,21 @@
 {
-  "schema_version": "1.2",
-  "agreed_between": ["police", "thief"],
+  "schema_version": "1.3",
+  "_note": "Shared, agreed game terms. BOTH peers must hold a byte-identical copy; the pre-game signature exchange refuses to play on any mismatch. This overlays the private per-peer game.toml. Book: Appendix F.",
+  "agreed_between": ["segal-police-team", "segal-thief-team"],
   "board_and_agents": {
     "grid_size": 7,
     "num_agents": 2,
     "thief_start": [3, 3],
     "cop_start": [0, 0],
     "axis_origin_corner": "top-left",
-    "axis_start_index": 0
+    "axis_start_index": 0,
+    "_axis_note": "Negotiated coordinate system both peers agree on. axis_origin_corner = where cell (0,0) sits: top-left|top-right|bottom-left|bottom-right (default top-left). axis_start_index = the first index of each axis (default 0)."
   },
   "world": {
+    "_note": "The real-world area the game is set in (e.g. 'New York', 'Manhattan', 'London'). Drives the location-based landmarks in the trash-talk hints. Default empty string = generic landmarks. Agreed & signed term.",
     "map_area": "New York",
-    "hint_max_words": 15
+    "hint_max_words": 15,
+    "_hint_max_words_note": "Hard cap on the number of words in each trash-talk hint sent across the wire (both template and LLM providers obey it; the LLM is also told the limit in its system prompt). Agreed & signed term; this simulator uses 15."
   },
   "movement_and_barriers": {
     "move_set": ["N", "S", "E", "W", "STAY"],
@@ -30,7 +34,8 @@
   "pheromones": {
     "pheromone_center_intensity": 0.9,
     "pheromone_decay": 0.10,
-    "pheromone_grid_size": 5
+    "pheromone_grid_size": 5,
+    "pheromone_min_center_intensity": 0.5
   },
   "network_and_league": {
     "response_timeout_sec": 30,

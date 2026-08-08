@@ -1,30 +1,19 @@
-"""The SDK facade: settings resolution, wiring, and one match played through it."""
+"""The SDK facade: settings resolution and opening the transport.
 
-import json
+League-mode validation lives in test_agent_league.py; runtime lifecycle and
+playing/persisting a match live in test_agent_lifecycle.py -- split three ways
+so each file stays under the project's 150-line rule.
+"""
 
 import pytest
 
 from police_agent.constants import Role
-from police_agent.domain.rules import ABORTED
 from police_agent.exceptions import ConfigError
 from police_agent.infra.tunnel import NgrokTunnel
-from police_agent.peer.controls import GameControls
 from police_agent.sdk import MatchOptions, PoliceAgentSDK
 from tests.conftest import CONFIG_DIR, config_with
-from tests.peer.fake_transport import FakeTransport, thief_turn
-
-NETWORKED = {"network__my_port": 8801, "network__opponent_url": "http://127.0.0.1:8802/mcp"}
-UNWIRED = object()  # distinguishes "no transport given" from "inject None"
-
-
-def agent_with(transport=UNWIRED, listener=None, options=None, **overrides) -> PoliceAgentSDK:
-    """An SDK on the agreed terms, wired to a test double instead of a socket."""
-    return PoliceAgentSDK(
-        options,
-        config=config_with(**{**NETWORKED, **overrides}),
-        transport=FakeTransport() if transport is UNWIRED else transport,
-        listener=listener,
-    )
+from tests.peer.fake_transport import FakeTransport
+from tests.sdk.conftest import _forbidden, agent_with, record_wiring
 
 
 def test_the_settings_come_from_the_config_when_nothing_overrides_them():
@@ -77,7 +66,7 @@ def test_an_injected_transport_is_never_replaced_by_a_socket(monkeypatch):
 
 
 def test_connect_opens_this_peers_mailbox_and_dials_the_opponent(monkeypatch):
-    opened, dialled = _record_wiring(monkeypatch)
+    opened, dialled = record_wiring(monkeypatch)
 
     transport = agent_with(transport=None).connect()
 
@@ -106,7 +95,7 @@ def test_the_deadlines_fall_back_when_the_terms_name_neither():
 
 def test_connecting_twice_opens_one_server(monkeypatch):
     """The second bind would fail on the port the first is holding."""
-    opened, _ = _record_wiring(monkeypatch)
+    opened, _ = record_wiring(monkeypatch)
     agent = agent_with(transport=None)
 
     assert agent.connect() is agent.connect()
@@ -114,7 +103,7 @@ def test_connecting_twice_opens_one_server(monkeypatch):
 
 
 def test_a_default_run_has_no_public_address_at_all(monkeypatch):
-    _record_wiring(monkeypatch)
+    record_wiring(monkeypatch)
     agent = agent_with(transport=None)
 
     agent.connect()
@@ -124,7 +113,7 @@ def test_a_default_run_has_no_public_address_at_all(monkeypatch):
 
 def test_the_tunnel_publishes_my_port_on_my_reserved_domain(monkeypatch):
     """The domain is private, so it comes from game.toml: no opponent verifies it."""
-    _record_wiring(monkeypatch)
+    record_wiring(monkeypatch)
     asked: list = []
 
     def open_tunnel(port, domain=None):
@@ -139,198 +128,3 @@ def test_the_tunnel_publishes_my_port_on_my_reserved_domain(monkeypatch):
 
     assert asked == [(8801, "cops.ngrok.app")]
     assert agent.public_url == "https://cops.ngrok.app/mcp"  # the /mcp mount, not the origin
-
-
-@pytest.mark.parametrize(
-    ("opponent", "error"),
-    [
-        ("http://thief.example/mcp", "HTTPS"),
-        ("https://localhost/mcp", "localhost"),
-        ("https://127.0.0.1/mcp", "private opponent"),
-        ("https://10.0.0.2/mcp", "private opponent"),
-    ],
-)
-def test_league_mode_rejects_non_public_opponents(opponent, error):
-    agent = agent_with(
-        options=MatchOptions(league=True, tunnel=True, opponent_url=opponent),
-        network__tunnel_domain="cops.ngrok.app",
-    )
-
-    with pytest.raises(ConfigError, match=error):
-        agent.connect()
-
-
-def test_league_mode_requires_a_tunnel_and_reserved_domain():
-    missing_tunnel = agent_with(
-        options=MatchOptions(league=True, opponent_url="https://thief.example/mcp"),
-        network__tunnel_domain="cops.ngrok.app",
-    )
-    missing_domain = agent_with(
-        options=MatchOptions(league=True, tunnel=True, opponent_url="https://thief.example/mcp")
-    )
-
-    with pytest.raises(ConfigError, match="--tunnel"):
-        missing_tunnel.connect()
-    with pytest.raises(ConfigError, match="tunnel_domain"):
-        missing_domain.connect()
-
-
-def test_league_mode_rejects_a_private_turn_timeout():
-    agent = agent_with(
-        options=MatchOptions(league=True, tunnel=True, opponent_url="https://thief.example/mcp"),
-        network__tunnel_domain="cops.ngrok.app",
-        network__turn_timeout_seconds=180,
-    )
-
-    with pytest.raises(ConfigError, match="turn_timeout_seconds"):
-        agent.connect()
-
-
-def test_league_mode_uses_the_reserved_https_tunnel_and_watchdog(monkeypatch):
-    opened, _ = _record_wiring(monkeypatch)
-    monkeypatch.setattr(
-        "police_agent.sdk.agent.open_tunnel", lambda port, domain: NgrokTunnel(f"https://{domain}")
-    )
-    agent = agent_with(
-        transport=None,
-        options=MatchOptions(league=True, tunnel=True, opponent_url="https://thief.example/mcp"),
-        network__tunnel_domain="cops.ngrok.app",
-        network__turn_timeout_seconds=90,
-        network__watchdog_timeout_seconds=90,
-    )
-
-    agent.connect()
-
-    assert opened
-    assert agent.public_url == "https://cops.ngrok.app/mcp"
-    assert agent.runtime._turn_timeout() == 90.0
-
-
-def test_league_mode_rejects_an_unreserved_tunnel_endpoint(monkeypatch):
-    _record_wiring(monkeypatch)
-    monkeypatch.setattr(
-        "police_agent.sdk.agent.open_tunnel", lambda port, domain: NgrokTunnel("https://other.ngrok.app")
-    )
-    agent = agent_with(
-        transport=None,
-        options=MatchOptions(league=True, tunnel=True, opponent_url="https://thief.example/mcp"),
-        network__tunnel_domain="cops.ngrok.app",
-    )
-
-    with pytest.raises(ConfigError, match="configured HTTPS"):
-        agent.connect()
-
-
-def test_the_runtime_is_the_match_and_is_not_rebuilt():
-    agent = agent_with()
-
-    assert agent.runtime is agent.runtime
-
-
-def test_restart_drops_the_runtime_so_the_next_access_builds_a_fresh_one():
-    agent = agent_with()
-    first = agent.runtime
-
-    agent.restart()
-
-    assert agent.runtime is not first
-
-
-def test_restart_reuses_the_same_transport_rather_than_reconnecting():
-    """Rebinding the port the old server still holds would fail outright."""
-    agent = agent_with()
-    transport = agent.connect()
-
-    agent.restart()
-
-    assert agent.connect() is transport
-    assert agent.runtime.transport is transport
-
-
-def test_play_returns_the_match_summary():
-    agent = agent_with(transport=FakeTransport(incoming=[thief_turn(1)]))
-
-    summary = agent.play()
-
-    assert summary["role"] == "police"
-    assert summary["steps"] == 1
-
-
-def test_a_listener_sees_the_game_end():
-    events: list[dict] = []
-
-    agent_with(transport=FakeTransport(incoming=[thief_turn(1)]), listener=events.append).play()
-
-    assert [event["type"] for event in events][-1] == "game_over"
-
-
-def test_save_summary_writes_the_whole_record(tmp_path):
-    """The report and the replay viewer are both rebuilt from this file, so a
-    record trimmed to the headline result would not support either."""
-    agent = agent_with(transport=FakeTransport(incoming=[thief_turn(1)]))
-    summary = agent.play()
-
-    path = agent.save_summary(summary, tmp_path / "result.json")
-
-    assert json.loads(path.read_text(encoding="utf-8")) == summary
-
-
-def test_a_saved_record_reads_back_for_the_replay_player(tmp_path):
-    agent = agent_with(transport=FakeTransport(incoming=[thief_turn(1)]))
-    path = agent.save_summary(agent.play(), tmp_path / "result.json")
-
-    assert agent.load_summary(path)["role"] == "police"
-
-
-def test_a_missing_log_names_the_file_rather_than_raising_an_os_error():
-    agent = agent_with()
-
-    with pytest.raises(ConfigError, match="Match log not found"):
-        agent.load_summary("nowhere/result.json")
-
-
-def test_a_log_that_is_not_json_says_so(tmp_path):
-    path = tmp_path / "broken.json"
-    path.write_text("{not json", encoding="utf-8")
-
-    with pytest.raises(ConfigError, match="not valid JSON"):
-        agent_with().load_summary(path)
-
-
-def test_controls_reach_the_runtime_so_the_windows_buttons_are_real():
-    """The GUI cannot pass these at construction -- it needs an SDK to build its
-    window from before it has a window to steer with -- so they are settable."""
-    controls = GameControls()
-    controls.stop()
-    agent = agent_with(transport=FakeTransport(incoming=[thief_turn(1)]))
-    agent.controls = controls
-
-    assert agent.play()["result"] == ABORTED
-
-
-def _forbidden(what: str):
-    def fail(*args, **kwargs):
-        raise AssertionError(what)
-
-    return fail
-
-
-def _record_wiring(monkeypatch) -> tuple[list, list]:
-    """Replace the socket-touching constructors with recorders, and ban ngrok."""
-    opened: list = []
-    dialled: list = []
-
-    def start(role, host, port):
-        opened.append((role, host, port))
-        return "inboxes"
-
-    def transport(url, inboxes, **timeouts):
-        dialled.append((url, inboxes, FakeTransport(), timeouts))
-        return dialled[-1][2]
-
-    monkeypatch.setattr("police_agent.sdk.agent.start_peer_server", start)
-    monkeypatch.setattr("police_agent.sdk.agent.McpTransport", transport)
-    # Tunnelling is opt-in, so every test using this helper also proves that a
-    # default run starts no child process and publishes nothing to the internet.
-    monkeypatch.setattr("police_agent.sdk.agent.open_tunnel", _forbidden("started ngrok"))
-    return opened, dialled
