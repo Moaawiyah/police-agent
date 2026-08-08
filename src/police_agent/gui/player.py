@@ -51,7 +51,9 @@ class LivePeerApp:
 
     def _build_title(self) -> str:
         group = self._agent.config.get("game.group_id", "unnamed")
-        return f"POLICE - {group} - port {self._agent.port}"
+        sub_game = self._agent.config.get("game.sub_game_number", 1)
+        num_games = self._agent.config.get("game.num_games", 1)
+        return f"POLICE - {group} - game {sub_game}/{num_games} - port {self._agent.port}"
 
     def _describe_verbal_layer(self) -> None:
         mode, model = mode_and_model(self._agent.config)

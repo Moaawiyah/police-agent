@@ -29,13 +29,14 @@ def normalize_log(log_data: dict) -> dict:
     """
     body = log_data.get("summary") if isinstance(log_data.get("summary"), dict) else log_data
     records = body.get("records") or log_data.get("records") or []
+    step_zero = step_zero_of(records)
     return {
         # Turns only. The player walks `records` alongside `my_log`, and the
         # step-zero declaration at the head is not a move -- leaving it in would
         # label every step with the previous step's commit. Filtered by reading
         # the payload, so an opponent's log with a declaration is handled too.
         "records": turn_records(records),
-        "step_zero": step_zero_of(records),
+        "step_zero": step_zero,
         "history": body.get("history", []),
         "my_log": body.get("my_log", []),
         "belief_log": body.get("belief_log", []),
@@ -43,6 +44,7 @@ def normalize_log(log_data: dict) -> dict:
         "result": body.get("result", UNKNOWN),
         "winner": body.get("winner") or "nobody",
         "group": body.get("group_name") or body.get("group_id", "unnamed"),
+        "sub_game_number": body.get("sub_game_number") or step_zero.get("sub_game_number", 1),
         "duration_seconds": body.get("duration_seconds", 0),
         "audit": body.get("audit") or {"passed": True, "verified_steps": 0},
         "reliability": body.get("opponent_reliability"),
