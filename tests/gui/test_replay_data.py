@@ -43,6 +43,16 @@ def test_our_own_log_reads_back_whole():
     assert view["reliability"] == 0.75
 
 
+def test_the_sub_game_number_is_read_from_the_top_level_when_present():
+    log = {**our_log(), "sub_game_number": 4}
+
+    assert normalize_log(log)["sub_game_number"] == 4
+
+
+def test_a_log_with_no_sub_game_number_falls_back_to_one():
+    assert normalize_log({})["sub_game_number"] == 1
+
+
 def test_a_log_nested_under_summary_reads_the_same_way():
     """The course reference nests it, and the league has us replay another
     group's log -- a player that could only open its own proves nothing."""
