@@ -104,6 +104,15 @@ def test_game_over_reports_the_result_and_what_the_audit_proved():
     assert window.labels["reliability"] == "0.81 - believable"
 
 
+def test_sub_game_over_reports_progress_rather_than_ending_the_session():
+    """Distinct from `game_over`: more sub-games may still follow, so the
+    wording must not read as the whole series being finished."""
+    window = apply({"type": "sub_game_over", "summary": SUMMARY, "sub_game_number": 2, "view": VIEW})
+
+    assert window.banner == (False, "SUB-GAME 2 DONE: capture - winner police")
+    assert "next sub-game" in window.labels["status"]
+
+
 def test_a_drawn_game_names_nobody_rather_than_crashing_on_a_null_winner():
     summary = {**SUMMARY, "result": "timeout", "winner": None}
 

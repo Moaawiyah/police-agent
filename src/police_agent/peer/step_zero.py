@@ -36,8 +36,15 @@ STEP_ZERO = 0
 RECORD_TYPE = "step_zero"
 
 
-def step_zero_payload(config) -> dict:
-    """Everything ch. 5.5 asks a peer to declare before it moves."""
+def step_zero_payload(config, sub_game_number: int | None = None) -> dict:
+    """Everything ch. 5.5 asks a peer to declare before it moves.
+
+    `sub_game_number` is normally read from the private `game.toml`, but a
+    series runner playing several sub-games over one held connection knows
+    its own count and passes it explicitly, overriding the static config.
+    """
+    if sub_game_number is None:
+        sub_game_number = config.get("game.sub_game_number", 1)
     return {
         "step": STEP_ZERO,
         "record_type": RECORD_TYPE,
@@ -46,7 +53,7 @@ def step_zero_payload(config) -> dict:
         "group_name": config.get("game.group_name", "unnamed"),
         "members": config.get("game.members", []),
         "repos": config.get("game.repos", {}),
-        "sub_game_number": config.get("game.sub_game_number", 1),
+        "sub_game_number": sub_game_number,
         "code_version": CODE_VERSION,
         "repository_url": REPOSITORY_URL,
         # Named, not measured: the model this peer is configured to talk to. The
@@ -60,9 +67,9 @@ def step_zero_payload(config) -> dict:
     }
 
 
-def sealed_step_zero(config) -> dict:
+def sealed_step_zero(config, sub_game_number: int | None = None) -> dict:
     """The declaration as a sealed record, in the same shape as a sealed turn."""
-    payload = step_zero_payload(config)
+    payload = step_zero_payload(config, sub_game_number)
     return {"payload": payload, **CommitReveal.seal(payload)}
 
 

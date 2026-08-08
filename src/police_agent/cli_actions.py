@@ -4,7 +4,21 @@ import sys
 
 
 def report(agent, summary: dict, base: str) -> None:
-    paths = agent.write_artifacts(summary, base)
+    _mail_report(agent, agent.write_artifacts(summary, base))
+
+
+def report_series(agent, summaries: list[dict], base: str) -> None:
+    """Write every sub-game's artifacts, then mail once: `write_artifacts`
+    rebuilds the series-wide result file from disk on each call (ch. 9.3.3),
+    so only the last call's paths -- covering every sub-game filed so far --
+    are worth mailing."""
+    paths = {}
+    for summary in summaries:
+        paths = agent.write_artifacts(summary, base)
+    _mail_report(agent, paths)
+
+
+def _mail_report(agent, paths: dict) -> None:
     for role, path in sorted(paths.items()):
         print(f"{role}: {path}", file=sys.stderr)
     mailed = agent.email_report(paths)
@@ -13,12 +27,22 @@ def report(agent, summary: dict, base: str) -> None:
 
 def play_headless(agent) -> dict:
     agent.connect()
+    _announce_listening(agent)
+    return agent.play()
+
+
+def play_series_headless(agent) -> list[dict]:
+    agent.connect()
+    _announce_listening(agent)
+    return agent.play_series()
+
+
+def _announce_listening(agent) -> None:
     print(
         f"police listening on {agent.host}:{agent.port}, opponent at {agent.opponent_url}",
         file=sys.stderr,
     )
     announce_tunnel(agent)
-    return agent.play()
 
 
 def announce_tunnel(agent) -> None:

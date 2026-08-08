@@ -124,9 +124,16 @@ uv run police-agent --port 8801 --opponent http://127.0.0.1:8802/mcp
 uv run police-agent --summary result.json    # also write the match record
 uv run police-agent --report                 # write the four report artifacts
 uv run police-agent --gui                    # play with the live board window
+uv run police-agent --series                 # play the whole agreed series, headless
 uv run police-agent --tunnel                 # publish a public URL
 uv run police-agent --league --tunnel        # enforce the league tunnel profile
 ```
+
+`--gui` always plays the whole agreed series (`game.num_games`, 1-6): the
+window's title tracks whichever sub-game is currently live, e.g. `game 3/6`.
+`--series` is the same thing headless, for a run with no display. Without
+either flag, one sub-game is played and the process exits -- the same single
+`PoliceRuntime` either flag loops internally.
 
 The thief must be started from its own repository, as a separate process.
 
@@ -414,7 +421,7 @@ played against a test double with no sockets and no opponent process.
 
 ```
 uv sync
-uv run pytest --cov              # 929 tests, ~98% coverage (floor: 85%)
+uv run pytest --cov              # 949 tests, ~98% coverage (floor: 85%)
 uv run pytest -m "not slow"      # skip the tests that bind real sockets
 uv run ruff check .
 uv run ruff format --check .

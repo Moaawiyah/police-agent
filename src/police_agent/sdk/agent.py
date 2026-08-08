@@ -110,6 +110,47 @@ class PoliceAgentSDK:
     def play(self) -> dict:
         return self.runtime.run()
 
+    def play_series(self) -> list[dict]:
+        """Play every sub-game of the agreed series over one held connection.
+
+        Each sub-game's own `game_over` is relabelled `sub_game_over` on the
+        way to the listener -- the GUI already treats `game_over` as "the
+        whole match is finished" (see `gui/player.py::_drain`), and only the
+        series as a whole is that. A real `game_over` is raised once more,
+        here, after the last sub-game actually ends.
+        """
+        from police_agent.peer.series import run_series
+
+        summaries = run_series(
+            self.config,
+            self.connect(),
+            listener=self._series_listener(),
+            controls=self.controls,
+            league=self.options.league,
+        )
+        if self.listener is not None:
+            self.listener(
+                {
+                    "type": "game_over",
+                    "summary": summaries[-1],
+                    "summaries": summaries,
+                    "sub_game_number": len(summaries),
+                }
+            )
+        return summaries
+
+    def _series_listener(self):
+        if self.listener is None:
+            return None
+
+        def relabel(event: dict) -> None:
+            if event.get("type") == "game_over":
+                self.listener({**event, "type": "sub_game_over"})
+                return
+            self.listener(event)
+
+        return relabel
+
     def restart(self) -> None:
         """Drop the finished runtime so the next `play()` builds a fresh one.
 

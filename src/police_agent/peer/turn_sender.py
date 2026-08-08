@@ -16,16 +16,24 @@ from police_agent.domain.actions import hold
 from police_agent.peer.sealing import build_turn_message, sealed_step_record
 
 
-def take_turn(runtime, claim_response: dict | None = None) -> None:
-    """Compute this peer's turn, commit to it locally, and hand it to the opponent."""
+def take_turn(runtime, claim_response: dict | None = None, transmit: bool = True) -> None:
+    """Compute this peer's turn, commit to it locally, and (usually) hand it
+    to the opponent.
+
+    `transmit=False` is for the one case where sending would actively hurt:
+    the opponent has already locally concluded its own game (a self-verified
+    survival claim needs no reply, so it never waits for one) and is not
+    listening. A message nobody reads would sit in the shared transport's
+    queue and, once the series moves on, be mistaken for the next sub-game's
+    first turn -- the transport is held open across the whole series, not
+    rebuilt per sub-game. The move still gets applied and sealed locally, so
+    this peer's own step count and log stay in step with the opponent's.
+    """
     # Opens this step's token accounting (Appendix He 54). Marked before the
     # brain runs rather than after the hint is written, so anything the turn
     # spends on a model is attributed to the turn that spent it.
     runtime.tokens.begin_step()
-    rounds_left = runtime.rules.max_steps - runtime.state.step_number
-    decision = runtime.brain.decide(
-        runtime.state, runtime.threat, runtime.barriers_max, rounds_left
-    )
+    decision = runtime.brain.decide(runtime.state, runtime.threat, runtime.barriers_max)
     if not runtime.state.apply_move(decision.action, runtime.barriers_max):
         # The brain is contractually forbidden from returning an illegal action,
         # so reaching this is a bug in the strategy, not a game event. Holding
@@ -37,6 +45,8 @@ def take_turn(runtime, claim_response: dict | None = None) -> None:
     claim = _capture_claim(runtime, decision)
     record = sealed_step_record(runtime.state, decision.rationale, claim)
     runtime.records.append(record)
+    if not transmit:
+        return
     message = build_turn_message(
         runtime.state,
         commit=record["commit"],

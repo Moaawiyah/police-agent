@@ -41,7 +41,7 @@ def pump(runtime, base: str) -> None:
     if runtime.controls.enable_requested and not runtime.link.i_enabled:
         runtime.link.enable()
     runtime.link.drain()
-    runtime.link.broadcast_status(_status_for(runtime, base), 1)
+    runtime.link.broadcast_status(_status_for(runtime, base), runtime.sub_game_number)
 
 
 def check(runtime) -> None:

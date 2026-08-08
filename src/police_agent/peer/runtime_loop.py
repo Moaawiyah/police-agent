@@ -9,7 +9,9 @@ from police_agent.peer.view import belief_matrix, snapshot
 
 def notify(runtime, event: dict) -> None:
     if runtime._listener is not None:
-        runtime._listener({**event, "view": snapshot(runtime)})
+        runtime._listener(
+            {**event, "sub_game_number": runtime.sub_game_number, "view": snapshot(runtime)}
+        )
 
 
 def turn_loop(runtime) -> None:
@@ -55,6 +57,16 @@ def apply_incoming(runtime, message: TurnMessage) -> None:
     if outcome.i_won:
         runtime._result = (CAPTURE, "police")
     elif outcome.opponent_won:
+        # The survival claim rides the thief's own final move, so without this
+        # check the police would concede one move short of the thief's own
+        # count -- step 34 in its log against the thief's 35 (Appendix He 46/47
+        # rely on both sides having played the same number of rounds). Local
+        # only: the thief's own loop set its result the instant it *sent* that
+        # claim, without waiting for a reply (a self-verified claim needs none),
+        # so a transmitted message here would sit unread in the shared
+        # transport and be mistaken for the next sub-game's first turn.
+        if not runtime.rules.out_of_steps(runtime.state):
+            take_turn(runtime, transmit=False)
         runtime._result = (SURVIVAL, "thief")
     elif runtime.rules.out_of_steps(runtime.state):
         runtime._result = ceiling_result(runtime)
