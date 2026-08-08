@@ -51,17 +51,15 @@ class PoliceBrainBase:
         state: OwnGameState,
         threat: ThreatEstimate,
         barriers_max: int = 0,
-        rounds_left: int | None = None,
     ) -> Decision:
         """Choose this turn's action. The result is always legal to apply."""
-        return self._decide_move(state, threat, barriers_max, rounds_left)
+        return self._decide_move(state, threat, barriers_max)
 
     def _decide_move(
         self,
         state: OwnGameState,
         threat: ThreatEstimate,
         barriers_max: int,
-        rounds_left: int | None = None,
     ) -> Decision:
         """Base policy: take the step `_pick_move` picks, or HOLD when walled in."""
         moves = state.board.legal_moves(state.position, state.barriers)
@@ -88,13 +86,12 @@ class PoliceBrain(PoliceBrainBase):
         state: OwnGameState,
         threat: ThreatEstimate,
         barriers_max: int,
-        rounds_left: int | None = None,
     ) -> Decision:
         moves = state.board.legal_moves(state.position, state.barriers)
         if not moves:
             return Decision(hold(), _NO_STEP)
         believed = threat.most_likely()
-        wall = self._pick_barrier(state, believed, barriers_max, threat.has_scent(), rounds_left)
+        wall = self._pick_barrier(state, believed, barriers_max, threat.has_scent())
         if wall is not None:
             return wall
         direction, target = self._pick_move(moves, state, threat)
@@ -129,7 +126,6 @@ class PoliceBrain(PoliceBrainBase):
         believed: Cell,
         barriers_max: int,
         has_evidence: bool = True,
-        rounds_left: int | None = None,
     ) -> Decision | None:
         """Delegate to the barrier policy. Override to change only the walling."""
-        return choose_barrier(state, believed, barriers_max, has_evidence, rounds_left)
+        return choose_barrier(state, believed, barriers_max, has_evidence)

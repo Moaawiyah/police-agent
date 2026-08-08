@@ -1,7 +1,7 @@
 """Tests for the medium-range barrier check: pocket-shrinking, not escape-removal."""
 
 from police_agent.domain.board import Board
-from police_agent.strategy.encirclement import ENDGAME_ROUNDS, wide_placement
+from police_agent.strategy.encirclement import wide_placement
 
 # A doorway at (4, 0) is the sole connection between the open board and a
 # 14-cell room filling rows 5-6. Sealing it strands the room without touching
@@ -43,41 +43,8 @@ class TestWidePlacement:
         board = Board(7)
         assert wide_placement(board, position=(0, 0), barriers=set(), believed=(6, 6)) is None
 
-
-class TestEndgameRelaxation:
-    def test_omitting_rounds_left_keeps_the_ordinary_threshold(self):
-        # Same open-board case as test_never_when_the_gain_is_too_small: no
-        # signal means no relaxation, ever.
+    def test_the_gain_bar_holds_even_on_the_last_reachable_round(self):
+        # No `rounds_left` signal exists anymore: the same marginal wall that
+        # is refused in round one is refused in the match's final round too.
         board = Board(5)
         assert wide_placement(board, position=(2, 1), barriers=set(), believed=(0, 0)) is None
-
-    def test_outside_the_endgame_window_the_ordinary_threshold_still_holds(self):
-        board = Board(5)
-        cell = wide_placement(
-            board,
-            position=(2, 1),
-            barriers=set(),
-            believed=(0, 0),
-            rounds_left=ENDGAME_ROUNDS + 1,
-        )
-        assert cell is None
-
-    def test_inside_the_endgame_window_a_trivial_gain_now_qualifies(self):
-        # The exact scenario that was refused above: with only a few rounds
-        # left, an unused barrier scores nothing anyway, so even a one-cell
-        # shrink is worth the turn.
-        board = Board(5)
-        cell = wide_placement(
-            board, position=(2, 1), barriers=set(), believed=(0, 0), rounds_left=ENDGAME_ROUNDS
-        )
-        assert cell is not None
-
-    def test_still_never_confines_the_police_or_costs_ground_in_the_endgame(self):
-        # The safety checks are not part of what the endgame window loosens --
-        # only the gain bar is.
-        board = Board(3)
-        barriers = {(1, 0)}
-        cell = wide_placement(
-            board, position=(0, 0), barriers=barriers, believed=(2, 2), rounds_left=1
-        )
-        assert cell is None

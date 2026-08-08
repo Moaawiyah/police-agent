@@ -153,17 +153,9 @@ class TestWideRangeFallsBackToEncirclement:
         assert choose_barrier(state, believed=(6, 6), barriers_max=5) is None
 
 
-class TestEndgameRelaxationFlowsThrough:
-    def test_an_open_board_wide_range_wall_is_refused_by_default(self):
+class TestWideRangeGainBar:
+    def test_an_open_board_wide_range_wall_is_refused(self):
+        """No endgame exemption exists: this exact refusal held whether it is
+        round one or the match's last round -- one gain bar, every round."""
         state = police(start=(0, 0), board_size=7)
         assert choose_barrier(state, believed=(0, 3), barriers_max=5) is None
-
-    def test_the_same_wall_qualifies_once_rounds_left_enters_the_endgame(self):
-        """An unused barrier scores nothing at game end, so `choose_barrier`
-        passes `rounds_left` straight through to `wide_placement`, which is
-        what turns this exact refusal into a placement."""
-        state = police(start=(0, 0), board_size=7)
-        decision = choose_barrier(state, believed=(0, 3), barriers_max=5, rounds_left=10)
-        assert decision is not None
-        assert decision.action.move_type is MoveType.BARRIER
-        assert "shrinks the pocket" in decision.rationale

@@ -33,7 +33,6 @@ def choose_barrier(
     believed: Cell,
     barriers_max: int,
     has_evidence: bool = True,
-    rounds_left: int | None = None,
 ) -> Decision | None:
     """Return the barrier placement worth making this turn, or None to move instead.
 
@@ -59,12 +58,8 @@ def choose_barrier(
     escapes? Beyond it and out to `encirclement.WIDE_REACH`, no wall can touch an
     immediate escape at all, so the question becomes whether it shrinks the
     thief's whole reachable pocket by enough to be worth a turn -- see
-    `encirclement.wide_placement` for why that bar is set where it is.
-
-    `rounds_left`, when the caller has it, only ever loosens the wide-range
-    bar in the match's closing rounds (`encirclement.ENDGAME_ROUNDS`) -- an
-    unused barrier scores nothing at game end, so the tempo this would have
-    cost earlier is no longer being protected for anything.
+    `encirclement.wide_placement` for why that bar is set where it is, and why
+    it holds the same in every round rather than loosening near the end.
     """
     if not has_evidence:
         return None
@@ -80,7 +75,7 @@ def choose_barrier(
                 f"wall {cell}: leaves the believed thief at {believed} {len(escapes) - 1} step(s)",
             )
     if gap <= WIDE_REACH:
-        cell = wide_placement(state.board, state.position, state.barriers, believed, rounds_left)
+        cell = wide_placement(state.board, state.position, state.barriers, believed)
         if cell is not None:
             return Decision(
                 barrier(direction_to(state.position, cell)),
