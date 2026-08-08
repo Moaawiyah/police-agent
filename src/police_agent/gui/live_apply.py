@@ -32,6 +32,8 @@ def apply_event(window, event: dict) -> None:
         window.set_label("status", f"replayed turn {event['step']} ignored (not answered)")
     elif kind == "moved":
         _apply_moved(window, event)
+    elif kind == "sub_game_over":
+        _apply_sub_game_over(window, event)
     elif kind == "game_over":
         _apply_game_over(window, event)
 
@@ -59,6 +61,17 @@ def _apply_moved(window, event: dict) -> None:
     # screenshot of this window must not leak more than the wire did.
     window.set_label("commit", f"{event['commit'][:32]}...")
     window.set_turn(False)
+
+
+def _apply_sub_game_over(window, event: dict) -> None:
+    """One sub-game of the series ended; more may follow -- the banner says
+    so, rather than reusing the final GAME OVER wording (`_apply_game_over`),
+    which the series as a whole earns only once."""
+    summary = event["summary"]
+    number = event.get("sub_game_number", 1)
+    winner = summary["winner"] or "nobody"
+    window.set_turn(False, f"SUB-GAME {number} DONE: {summary['result']} - winner {winner}")
+    window.set_label("status", f"{_audit_line(summary['audit'], summary)} - next sub-game...")
 
 
 def _apply_game_over(window, event: dict) -> None:

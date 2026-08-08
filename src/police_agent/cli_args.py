@@ -23,6 +23,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help=f"where --report writes; files land in <dir>/<group_id>/ (default: {DEFAULT_REPORT_DIR})",
     )
     parser.add_argument("--gui", action="store_true", help="play with the live board window")
+    parser.add_argument(
+        "--series",
+        action="store_true",
+        help="play the whole agreed series (game.num_games) instead of one sub-game",
+    )
     parser.add_argument("--replay", help="replay a saved match log instead of playing")
     parser.add_argument("--opponent-log", help="the thief's revealed log for replay")
     parser.add_argument(

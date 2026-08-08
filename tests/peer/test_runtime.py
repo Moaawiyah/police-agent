@@ -67,6 +67,25 @@ def test_a_survival_claim_without_a_reveal_becomes_a_technical_win():
     assert (summary["result"], summary["winner"]) == (TECHNICAL_LOSS, "police")
 
 
+def test_the_police_still_plays_its_matching_final_move_before_conceding_survival():
+    """A real match hit exactly this: the thief's step-35 message carried both
+    its last move and the survival claim, so the police conceded one move short
+    of the thief's own count (34 logged steps against the thief's 35).
+
+    That final move is recorded locally only, never sent: a self-verified
+    survival claim never waits for a reply, so a transmitted message here
+    would sit unread in a transport a series holds open across sub-games --
+    and be mistaken for the next sub-game's opening turn."""
+    summary, transport = run_against(
+        [thief_turn(1), thief_turn(2), thief_turn(3, win_claim={"type": "survival"})],
+        rules__max_steps=3,
+        rules__survival_threshold=3,
+    )
+
+    assert summary["steps"] == 3
+    assert len(transport.sent_turns) == 2
+
+
 def test_an_early_survival_claim_is_disputed_not_conceded():
     summary, _ = run_against(
         [thief_turn(1, win_claim={"type": "survival"})],

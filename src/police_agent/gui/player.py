@@ -49,11 +49,12 @@ class LivePeerApp:
         self._describe_verbal_layer()
         self._bar = LiveControls(self._window.root, self)
 
-    def _build_title(self) -> str:
+    def _build_title(self, sub_game_number: int | None = None) -> str:
         group = self._agent.config.get("game.group_id", "unnamed")
-        sub_game = self._agent.config.get("game.sub_game_number", 1)
+        if sub_game_number is None:
+            sub_game_number = self._agent.config.get("game.sub_game_number", 1)
         num_games = self._agent.config.get("game.num_games", 1)
-        return f"POLICE - {group} - game {sub_game}/{num_games} - port {self._agent.port}"
+        return f"POLICE - {group} - game {sub_game_number}/{num_games} - port {self._agent.port}"
 
     def _describe_verbal_layer(self) -> None:
         mode, model = mode_and_model(self._agent.config)
@@ -106,7 +107,8 @@ class LivePeerApp:
 
     def _worker(self) -> None:
         try:
-            self._summary = self._agent.play()
+            summaries = self._agent.play_series()
+            self._summary = summaries[-1] if summaries else None
         except RestartRequested:
             # agent.play() has already unwound on this thread -- never two
             # runtimes racing. Dispatched via `after`: Tk is not thread-safe.
@@ -131,6 +133,8 @@ class LivePeerApp:
     def _drain(self) -> None:
         while not self._events.empty():
             event = self._events.get_nowait()
+            if "sub_game_number" in event:
+                self._title = self._build_title(event["sub_game_number"])
             apply_event(self._window, event)
             if event["type"] in ("game_over", "error"):
                 self._started_at = None  # the clock stops with the game

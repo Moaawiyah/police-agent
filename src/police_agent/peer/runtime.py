@@ -60,11 +60,17 @@ class PoliceRuntime:
         controls=None,
         league: bool = False,
         link=None,
+        sub_game_number: int | None = None,
     ) -> None:
         # Validated before anything else: a missing agreed term is far cheaper to
         # discover here than three turns into a match against another group.
         self.terms = validate_agreement(config)
         self.config = config
+        self.sub_game_number = (
+            sub_game_number
+            if sub_game_number is not None
+            else config.get("game.sub_game_number", 1)
+        )
         self.transport = transport
         self.league = league
 
@@ -105,7 +111,7 @@ class PoliceRuntime:
         self.link = link or ControlLink("police", self.transport, self.controls, self.notify)
         # The declaration heads the log, sealed before anything is played, so its
         # digest can go out with the handshake below (Appendix He 24/53).
-        self.records: list[dict] = [sealed_step_zero(config)]
+        self.records: list[dict] = [sealed_step_zero(config, self.sub_game_number)]
         self.disputes: list[str] = []
         self.belief_log: list[dict] = []  # one entry per Bayes-filter update
         self.peer_identity: dict = {}
