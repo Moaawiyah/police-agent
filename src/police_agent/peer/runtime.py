@@ -40,8 +40,8 @@ from police_agent.shared.rate_limit import DosDetector
 from police_agent.shared.tokens import TokenLedger
 from police_agent.strategy import resolve_brain
 from police_agent.strategy.belief import BeliefGrid
-from police_agent.strategy.bluff import resolve_bluff_analyst
-from police_agent.strategy.talk import resolve_hint_writer
+from police_agent.strategy.bluff import BluffAnalyst, resolve_bluff_analyst
+from police_agent.strategy.talk import HintWriter, resolve_hint_writer
 
 
 class PoliceRuntime:
@@ -73,6 +73,11 @@ class PoliceRuntime:
         )
         self.transport = transport
         self.league = league
+        # The SDK marks real outbound links as reference-v3. Test doubles and
+        # direct native transports keep the original dialect unless a caller
+        # opts in explicitly, which preserves the small fake protocol used by
+        # the unit suite and older Police peers.
+        self.reference_v3 = getattr(transport, "dialect", "native") == "reference_v3"
 
         size = self.terms["board_size"]
         self.state = OwnGameState(tuple(self.terms["cop_start"]), size)
@@ -96,11 +101,31 @@ class PoliceRuntime:
 
         self.threat = threat or BeliefGrid.from_config(self.terms, config)
         self.brain = brain or resolve_brain(config)
-        self.scent = scent or ScentField.from_terms(self.terms)
-        self.hint_writer = hint_writer or resolve_hint_writer(
-            config, gate=self.gatekeeper, ledger=self.tokens
+        self.scent = scent or ScentField.from_terms(
+            self.terms, config.shared, reference_v3=self.reference_v3
         )
-        self.analyst = analyst or resolve_bluff_analyst(config, self.gatekeeper, self.tokens)
+        if self.reference_v3:
+            self.scent.seed(self.state.position)
+        if hint_writer is not None:
+            self.hint_writer = hint_writer
+        elif self.reference_v3 and config.get("trash_talk.provider") is None:
+            # The reference peer defaults to its local template provider. Keep
+            # an absent Police setup equally bounded; waiting five seconds per
+            # turn for an unconfigured Ollama endpoint would look like a broken
+            # network peer even though the wire is healthy.
+            self.hint_writer = HintWriter(
+                None,
+                config.get("play.setting", ""),
+                config.get("play.hint_max_words", 15),
+            )
+        else:
+            self.hint_writer = resolve_hint_writer(config, gate=self.gatekeeper, ledger=self.tokens)
+        if analyst is not None:
+            self.analyst = analyst
+        elif self.reference_v3 and config.get("trash_talk.provider") is None:
+            self.analyst = BluffAnalyst(None, float(config.get("bluff.gain") or 0.6))
+        else:
+            self.analyst = resolve_bluff_analyst(config, self.gatekeeper, self.tokens)
         self.handler = TurnHandler(self.state, self.threat, self.rules, self.analyst)
 
         self._listener = listener

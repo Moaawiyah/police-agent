@@ -29,12 +29,19 @@ _TRANSLATION: tuple[tuple[str, str], ...] = (
     ("pheromones.pheromone_center_intensity", "smell.emit_intensity"),
     ("pheromones.pheromone_decay", "smell.decay_per_step"),
     ("pheromones.pheromone_grid_size", "smell.grid_size"),
+    # Reference-v3 names the selected emission table and the disclosure delay
+    # explicitly. They are not signed terms, but they still have to reach the
+    # scent layer so both peers run the same physics.
+    ("pheromones.pheromone_kernel", "smell.kernel"),
+    ("pheromones.pheromone_sigma_sq", "smell.sigma_sq"),
+    ("pheromones.pheromone_transmit_lag", "smell.transmit_lag"),
     # Absent from the shipped game.json; both peers fall back to the same agreed
     # default (see peer/terms.py). Mapped so an explicit value would still win.
     ("pheromones.pheromone_min_center_intensity", "smell.min_center_intensity"),
     ("network_and_league.response_timeout_sec", "network.response_timeout_seconds"),
     ("network_and_league.watchdog_timeout_sec", "network.watchdog_timeout_seconds"),
     ("network_and_league.num_games", "game.num_games"),
+    ("network_and_league.num_sub_games", "game.num_games"),
     ("network_and_league.token_budget_per_series", "game.token_budget_per_series"),
     # Appendix Vav table 19, the Gatekeeper's limits. Every one is status
     # "minimum": absent from the agreed file, `shared/gatekeeper.py` supplies the

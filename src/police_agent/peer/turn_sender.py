@@ -43,7 +43,16 @@ def take_turn(runtime, claim_response: dict | None = None, transmit: bool = True
         decision = _held_instead(decision)
 
     claim = _capture_claim(runtime, decision)
-    record = sealed_step_record(runtime.state, decision.rationale, claim)
+    hint = ""
+    if transmit:
+        hint = runtime.hint_writer(runtime.state, claim, _opponent_hint(runtime))
+    record = sealed_step_record(
+        runtime.state,
+        decision.rationale,
+        claim,
+        reference_v3=runtime.reference_v3,
+        hint=hint,
+    )
     runtime.records.append(record)
     if not transmit:
         return
@@ -51,7 +60,7 @@ def take_turn(runtime, claim_response: dict | None = None, transmit: bool = True
         runtime.state,
         commit=record["commit"],
         smell_grid=runtime.scent.emit(runtime.state.position),
-        hint=runtime.hint_writer(runtime.state, claim, _opponent_hint(runtime)),
+        hint=hint,
         capture_claim=claim,
         claim_response=claim_response,
     )

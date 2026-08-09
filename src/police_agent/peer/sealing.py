@@ -17,6 +17,7 @@ from police_agent.constants import Cell
 from police_agent.domain.crypto import CommitReveal
 from police_agent.domain.own_state import OwnGameState
 from police_agent.peer.protocol import TurnMessage
+from police_agent.peer.reference_v3 import sealed_police_step
 
 
 def now_iso() -> str:
@@ -30,7 +31,14 @@ def _state_str(state: OwnGameState) -> str:
     return f"grid={state.board.size}x{state.board.size};self={list(state.position)};barriers={barriers}"
 
 
-def sealed_step_record(state: OwnGameState, rationale: str, capture_claim: Cell | None) -> dict:
+def sealed_step_record(
+    state: OwnGameState,
+    rationale: str,
+    capture_claim: Cell | None,
+    *,
+    reference_v3: bool = False,
+    hint: str = "",
+) -> dict:
     """Seal one turn's truth: where I am, what I did, and what I claimed.
 
     The capture claim is inside the sealed payload as well as on the wire. That
@@ -38,6 +46,13 @@ def sealed_step_record(state: OwnGameState, rationale: str, capture_claim: Cell 
     cell the police *claimed* is the cell the police actually stood on, so a
     police peer cannot later deny a claim its opponent answered honestly.
     """
+    if reference_v3:
+        # Reference-v3 commits the StepIntent shape: the settled cell, the
+        # explicit COP role, a wire move, intent, and the exact hint. The
+        # capture claim remains a public protocol field and is intentionally
+        # not part of that reference payload.
+        return sealed_police_step(state, hint)
+
     last = state.log[-1] if state.log else {}
     payload = {
         "step": state.step_number,

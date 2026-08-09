@@ -67,6 +67,10 @@ class PoliceAgentSDK:
             inboxes = start_peer_server(Role.POLICE, self.host, self.port)
             self._open_tunnel()
             self._transport = McpTransport(self.opponent_url, inboxes, **self.transport_timeouts())
+        if hasattr(self._transport, "set_dialect"):
+            self._transport.set_dialect("reference_v3")
+        if hasattr(self._transport, "open"):
+            self._transport.open()
         return self._transport
 
     def _open_tunnel(self) -> None:
@@ -162,6 +166,12 @@ class PoliceAgentSDK:
         deliberately not re-armable for that exact reason).
         """
         self._runtime = None
+
+    def close(self) -> None:
+        """Close a held outbound MCP session when the caller is finished."""
+        close = getattr(self._transport, "close", None)
+        if callable(close):
+            close()
 
     def load_summary(self, path: str | Path) -> dict:
         return load_summary(path)
