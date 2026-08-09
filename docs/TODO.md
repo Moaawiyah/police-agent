@@ -209,8 +209,8 @@ public repository would be redistribution.
       event carries one. Recording them would make the log complete
 - [ ] **No sub-game selector.** The naming convention now exists (step 9's
       `report/writer.py` writes `log_<game_id>_gNN.json` and discovers siblings),
-      but nothing in the replay window offers a list of them. A series driver is
-      still the prerequisite, not the widget
+      and the series driver now files those siblings. The replay window still
+      offers no list of sub-games; that selector remains a UI follow-up
 - [ ] **No bidirectional control channel.** The reference lets one peer ask the
       other to restart a series. `ControlMessage` and `McpTransport.poll_control`
       already exist here and the runtime ignores both; the opponent would have to
@@ -324,9 +324,10 @@ report is nought for **both** teams, so this was the most expensive gap open.
 - [ ] **The live send has never run against Google.** Everything offline is
       exercised; the send path is proven against a stand-in for the client
       library. Run it once, deliberately, before the league
-- [ ] **No series driver.** `--report` writes a result over whatever sub-games
-      are filed, but nothing plays a series: each sub-game is still started by
-      hand with `game.sub_game_number` set in `game.toml`
+- [x] **Series driver.** `--series` and `--gui` play the configured whole
+      series, write each sub-game's artifacts, and report once after the series.
+      `--report` remains the explicit one-sub-game reporting path for a normal
+      headless run
 - [ ] **The opponent's declaration is not audited.** Its step-zero record arrives
       in the reveal and its hash is re-verified like any other, but nothing
       checks that the hardware it declared is plausible or that the commit it

@@ -69,3 +69,15 @@ document, one level more specific than this project-wide one:
   — barrier placement, close-range and wide-range (F2–F4).
 - [`mechanisms/PRD-commit-reveal.md`](mechanisms/PRD-commit-reveal.md) — the
   cryptographic seal-and-audit protocol (F7, F8).
+
+## Implementation feature guides
+
+[`FEATURES.md`](FEATURES.md) is the navigation page for the complete
+implementation guide. It maps each major feature to its source package,
+tests, user-facing entry points, and current verification status. The detailed
+pages cover [core gameplay](CORE_GAMEPLAY.md),
+[P2P transport](P2P_PROTOCOL.md), [security and audit](SECURITY_AND_AUDIT.md),
+[strategy](POLICE_STRATEGY.md), [language](VERBAL_LAYER.md),
+[provider controls](GATEKEEPER_AND_TOKENS.md), [SDK and configuration](SDK_CLI_CONFIGURATION.md),
+[GUI/replay](GUI_REPLAY_EXPORT.md), [reporting](REPORTING_AND_SERIES.md), and
+[operations/interoperability](INTEROPERABILITY_AND_OPERATIONS.md).
