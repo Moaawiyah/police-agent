@@ -18,10 +18,8 @@ from police_agent.domain.semantic_audit import audit_semantics
 from police_agent.exceptions import ProtocolError
 from police_agent.peer.handshake import identity_from_config
 from police_agent.peer.protocol import AuditPayload
-from police_agent.peer.reference_v3 import audit_from_records
-from police_agent.peer.reference_v3 import audit_records as audit_reference_records
 from police_agent.peer.sealing import now_iso
-from police_agent.peer.step_zero import step_zero_of, turn_records
+from police_agent.peer.step_zero import step_zero_of
 
 SKIPPED_AUDIT = {
     "passed": False,
@@ -43,13 +41,8 @@ def exchange_and_audit(runtime, result: str, winner: str | None) -> tuple[str, s
     if result in NO_AUDIT_RESULTS:
         return result, winner, SKIPPED_AUDIT
 
-    mine_records = turn_records(runtime.records) if runtime.reference_v3 else runtime.records
-    mine = (
-        audit_from_records("police", mine_records, result)
-        if runtime.reference_v3
-        else AuditPayload(sender="police", records=mine_records, result_claim=result).to_dict()
-    )
-    theirs = runtime.transport.exchange_audit(mine)
+    mine = AuditPayload(sender="police", records=runtime.records, result_claim=result)
+    theirs = runtime.transport.exchange_audit(mine.to_dict())
     if theirs is None:
         audit = {**SKIPPED_AUDIT, "semantic_failures": ["opponent did not reveal its audit"]}
         return TECHNICAL_LOSS, "police", audit
@@ -58,24 +51,20 @@ def exchange_and_audit(runtime, result: str, winner: str | None) -> tuple[str, s
     except (ProtocolError, TypeError, ValueError, KeyError):
         audit = {**SKIPPED_AUDIT, "skipped": False, "semantic_failures": ["malformed audit reveal"]}
         return TAMPER_FORFEIT, "police", audit
-    if runtime.reference_v3:
-        audit = audit_reference_records(revealed.records, runtime.handler.opponent_commits)
-        audit.update(_reference_semantics(revealed.records, revealed.result_claim))
-    else:
-        audit = audit_records(revealed.records)
-        audit.update(
-            audit_semantics(
-                revealed.records,
-                runtime.handler.history,
-                runtime.records,
-                runtime.state.log,
-                runtime.rules,
-                runtime.terms["board_size"],
-                runtime.terms["thief_start"],
-                runtime.terms["cop_start"],
-                revealed.result_claim,
-            )
+    audit = audit_records(revealed.records)
+    audit.update(
+        audit_semantics(
+            revealed.records,
+            runtime.handler.history,
+            runtime.records,
+            runtime.state.log,
+            runtime.rules,
+            runtime.terms["board_size"],
+            runtime.terms["thief_start"],
+            runtime.terms["cop_start"],
+            revealed.result_claim,
         )
+    )
     if not audit["passed"] or not audit["semantic_passed"]:
         return TAMPER_FORFEIT, "police", audit
     terminal = audit.get("terminal")
@@ -88,42 +77,6 @@ def exchange_and_audit(runtime, result: str, winner: str | None) -> tuple[str, s
     return result, winner, audit
 
 
-def _reference_semantics(records: list[dict], result_claim: str) -> dict:
-    """Check the structural facts available without the native replay model."""
-    failures: list[str] = []
-    steps: list[int] = []
-    for index, record in enumerate(records):
-        payload = record.get("payload") if isinstance(record, dict) else None
-        if not isinstance(payload, dict):
-            failures.append(f"record {index} has no payload")
-            continue
-        step = payload.get("step")
-        if not isinstance(step, int) or isinstance(step, bool) or step < 1:
-            failures.append(f"record {index} has an invalid step")
-            continue
-        steps.append(step)
-        required = ("role", "state", "move", "intent", "hint")
-        missing = [name for name in required if name not in payload]
-        if missing:
-            failures.append(f"step {step} is missing {', '.join(missing)}")
-        if payload.get("role") != "THIEF":
-            failures.append(f"step {step} has role {payload.get('role')!r}, expected 'THIEF'")
-        state = payload.get("state")
-        if (
-            not isinstance(state, list)
-            or len(state) != 2
-            or any(isinstance(value, bool) or not isinstance(value, int) for value in state)
-        ):
-            failures.append(f"step {step} has an invalid state")
-    if len(steps) != len(set(steps)):
-        failures.append("reference audit contains duplicate steps")
-    if steps and sorted(steps) != list(range(min(steps), max(steps) + 1)):
-        failures.append("reference audit steps are not contiguous")
-    if not isinstance(result_claim, str) or not result_claim:
-        failures.append("reference audit has no result claim")
-    return {"semantic_passed": not failures, "semantic_failures": failures}
-
-
 def build_summary(runtime, result: str, winner: str | None, audit: dict) -> dict:
     """The match record: the result, the evidence for it, and the logs behind it.
 
@@ -134,7 +87,6 @@ def build_summary(runtime, result: str, winner: str | None, audit: dict) -> dict
         "result": result,
         "winner": winner,
         "role": "police",
-        "protocol_dialect": "reference_v3" if runtime.reference_v3 else "native",
         "steps": runtime.state.step_number,
         "unique_cells": runtime.state.unique_cells,
         "barriers_used": runtime.state.my_barriers,

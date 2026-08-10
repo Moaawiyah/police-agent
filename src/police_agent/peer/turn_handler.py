@@ -50,17 +50,6 @@ class TurnHandler:
         self.history: list[dict] = []  # every message received, for replay and the report
         self.readings: list[str] = []  # what was made of each hint, for the report
         self._seen: set[str] = set()  # turn identities already spent
-        self.opponent_commits: dict[int, str] = {}
-
-    def remember_commit(self, message: TurnMessage) -> None:
-        """Keep a terminal reference-v3 seal without applying another move.
-
-        The reference thief sends one final sealed ``STAY`` after a survival
-        claim. Police has already settled the game by then, but the audit still
-        needs to cross-check that terminal commitment against the one received
-        live.
-        """
-        self.opponent_commits[int(message.step)] = str(message.commit)
 
     def process(self, message: TurnMessage) -> IncomingOutcome:
         fingerprint = self._fingerprint(message)
@@ -75,7 +64,6 @@ class TurnHandler:
                 disputes=[f"ignored a repeat of an already-played turn (step {message.step})"],
             )
         self._seen.add(fingerprint)
-        self.opponent_commits[int(message.step)] = str(message.commit)
         self.history.append(message.to_dict())
         if message.barrier_placed:
             # Barriers are a police-only mechanic (3.4), so this should not arrive
