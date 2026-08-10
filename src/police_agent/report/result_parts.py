@@ -1,6 +1,6 @@
 """Small projections used by the binding series result artifact."""
 
-from police_agent.domain.scoring import score_subgame
+from police_agent.domain.scoring import aggregate, score_subgame
 from police_agent.report.artifacts import roles_of
 
 TOKENS_REMARK = (
@@ -25,6 +25,16 @@ def subgame_block(summary: dict, scoring: dict) -> dict:
         "audit_passed": bool((summary.get("audit") or {}).get("passed")),
         "github_commits": commits_of(summary),
     }
+
+
+def series_totals(summaries: list, scoring: dict) -> dict:
+    """Aggregate every sub-game summary into one series-level result.
+
+    Shared by the binding report (`report/result.py`) and the live GUI, so a
+    series winner means the same thing wherever it is shown.
+    """
+    scores = [subgame_block(summary, scoring)["scores"] for summary in summaries]
+    return aggregate(scores, int(scoring.get("tie_score", 0)))
 
 
 def agreement_core(facts, sub_games: list, totals: dict) -> dict:

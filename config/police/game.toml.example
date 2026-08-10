@@ -2,7 +2,7 @@ version = "1.10"
 
 [game]
 group_id = "MOAAMOHA"
-sub_game_number = 1
+sub_game_number = 6
 members = ["id-1001", "id-1002"]
 repos = { cop = "https://github.com/you/repo", thief = "https://github.com/you/repo" }
 

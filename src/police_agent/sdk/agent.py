@@ -7,6 +7,8 @@ from police_agent.infra.mcp_client import McpTransport
 from police_agent.infra.mcp_server import start_peer_server
 from police_agent.infra.tunnel import open_tunnel
 from police_agent.peer.runtime import PoliceRuntime
+from police_agent.report.result import scoring_from
+from police_agent.report.result_parts import series_totals
 from police_agent.sdk.league import (
     validate_league,
     validate_public_opponent,
@@ -129,12 +131,14 @@ class PoliceAgentSDK:
             league=self.options.league,
         )
         if self.listener is not None:
+            totals = series_totals(summaries, scoring_from(self.config))
             self.listener(
                 {
                     "type": "game_over",
                     "summary": summaries[-1],
                     "summaries": summaries,
                     "sub_game_number": len(summaries),
+                    "totals": totals,
                 }
             )
         return summaries

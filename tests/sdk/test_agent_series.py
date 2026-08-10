@@ -4,6 +4,8 @@ Split from test_agent_lifecycle.py (single-game play) to keep both files
 under the project's 150-line rule.
 """
 
+from police_agent.report.result import scoring_from
+from police_agent.report.result_parts import series_totals
 from tests.peer.fake_transport import FakeTransport
 from tests.sdk.conftest import agent_with
 
@@ -54,6 +56,21 @@ def test_the_final_game_over_names_every_sub_game_played():
     final = events[-1]
     assert final["summaries"] == summaries
     assert final["sub_game_number"] == 3
+
+
+def test_the_final_game_over_carries_the_real_series_totals():
+    """The series winner shown live must be the same one the binding report
+    would compute -- one aggregation, reused, not two answers to the same
+    question (see report/result_parts.py)."""
+    events: list[dict] = []
+    agent = agent_with(
+        game__num_games=2, transport=FakeTransport(incoming=[]), listener=events.append
+    )
+
+    summaries = agent.play_series()
+
+    expected = series_totals(summaries, scoring_from(agent.config))
+    assert events[-1]["totals"] == expected
 
 
 def test_no_listener_is_a_quiet_series():

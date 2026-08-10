@@ -77,11 +77,32 @@ def _apply_sub_game_over(window, event: dict) -> None:
 def _apply_game_over(window, event: dict) -> None:
     summary = event["summary"]
     audit = summary["audit"]
-    winner = summary["winner"] or "nobody"
-    window.set_turn(False, f"GAME OVER: {summary['result']} - winner {winner.upper()}")
-    window.set_label("status", _audit_line(audit, summary))
+    totals = event.get("totals")
+    window.set_turn(False, _series_banner(summary, totals))
+    window.set_label("status", _game_over_status(audit, summary, totals))
     window.set_label("reliability", _reliability_line(summary))
     window.set_label("tokens", _tokens_line(summary))
+
+
+def _series_banner(summary: dict, totals: dict | None) -> str:
+    """The series verdict once the whole match is over, not just its last
+    sub-game -- `totals` is the aggregate every group's score across every
+    sub-game played (`report/result_parts.series_totals`), keyed by group id
+    since roles alternate across a series (ch. 9.3.3)."""
+    if not totals:
+        winner = summary["winner"] or "nobody"
+        return f"GAME OVER: {summary['result']} - winner {winner.upper()}"
+    winner_group = totals.get("winner_group")
+    if winner_group is None:
+        return "SERIES COMPLETE: TIE"
+    return f"SERIES COMPLETE - winner {winner_group}"
+
+
+def _game_over_status(audit: dict, summary: dict, totals: dict | None) -> str:
+    line = _audit_line(audit, summary)
+    if not totals:
+        return line
+    return f"{line} | final score {totals['total_score']} (sub-games won {totals['sub_games_won']})"
 
 
 def _tokens_line(summary: dict) -> str:
