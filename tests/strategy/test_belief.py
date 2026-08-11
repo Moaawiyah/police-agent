@@ -186,3 +186,17 @@ class TestConstruction:
 
         assert belief._smell_power == 3.0
         assert belief._leak == 0.1
+
+    def test_stale_decay_and_support_also_default_to_the_shipped_values(self, config):
+        belief = BeliefGrid.from_config(terms_from_config(config), config)
+
+        assert belief._stale_decay == 0.85
+        assert belief._stale_support == 0.1
+
+    def test_stale_decay_and_support_are_overridable_from_the_private_file(self):
+        config = config_with(belief__stale_decay=0.5, belief__stale_support=0.2)
+
+        belief = BeliefGrid.from_config(terms_from_config(config), config)
+
+        assert belief._stale_decay == 0.5
+        assert belief._stale_support == 0.2

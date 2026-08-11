@@ -16,7 +16,13 @@ from PIL import Image
 from police_agent.exceptions import ConfigError
 from police_agent.gui.export_frames import build_views
 from police_agent.gui.export_render import render_frame
-from police_agent.strategy.belief import DEFAULT_LEAK, DEFAULT_SMELL_POWER, DEFAULT_SMELL_TRUST
+from police_agent.strategy.belief import (
+    DEFAULT_LEAK,
+    DEFAULT_SMELL_POWER,
+    DEFAULT_SMELL_TRUST,
+    DEFAULT_STALE_DECAY,
+    DEFAULT_STALE_SUPPORT,
+)
 
 __all__ = ["export_replay"]
 
@@ -35,7 +41,11 @@ def export_replay(config, log_data: dict, opponent_log: dict | None, out_path) -
     trust = float(config.get("belief.smell_trust", DEFAULT_SMELL_TRUST))
     power = float(config.get("belief.smell_power", DEFAULT_SMELL_POWER))
     leak = float(config.get("belief.leak", DEFAULT_LEAK))
-    views = build_views(log_data, opponent_log, board_size, trust, power, leak)
+    stale_decay = float(config.get("belief.stale_decay", DEFAULT_STALE_DECAY))
+    stale_support = float(config.get("belief.stale_support", DEFAULT_STALE_SUPPORT))
+    views = build_views(
+        log_data, opponent_log, board_size, trust, power, leak, stale_decay, stale_support
+    )
     frames = [render_frame(view, board_size) for view in views]
     if not frames:
         raise ConfigError("nothing to export -- the log has no steps")

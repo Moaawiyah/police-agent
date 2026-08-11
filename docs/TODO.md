@@ -57,6 +57,16 @@
 - [ ] The absorbed opponent trail is not kept: the belief consumes each received
       grid directly. `ScentField.absorb`/`decay_all`/`strongest_cell` exist and
       are tested for when the step-8 GUI wants a trail layer to draw
+- [x] `strategy/belief.py`: staleness shrink (`DEFAULT_STALE_DECAY`/
+      `DEFAULT_STALE_SUPPORT`) -- a cell not currently reinforced (peak-relative
+      reading below `stale_support`) loses an extra `stale_decay` share of its
+      mass every observation, on top of the flat leak, so an abandoned "stale
+      hot cell" fades faster than one still being reinforced. Same caveat as
+      `smell_trust` above: tuned only against a synthetic sweep
+      (`tests/strategy/test_belief_staleness.py`), not a live thief. Its
+      real-game bite is concentrated on cells outside a chase's recent
+      footprint -- a full-strength deposit takes ~20 turns before it even
+      starts counting as unsupported, given the mandatory 0.9/turn decay
 
 ## Step 6.5 — The verbal layer (done)
 

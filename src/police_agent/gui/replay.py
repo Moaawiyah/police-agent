@@ -8,6 +8,8 @@ from police_agent.strategy.belief import (
     DEFAULT_LEAK,
     DEFAULT_SMELL_POWER,
     DEFAULT_SMELL_TRUST,
+    DEFAULT_STALE_DECAY,
+    DEFAULT_STALE_SUPPORT,
     BeliefGrid,
 )
 
@@ -22,6 +24,8 @@ class ReplayApp:
         self._trust = float(config.get("belief.smell_trust", DEFAULT_SMELL_TRUST))
         self._power = float(config.get("belief.smell_power", DEFAULT_SMELL_POWER))
         self._leak = float(config.get("belief.leak", DEFAULT_LEAK))
+        self._stale_decay = float(config.get("belief.stale_decay", DEFAULT_STALE_DECAY))
+        self._stale_support = float(config.get("belief.stale_support", DEFAULT_STALE_SUPPORT))
         view = normalize_log(log_data)
         self._records, self._history = view["records"], view["history"]
         self._my_log, self._role = view["my_log"], view["role"]
@@ -46,7 +50,9 @@ class ReplayApp:
         return window
 
     def _reset_state(self) -> None:
-        self._belief = BeliefGrid(self._size, self._trust, self._power, self._leak)
+        self._belief = BeliefGrid(
+            self._size, self._trust, self._power, self._leak, self._stale_decay, self._stale_support
+        )
         self._barriers: set = set()
         self._visited: set = set()
         self._index = 0
