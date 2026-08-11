@@ -16,13 +16,13 @@ import importlib
 import random
 from typing import Any
 
-from police_agent.strategy.barrier import BARRIER_REACH
 from police_agent.strategy.brain import PoliceBrain, PoliceBrainBase
 from police_agent.strategy.decision import Decision
+from police_agent.strategy.encirclement import WIDE_REACH
 from police_agent.strategy.threat import PointThreat, ThreatEstimate, UniformThreat
 
 __all__ = [
-    "BARRIER_REACH",
+    "WIDE_REACH",
     "Decision",
     "PoliceBrain",
     "PoliceBrainBase",

@@ -31,7 +31,7 @@ def _state_str(state: OwnGameState) -> str:
 
 
 def sealed_step_record(
-    state: OwnGameState, rationale: str, capture_claim: Cell | None, tokens: int = 0
+    state: OwnGameState, rationale: str, capture_claim: Cell | None, tokens: dict | None = None
 ) -> dict:
     """Seal one turn's truth: where I am, what I did, and what I claimed.
 
@@ -40,10 +40,14 @@ def sealed_step_record(
     cell the police *claimed* is the cell the police actually stood on, so a
     police peer cannot later deny a claim its opponent answered honestly.
 
-    `tokens` rides along too -- the reference record schema carries it (SPEC
-    3), and sealing it here means a peer's claimed spend is tamper-evident at
-    the audit reveal rather than a bare, freely-editable assertion.
+    `tokens` (`TokenLedger.step_snapshot()`) rides along too -- the reference
+    record schema carries it (SPEC 3), and sealing it here means a peer's
+    claimed spend is tamper-evident at the audit reveal rather than a bare,
+    freely-editable assertion. `tokens` (bare, no suffix) is kept alongside
+    `tokens_step` as the cross-repo wire key the sibling thief repo's own
+    `audit_records()` sums by name -- do not rename or drop it.
     """
+    tokens = tokens or {}
     last = state.log[-1] if state.log else {}
     payload = {
         "step": state.step_number,
@@ -54,7 +58,11 @@ def sealed_step_record(
         "unique_cells": state.unique_cells,
         "capture_claim": list(capture_claim) if capture_claim else None,
         "rationale": rationale,
-        "tokens": tokens,
+        "tokens_input": tokens.get("tokens_input", 0),
+        "tokens_output": tokens.get("tokens_output", 0),
+        "tokens_step": tokens.get("tokens_step", 0),
+        "tokens_total": tokens.get("tokens_total", 0),
+        "tokens": tokens.get("tokens_step", 0),
     }
     return {"payload": payload, **CommitReveal.seal(payload)}
 

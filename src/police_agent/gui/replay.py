@@ -32,13 +32,13 @@ class ReplayApp:
         self._reset_state()
         self._window = window or self._open_window(config, view)
         self._window.add_menu({"log_role": self._role, "result": self._result})
+        self._window.set_label("game", str(view["sub_game_number"]))
         reliability = view["reliability"]
         self._window.set_label("reliability", "-" if reliability is None else f"{reliability:.2f}")
 
     def _open_window(self, config, view: dict) -> PeerWindow:
         window = PeerWindow(
-            f"REPLAY - {view['group']} - game {view['sub_game_number']} - "
-            f"{self._role} - {view['duration_seconds']}s",
+            f"REPLAY - {view['group']} - {self._role} - {view['duration_seconds']}s",
             self._size,
             float(config.get("gui.step_seconds", DEFAULT_STEP_SECONDS)),
         )

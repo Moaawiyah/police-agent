@@ -16,6 +16,14 @@ class TestPointThreat:
     def test_a_known_target_counts_as_evidence(self):
         assert PointThreat((0, 0)).has_scent() is True
 
+    def test_offers_its_one_cell_at_full_weight(self):
+        assert PointThreat((2, 5)).top_cells(3) == [((2, 5), 1.0)]
+
+    def test_excluding_the_fixed_cell_does_not_change_it(self):
+        threat = PointThreat((2, 5))
+        threat.exclude((2, 5))
+        assert threat.most_likely() == (2, 5)
+
 
 class TestUniformThreat:
     def test_flat_prior_points_at_the_board_centre(self):
@@ -33,6 +41,14 @@ class TestUniformThreat:
     def test_rejects_an_impossible_board(self):
         with pytest.raises(ValueError, match="positive"):
             UniformThreat(0)
+
+    def test_offers_only_the_centre_because_a_flat_ranking_is_noise(self):
+        assert UniformThreat(7).top_cells(5) == [((3, 3), 1.0)]
+
+    def test_excluding_a_cell_leaves_the_flat_prior_flat(self):
+        threat = UniformThreat(7)
+        threat.exclude((0, 0))
+        assert threat.most_likely() == (3, 3)
 
 
 class TestProtocol:
@@ -53,8 +69,14 @@ class TestProtocol:
             def scale(self, cells, factor):
                 pass
 
+            def exclude(self, cell):
+                pass
+
             def most_likely(self):
                 return (4, 4)
+
+            def top_cells(self, count=1):
+                return [((4, 4), 1.0)]
 
             def has_scent(self):
                 return True

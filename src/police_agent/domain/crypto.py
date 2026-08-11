@@ -80,10 +80,14 @@ def audit_records(records: list[dict]) -> dict:
     incomplete reveal proves nothing, and treating it as a pass would let a peer
     escape the audit simply by omitting the step it wants to hide.
 
-    `peer_tokens_total` sums whatever `tokens` each revealed payload declares --
-    0 for a peer whose payload schema omits the key (SPEC 3: not an interop
-    constraint). It is summed here rather than trusted blindly: the caller only
-    uses it when `passed` is true, since an unverified reveal proves nothing.
+    `peer_tokens_total` sums the per-step token field each revealed payload
+    declares -- 0 for a peer whose payload schema omits both spellings (SPEC
+    3: not an interop constraint). `tokens_step` is preferred and `tokens` is
+    the fallback: at least one real opponent observed in play declares only
+    the bare `tokens` name, so accepting either keeps this readable off a
+    real opponent's revealed log, not just the sibling thief repo's own. It
+    is summed here rather than trusted blindly: the caller only uses it when
+    `passed` is true, since an unverified reveal proves nothing.
     """
     failed: list[int] = []
     tokens_total = 0
@@ -96,7 +100,8 @@ def audit_records(records: list[dict]) -> dict:
             CommitReveal.verify(payload, record.get("nonce", ""), record.get("commit", ""))
         except CryptoError:
             failed.append(payload.get("step", index))
-        tokens_total += int(payload.get("tokens") or 0)
+        declared = payload.get("tokens_step", payload.get("tokens"))
+        tokens_total += int(declared or 0)
     return {
         "passed": not failed,
         "verified_steps": len(records) - len(failed),

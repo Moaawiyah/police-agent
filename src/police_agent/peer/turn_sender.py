@@ -42,9 +42,25 @@ def take_turn(runtime, claim_response: dict | None = None, transmit: bool = True
         runtime.state.apply_move(hold(), runtime.barriers_max)
         decision = _held_instead(decision)
 
+    placed = runtime.state.last_barrier()
+    if placed is not None:
+        # A wall just made this cell physically unoccupiable. Without this the
+        # belief keeps a residual reading here forever (diffuse only blocks it
+        # as a *destination*, and the leak keeps re-seeding every cell), which
+        # can park a large share of the whole distribution on a cell that was
+        # just proven impossible the instant it was walled.
+        runtime.threat.exclude(placed)
+
     claim = _capture_claim(runtime, decision)
+    # The hint is the only thing the shipped brain spends tokens on -- the
+    # move/barrier decision itself is a deterministic heuristic, never an LLM
+    # call. Writing it here, before sealing, is what makes `step_tokens` below
+    # reflect this step's real spend instead of always reading the zero
+    # `begin_step()` just set. Skipped when not transmitting: nobody would
+    # hear it, so spending a call (and tokens) on it would be wasted.
+    hint = runtime.hint_writer(runtime.state, claim, _opponent_hint(runtime)) if transmit else ""
     record = sealed_step_record(
-        runtime.state, decision.rationale, claim, runtime.tokens.step_tokens
+        runtime.state, decision.rationale, claim, runtime.tokens.step_snapshot()
     )
     runtime.records.append(record)
     if not transmit:
@@ -53,7 +69,7 @@ def take_turn(runtime, claim_response: dict | None = None, transmit: bool = True
         runtime.state,
         commit=record["commit"],
         smell_grid=runtime.scent.emit(runtime.state.position),
-        hint=runtime.hint_writer(runtime.state, claim, _opponent_hint(runtime)),
+        hint=hint,
         capture_claim=claim,
         claim_response=claim_response,
     )

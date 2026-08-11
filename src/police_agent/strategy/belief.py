@@ -117,12 +117,18 @@ class BeliefGrid:
 
     def most_likely(self) -> Cell:
         """The argmax; ties break row-major so the same evidence always answers the same."""
-        best, best_prob = (0, 0), -1.0
-        for row in range(self._size):
-            for col in range(self._size):
-                if self._probs[row][col] > best_prob:
-                    best, best_prob = (row, col), self._probs[row][col]
-        return best
+        return self.top_cells(1)[0][0]
+
+    def top_cells(self, count: int = 1) -> list[tuple[Cell, float]]:
+        """The `count` likeliest cells and their probabilities, likeliest first.
+
+        The argmax alone is a point estimate of a distribution that is rarely
+        peaked, so the barrier policy weighs a wall against several cells.
+        Ordering by `(-prob, cell)` keeps the row-major tie-break `most_likely`
+        has always had, so this stays recomputable in the end-of-game audit."""
+        cells = ((row, col) for row in range(self._size) for col in range(self._size))
+        ranked = sorted(cells, key=lambda c: (-self._probs[c[0]][c[1]], c))
+        return [(cell, self._probs[cell[0]][cell[1]]) for cell in ranked[:count]]
 
     def as_matrix(self) -> list[list[float]]:
         """A copy of the distribution, for the heatmap and the game log."""

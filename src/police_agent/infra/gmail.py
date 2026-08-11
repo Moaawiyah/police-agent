@@ -1,14 +1,13 @@
-"""Mailing the binding result to the lecturer, as an attachment and nothing else.
+"""Mailing the binding result to the lecturer: JSON attachment plus a matching
+human-readable summary in the body.
 
 Rule 32 has each team send the end-of-game report itself, and rule 35 attaches
 the sanction: no report, no points -- for *either* team, however the board went.
-Rule 34 fixes the form. The report must be structured, machine-readable JSON sent
-as an attached file; a plain-text summary in the body is grounds for rejection,
-which under rule 35 costs the round. So the body here is four lines of prose that
-say where the report is, and carry no game data at all.
-
-Appendix Alef's sample writes the result into the body. Rule 34 forbids it, and
-where the appendix's convenience and a numbered rule disagree the rule wins.
+Rule 34 fixes the form: the report must be structured, machine-readable JSON,
+sent as an attached file. The body (`report/email_summary.py`, shared with the
+sibling thief repo's own template) is not a substitute for that file -- it is a
+summary alongside it, matching the settled cross-team convention that the body
+carries the same result facts the attachment does.
 
 ## Off by default, and inert when off
 
@@ -29,11 +28,13 @@ calls nobody and spends nothing.
 """
 
 import base64
+import json
 from email.message import EmailMessage
 from pathlib import Path
 
 from police_agent.exceptions import ConfigError
 from police_agent.infra.gmail_client import SCOPE, send_raw
+from police_agent.report.email_summary import build_body, build_subject
 from police_agent.shared.gatekeeper import Gatekeeper
 from police_agent.shared.quota import DailyQuota
 
@@ -51,21 +52,13 @@ DEFAULTS = {
     "quota_file": "logs/.mail_quota.json",
 }
 
-# Rule 34: the body is not the report. It says where the report is and stops.
-BODY = (
-    "Automated end-of-game report from the police agent.\n\n"
-    "The binding report is the attached JSON file. This body deliberately "
-    "carries no game data: the specification requires a structured, "
-    "machine-readable report and rejects free-text ones.\n"
-)
 
-
-def build_message(recipient: str, subject: str, attachment: Path) -> EmailMessage:
-    """The report as mail: prose body, JSON attachment, nothing else."""
+def build_message(recipient: str, subject: str, attachment: Path, body: str = "") -> EmailMessage:
+    """The report as mail: a summary body, and the JSON itself as an attachment."""
     message = EmailMessage()
     message["To"] = recipient
     message["Subject"] = subject
-    message.set_content(BODY)
+    message.set_content(body or "Attached is this peer's independently generated match report.")
     message.add_attachment(
         Path(attachment).read_bytes(),
         maintype="application",
@@ -112,7 +105,16 @@ def gmail_reporter(config=None, gate: Gatekeeper | None = None):
     def report(attachment) -> str | None:
         if not options["enabled"]:
             return None
-        message = build_message(options["recipient"], _subject(attachment), Path(attachment))
+        # `config` is never None here: `enabled` only turns True through a real
+        # config, since `settings(None)` always resolves it to the DEFAULTS false.
+        result_json = json.loads(Path(attachment).read_text(encoding="utf-8"))
+        own = {
+            "group_id": config.get("game.group_id", "unknown-group"),
+            "group_name": config.get("game.group_name", "unnamed"),
+        }
+        subject = build_subject(result_json, own)
+        body = build_body(result_json, own)
+        message = build_message(options["recipient"], subject, Path(attachment), body)
         if options["mode"] == DRAFT:
             return f"draft written to {write_draft(message, draft_path(attachment))}"
         if options["mode"] != SEND:
@@ -128,11 +130,6 @@ def gmail_reporter(config=None, gate: Gatekeeper | None = None):
 def _mail_gate(options: dict) -> Gatekeeper:
     """The rate limiter and the daily allowance Google's quota actually needs."""
     return Gatekeeper(quota=DailyQuota(options["daily_limit"], options["quota_file"]))
-
-
-def _subject(attachment) -> str:
-    """Names the file, so a mailbox of these can be sorted without opening one."""
-    return f"P2P Cop-Chase report: {Path(attachment).stem}"
 
 
 def _or_default(value, default):

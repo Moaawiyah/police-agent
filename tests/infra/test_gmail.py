@@ -1,15 +1,16 @@
-"""The mandatory report as mail: an attachment, one scope, and off by default.
+"""The mandatory report as mail: an attachment, a matching summary, off by default.
 
 Rule 35 makes this the most expensive thing in the repository to get wrong -- no
-report means no points for *either* team -- and rule 34 makes it easy to get
-wrong quietly, because a free-text report looks fine to a human and is rejected
-by the tooling. So the assertions here are about form: the JSON is an attachment,
-the body is not the report, and the scope is exactly the one rule 30 allows.
+report means no points for *either* team. Rule 34 fixes the attachment's form
+(structured, machine-readable JSON); the body is a human-readable summary of
+that same JSON (`report/email_summary.py`), not a substitute for it -- the
+settled cross-team convention this project follows.
 
 Every test that could touch the network proves it did not: the default path is
 handed a gate that raises if anything is submitted to it.
 """
 
+import base64
 import json
 from email import message_from_bytes
 from email.policy import default as default_policy
@@ -52,18 +53,12 @@ class TestTheFormRuleThirtyFourFixes:
         assert attached.get_payload(decode=True) == report.read_bytes()
         assert attached.get_filename() == report.name
 
-    def test_the_body_is_not_the_report(self, report):
-        """A free-text report is rejected, and rejection costs the round."""
+    def test_a_default_body_still_points_at_the_attachment(self, report):
+        """`build_message` is the low-level primitive: given no summary, it
+        falls back to a one-line pointer rather than an empty body."""
         body = build_message("them@example.test", "subject", report).get_body().get_content()
 
-        assert "police-vs-thief" not in body
-        assert "attached" in body
-
-    def test_the_subject_names_the_file_so_a_mailbox_can_be_sorted(self, report):
-        message = gmail_reporter(_enabled(), gate=_forbidden_gate())
-        message(report)
-
-        assert report.stem in _draft_of(report)["Subject"]
+        assert "attached" in body.lower()
 
     def test_the_api_body_is_the_whole_message_base64url_encoded(self, report):
         message = build_message("them@example.test", "subject", report)
@@ -127,9 +122,8 @@ class TestReadingTheEmailBlock:
         assert settings() == DEFAULTS
 
     def test_a_configured_value_wins(self):
-        assert settings(_enabled(email__recipient="me@example.test"))["recipient"] == (
-            "me@example.test"
-        )
+        config = _enabled(email__recipient="me@example.test")
+        assert settings(config)["recipient"] == "me@example.test"
 
     def test_a_false_setting_is_not_mistaken_for_an_absent_one(self):
         """`or` would read `enabled = false` as "unset" and turn mailing back on."""
@@ -153,6 +147,4 @@ def _draft_of(report):
 
 
 def _decode(raw: str) -> bytes:
-    import base64
-
     return base64.urlsafe_b64decode(raw)

@@ -23,6 +23,7 @@ WAITING_COLOR = "#95a5a6"
 # budget worth watching turn by turn -- but the total (Appendix He 54) is
 # worth showing once the match ends, alongside the audit line.
 PANEL_ROWS = (
+    ("game", "Sub-game"),
     ("step", "Step"),
     ("mode", "Verbal mode"),
     ("model", "Model"),

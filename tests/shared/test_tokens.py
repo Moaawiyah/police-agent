@@ -77,3 +77,36 @@ class TestTheStepBoundary:
         subject.record(Usage(30, 5))
 
         assert subject.snapshot()["tokens_step"] == 85
+
+
+class TestTheStepSnapshot:
+    """What the sealed per-step record carries -- the input/output split and
+    the running total through this step, matching the sibling thief repo's
+    own richer per-step schema rather than only a flat figure."""
+
+    def test_a_fresh_step_has_spent_nothing(self):
+        subject = TokenLedger()
+        subject.begin_step()
+
+        assert subject.step_snapshot() == {
+            "tokens_input": 0,
+            "tokens_output": 0,
+            "tokens_step": 0,
+            "tokens_total": 0,
+        }
+
+    def test_the_split_is_this_steps_own_not_the_whole_sub_games(self):
+        subject = ledger((100, 20))
+        subject.begin_step()
+        subject.record(Usage(7, 3))
+
+        snapshot = subject.step_snapshot()
+        assert (snapshot["tokens_input"], snapshot["tokens_output"]) == (7, 3)
+        assert snapshot["tokens_step"] == 10
+
+    def test_the_running_total_includes_every_step_so_far(self):
+        subject = ledger((100, 20))
+        subject.begin_step()
+        subject.record(Usage(7, 3))
+
+        assert subject.step_snapshot()["tokens_total"] == 130

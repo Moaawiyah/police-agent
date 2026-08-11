@@ -41,6 +41,8 @@ def apply_event(window, event: dict) -> None:
 def _apply_negotiated(window, event: dict) -> None:
     """The handshake passed. The thief opens, so this peer waits first."""
     peer = event.get("peer") or {}
+    if event.get("sub_game_number") is not None:
+        window.set_label("game", f"{event['sub_game_number']} in progress")
     window.set_label("status", "Terms agreed and signature verified (SHA-256)")
     window.set_label("hint_in", f"opponent: {peer.get('group_id', 'unknown')}")
     window.set_turn(False)
@@ -70,6 +72,7 @@ def _apply_sub_game_over(window, event: dict) -> None:
     summary = event["summary"]
     number = event.get("sub_game_number", 1)
     winner = summary["winner"] or "nobody"
+    window.set_label("game", f"{number} complete")
     window.set_turn(False, f"SUB-GAME {number} DONE: {summary['result']} - winner {winner}")
     window.set_label("status", f"{_audit_line(summary['audit'], summary)} - next sub-game...")
 
@@ -78,6 +81,9 @@ def _apply_game_over(window, event: dict) -> None:
     summary = event["summary"]
     audit = summary["audit"]
     totals = event.get("totals")
+    played = event.get("sub_game_number")
+    if played is not None:
+        window.set_label("game", f"{played} / {played} complete")
     window.set_turn(False, _series_banner(summary, totals))
     window.set_label("status", _game_over_status(audit, summary, totals))
     window.set_label("reliability", _reliability_line(summary))

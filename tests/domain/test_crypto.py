@@ -83,6 +83,23 @@ def test_a_payload_without_tokens_counts_as_zero():
     assert audit_records(records)["peer_tokens_total"] == 0
 
 
+def test_tokens_step_is_read_when_a_peer_uses_the_books_own_name():
+    """Symmetric with the sibling thief repo's own `audit_records`: a real
+    opponent may declare the book's `tokens_step` instead of the bare
+    `tokens` alias, and that must be readable too, not just our own name."""
+    payload = {"step": 0, "tokens_step": 15}
+    records = [{"payload": payload, **CommitReveal.seal(payload)}]
+
+    assert audit_records(records)["peer_tokens_total"] == 15
+
+
+def test_tokens_step_wins_when_a_payload_carries_both_spellings():
+    payload = {"step": 0, "tokens_step": 15, "tokens": 99}
+    records = [{"payload": payload, **CommitReveal.seal(payload)}]
+
+    assert audit_records(records)["peer_tokens_total"] == 15
+
+
 def test_the_audit_names_every_failing_step_not_just_the_first():
     records = [{"payload": {"step": n}, **CommitReveal.seal({"step": n})} for n in range(4)]
     records[1]["commit"] = "forged"

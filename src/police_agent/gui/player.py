@@ -40,7 +40,7 @@ class LivePeerApp:
         self._summaries: list[dict] = []
         self._started_at: float | None = None
         self._in_progress = False  # whether a worker thread currently owns _agent
-        self._title = self._build_title()
+        self._title = f"POLICE - {agent.config.get('game.group_id', 'unnamed')} - port {agent.port}"
         self._window = PeerWindow(
             self._title,
             agent.config.require("board.size"),
@@ -48,13 +48,6 @@ class LivePeerApp:
         )
         self._describe_verbal_layer()
         self._bar = LiveControls(self._window.root, self)
-
-    def _build_title(self, sub_game_number: int | None = None) -> str:
-        group = self._agent.config.get("game.group_id", "unnamed")
-        if sub_game_number is None:
-            sub_game_number = self._agent.config.get("game.sub_game_number", 1)
-        num_games = self._agent.config.get("game.num_games", 1)
-        return f"POLICE - {group} - game {sub_game_number}/{num_games} - port {self._agent.port}"
 
     def _describe_verbal_layer(self) -> None:
         mode, model = mode_and_model(self._agent.config)
@@ -76,6 +69,8 @@ class LivePeerApp:
         self._bar.mark_started()
         self._in_progress = True
         self._started_at = time.monotonic()
+        total = self._agent.config.get("game.num_games", 1)
+        self._window.set_label("game", f"1 / {total}")
         self._window.set_turn(False, "STARTING - negotiating terms...")
         threading.Thread(target=self._worker, daemon=True, name="police-runtime").start()
         self._window.root.after(CLOCK_INTERVAL_MS, self._tick_clock)
@@ -132,8 +127,6 @@ class LivePeerApp:
     def _drain(self) -> None:
         while not self._events.empty():
             event = self._events.get_nowait()
-            if "sub_game_number" in event:
-                self._title = self._build_title(event["sub_game_number"])
             apply_event(self._window, event)
             if event["type"] in ("game_over", "error"):
                 self._started_at = None  # the clock stops with the game
