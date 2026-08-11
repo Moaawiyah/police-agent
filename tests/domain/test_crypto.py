@@ -61,7 +61,26 @@ def test_a_wrong_nonce_is_caught():
 def test_an_honest_log_passes_the_audit():
     records = [{"payload": {"step": n}, **CommitReveal.seal({"step": n})} for n in range(3)]
 
-    assert audit_records(records) == {"passed": True, "verified_steps": 3, "failed_steps": []}
+    assert audit_records(records) == {
+        "passed": True,
+        "verified_steps": 3,
+        "failed_steps": [],
+        "peer_tokens_total": 0,
+    }
+
+
+def test_the_audit_sums_the_peer_s_declared_tokens():
+    payloads = [{"step": n, "tokens": 10 * (n + 1)} for n in range(3)]
+    records = [{"payload": p, **CommitReveal.seal(p)} for p in payloads]
+
+    assert audit_records(records)["peer_tokens_total"] == 60
+
+
+def test_a_payload_without_tokens_counts_as_zero():
+    """Interop: another team's payload schema need not carry `tokens` at all."""
+    records = [{"payload": {"step": 0}, **CommitReveal.seal({"step": 0})}]
+
+    assert audit_records(records)["peer_tokens_total"] == 0
 
 
 def test_the_audit_names_every_failing_step_not_just_the_first():
