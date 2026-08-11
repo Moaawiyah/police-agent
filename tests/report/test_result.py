@@ -28,7 +28,7 @@ class TestWhatTheLecturerIsSent:
     def test_it_names_itself_and_the_schema_it_follows(self):
         artifact = _result()
 
-        assert artifact["artifact_type"] == RESULT_TYPE
+        assert artifact["report_type"] == RESULT_TYPE
         assert artifact["schema_version"] == SCHEMA_VERSION
 
     def test_it_carries_the_identifiers_the_four_files_are_joined_on(self):
@@ -41,19 +41,19 @@ class TestWhatTheLecturerIsSent:
     def test_it_carries_all_four_repository_links_as_chapter_nine_four_requires(self):
         artifact = _result()
 
-        assert artifact["repos"] == {POLICE: OUR_REPOS, THIEF: THEIR_REPOS}
+        assert artifact["repositories"] == {POLICE: OUR_REPOS, THIEF: THEIR_REPOS}
 
     def test_it_carries_the_commit_each_group_played_per_sub_game(self):
         """Rule 53: a team may change its code between sub-games."""
         artifact = _result()
 
-        assert artifact["sub_games"][0]["github_commits"] == {POLICE: "a" * 40, THIEF: "b" * 40}
-        assert artifact["sub_games"][1]["github_commits"][POLICE] == "c" * 40
+        assert artifact["sub_games"][0]["github_commit"] == {POLICE: "a" * 40, THIEF: "b" * 40}
+        assert artifact["sub_games"][1]["github_commit"][POLICE] == "c" * 40
 
     def test_it_reports_the_series_length_played_against_the_one_agreed(self):
         artifact = _result()
 
-        assert artifact["sub_games_played"] == 2
+        assert artifact["num_sub_games"] == 2
         assert artifact["num_sub_games_agreed"] == 2
 
 
@@ -62,7 +62,7 @@ class TestScoringTheSeries:
         """A capture is 20 to whoever policed it and 5 to whoever was caught."""
         artifact = _result()
 
-        assert artifact["sub_games"][0]["scores"] == {POLICE: 20, THIEF: 5}
+        assert artifact["sub_games"][0]["score"] == {POLICE: 20, THIEF: 5}
 
     def test_the_winner_is_reported_as_a_group_not_as_a_role(self):
         """Roles swap across the series, so only the group id means the same twice."""
@@ -74,16 +74,16 @@ class TestScoringTheSeries:
     def test_the_totals_are_the_sub_games_summed(self):
         artifact = _result()
 
-        assert artifact["totals"]["total_score"] == {POLICE: 25, THIEF: 15}
-        assert artifact["totals"]["winner_group"] == POLICE
-        assert artifact["totals"]["sub_games_won"] == {POLICE: 1, THIEF: 1}
+        assert artifact["final_result"]["total_score"] == {POLICE: 25, THIEF: 15}
+        assert artifact["final_result"]["winner_group"] == POLICE
+        assert artifact["final_result"]["sub_games_won"] == {POLICE: 1, THIEF: 1}
 
     def test_a_sub_game_nobody_won_scores_the_technical_loss_for_both(self):
         summary = {**_capture(), "result": "technical_loss", "winner": None}
 
         block = subgame_block(summary, DEFAULT_SCORING)
 
-        assert block["scores"] == {POLICE: 0, THIEF: 0}
+        assert block["score"] == {POLICE: 0, THIEF: 0}
         assert block["winner_group"] is None
 
     def test_the_signed_table_is_used_when_one_was_loaded(self):

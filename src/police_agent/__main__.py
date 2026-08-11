@@ -37,9 +37,11 @@ def main(argv: list[str] | None = None) -> int:
         agent = PoliceAgentSDK(_options(args))
         if args.replay:
             return _replay(agent, args)
-        if args.series and not args.gui:
+        if args.gui:
+            return _play_gui(agent, args)
+        if args.series:
             return _play_series(agent, args)
-        summary = _play_with_window(agent) if args.gui else _play_headless(agent)
+        summary = _play_headless(agent)
     except PoliceAgentError as exc:
         print(f"police-agent: {exc}", file=sys.stderr)
         return 1
@@ -55,10 +57,22 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
+def _play_gui(agent, args) -> int:
+    """The GUI's Start button always plays the whole series (`gui/player.py`),
+    never one sub-game -- so, like `_play_series` below, it reports through
+    `_finish_series`: one writer for both, rather than two that can quietly
+    disagree about how many sub-games actually got saved."""
+    return _finish_series(agent, args, _play_with_window(agent))
+
+
 def _play_series(agent, args) -> int:
-    """`--gui` already plays the whole series on its own (its Start button
-    calls `play_series()` directly); this headless path is `--series` alone."""
-    summaries = _play_series_headless(agent)
+    return _finish_series(agent, args, _play_series_headless(agent))
+
+
+def _finish_series(agent, args, summaries: list[dict]) -> int:
+    if not summaries:
+        print("no match played")
+        return 0
     for summary in summaries:
         print(f"result={summary['result']} winner={summary['winner']} steps={summary['steps']}")
     if args.summary:

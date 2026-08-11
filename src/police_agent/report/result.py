@@ -15,9 +15,12 @@ answer to the same question, which is precisely the disagreement rule 51 is abou
 
 Both peers must produce the *same* `mutual_agreement.sha256`, because that is how
 two independently written reports are shown to describe one match. So the digest
-covers only what both sides can derive identically: the identifiers, the sorted
-group pair, and per sub-game its number, its outcome, its winning group and the
-points each group earned -- plus the totals over them.
+covers only the game_id and, per sub-game, its roles, its outcome, its winning
+group and the points each group earned -- plus the totals over them
+(`result_parts.agreement_core`). `game_uid` and the sorted group pair are left
+out even though both peers derive them identically too: the shape mirrors the
+one the grading opponent's independent implementation is expected to hash,
+which is the only thing that makes byte-for-byte agreement possible at all.
 
 Everything per-peer is deliberately outside it. Timestamps differ by the clock
 skew between two machines. File paths differ by whose disk it is. Token spend
@@ -30,15 +33,17 @@ see `report/artifacts.py`.
 """
 
 from police_agent.domain.scoring import aggregate
-from police_agent.report.ids import SCHEMA_VERSION, consensus_signature
+from police_agent.report.ids import SCHEMA_VERSION, consensus_signature, interop_sha256
 from police_agent.report.result_parts import (
     agreement_core,
+    log_files_of,
     repos_of,
     subgame_block,
+    tokens_total_series,
     tokens_used,
 )
 
-RESULT_TYPE = "final_result"
+RESULT_TYPE = "final_game_result"
 
 # Appendix Vav table 17's own example values, which are also the ones it makes
 # mandatory in the absence of a negotiated table. Defaults rather than a crash,
@@ -74,29 +79,36 @@ def build_result(facts, summaries: list, scoring: dict | None = None) -> dict:
     sub-game runs in its own process. One record is a legitimate series of one.
     """
     table = scoring or DEFAULT_SCORING
-    sub_games = [subgame_block(summary, table) for summary in summaries]
-    totals = aggregate([block["scores"] for block in sub_games], int(table.get("tie_score", 0)))
-    core = agreement_core(facts, sub_games, totals)
+    sub_games = [
+        {**subgame_block(summary, table), "log_files": log_files_of(summary, facts.game_id)}
+        for summary in summaries
+    ]
+    totals = aggregate([block["score"] for block in sub_games], int(table.get("tie_score", 0)))
+    core = agreement_core(facts.game_id, sub_games, totals)
+    final_result = {**totals, "tokens_total_series": tokens_total_series(sub_games)}
     return {
         "_schema": RESULT_NOTE,
         "schema_version": SCHEMA_VERSION,
-        "artifact_type": RESULT_TYPE,
+        "report_type": RESULT_TYPE,
         "game_id": facts.game_id,
         "game_uid": facts.game_uid,
         "links": facts.links,
+        "repositories": repos_of(summaries),
         "timezone": facts.timezone,
         "groups": facts.groups,
-        "repos": repos_of(summaries),
         "game_started_at": facts.started_at,
         "game_ended_at": facts.ended_at,
-        "sub_games_played": len(sub_games),
+        "num_sub_games": len(sub_games),
         "num_sub_games_agreed": facts.num_sub_games,
         "sub_games": sub_games,
-        "totals": totals,
+        "final_result": final_result,
         "max_tokens_per_game": facts.token_budget,
         "tokens_used": tokens_used(facts, summaries),
         "mutual_agreement": {
-            "confirmed": all(block["audit_passed"] for block in sub_games),
             "sha256": consensus_signature(core),
+            "confirmed": all(block["audit"]["log_verified"] for block in sub_games),
+            "scope": "symmetric_outcome",
+            "interop_sha256": interop_sha256(core),
+            "interop_scope": "symmetric_outcome_ascii",
         },
     }

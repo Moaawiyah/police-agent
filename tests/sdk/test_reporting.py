@@ -53,7 +53,7 @@ class TestTheSdkWritesTheReport:
         paths = agent.write_artifacts(agent.play(), tmp_path)
 
         result = json.loads(paths["result"].read_text(encoding="utf-8"))
-        assert result["sub_games"][0]["github_commits"][GROUP] == "0" * 40
+        assert result["sub_games"][0]["github_commit"][GROUP] == "0" * 40
 
     def test_the_default_directory_is_named_rather_than_spelled_out_twice(self):
         assert DEFAULT_REPORT_DIR == "logs"
@@ -122,6 +122,40 @@ class TestTheCliFlag:
         cli.main(["--report"])
 
         assert "msg-1" in capsys.readouterr().err
+
+
+class TestTheGuiReportsTheWholeSeries:
+    """The GUI's Start button always plays the whole agreed series
+    (gui/player.py), never one sub-game -- so `--gui --report` must write
+    every sub-game it played, the same way headless `--series --report`
+    already does, and not just the last one (see `__main__._finish_series`,
+    the writer both paths now share)."""
+
+    def test_report_writes_every_sub_game_the_gui_played(self, monkeypatch):
+        agent = _StubAgent()
+        monkeypatch.setattr(cli, "PoliceAgentSDK", lambda options: agent)
+        monkeypatch.setattr(cli, "_play_with_window", lambda _agent: _two_sub_games())
+
+        cli.main(["--gui", "--report"])
+
+        assert agent.reported == [DEFAULT_REPORT_DIR, DEFAULT_REPORT_DIR]
+
+    def test_a_gui_run_that_played_nothing_reports_nothing(self, monkeypatch, capsys):
+        agent = _StubAgent()
+        monkeypatch.setattr(cli, "PoliceAgentSDK", lambda options: agent)
+        monkeypatch.setattr(cli, "_play_with_window", lambda _agent: [])
+
+        cli.main(["--gui", "--report"])
+
+        assert agent.reported == []
+        assert "no match played" in capsys.readouterr().out
+
+
+def _two_sub_games() -> list[dict]:
+    return [
+        {"result": "capture", "winner": "police", "steps": 12},
+        {"result": "survival", "winner": "thief", "steps": 35},
+    ]
 
 
 class _StubAgent:
