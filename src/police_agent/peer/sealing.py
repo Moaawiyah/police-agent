@@ -30,13 +30,19 @@ def _state_str(state: OwnGameState) -> str:
     return f"grid={state.board.size}x{state.board.size};self={list(state.position)};barriers={barriers}"
 
 
-def sealed_step_record(state: OwnGameState, rationale: str, capture_claim: Cell | None) -> dict:
+def sealed_step_record(
+    state: OwnGameState, rationale: str, capture_claim: Cell | None, tokens: int = 0
+) -> dict:
     """Seal one turn's truth: where I am, what I did, and what I claimed.
 
     The capture claim is inside the sealed payload as well as on the wire. That
     is what makes the claim binding: at the audit the thief can check that the
     cell the police *claimed* is the cell the police actually stood on, so a
     police peer cannot later deny a claim its opponent answered honestly.
+
+    `tokens` rides along too -- the reference record schema carries it (SPEC
+    3), and sealing it here means a peer's claimed spend is tamper-evident at
+    the audit reveal rather than a bare, freely-editable assertion.
     """
     last = state.log[-1] if state.log else {}
     payload = {
@@ -48,6 +54,7 @@ def sealed_step_record(state: OwnGameState, rationale: str, capture_claim: Cell 
         "unique_cells": state.unique_cells,
         "capture_claim": list(capture_claim) if capture_claim else None,
         "rationale": rationale,
+        "tokens": tokens,
     }
     return {"payload": payload, **CommitReveal.seal(payload)}
 

@@ -5,9 +5,10 @@ from police_agent.report.artifacts import roles_of
 from police_agent.report.ids import log_filename
 
 TOKENS_REMARK = (
-    "opponent is always 0: no peer can measure another's model spend, and a "
-    "figure we estimated would be one nobody could check. Excluded from "
-    "mutual_agreement so an honest zero can never cause a disagreement."
+    "opponent's figure is the peer's own sealed per-step token counts, "
+    "revealed and tamper-checked at the audit; 0 if the peer's schema omits "
+    "them or the audit did not pass. Excluded from mutual_agreement so an "
+    "honest zero can never cause a disagreement."
 )
 
 
@@ -28,7 +29,9 @@ def subgame_block(summary: dict, scoring: dict) -> dict:
     own_gid = (summary.get("identity") or {}).get("group_id", "")
     opp_gid = (summary.get("peer_identity") or {}).get("group_id", "")
     passed = bool((summary.get("audit") or {}).get("passed"))
-    spent = int((summary.get("tokens") or {}).get("tokens_total") or 0)
+    tokens = summary.get("tokens") or {}
+    spent = int(tokens.get("tokens_total") or 0)
+    peer_spent = int(tokens.get("peer_tokens_total") or 0)
     return {
         "sub_game_number": int((summary.get("step_zero") or {}).get("sub_game_number", 1)),
         "roles": roles,
@@ -38,7 +41,7 @@ def subgame_block(summary: dict, scoring: dict) -> dict:
         "winner_group": winner_group,
         "tie": winner_group is None,
         "github_commit": commits_of(summary),
-        "tokens": {own_gid: spent, opp_gid: 0},
+        "tokens": {own_gid: spent, opp_gid: peer_spent},
         "score": score_subgame(result, played, scoring),
         "audit": {"log_verified": passed, "tampered": not passed},
         "steps": summary.get("steps", 0),
@@ -120,12 +123,12 @@ def repos_of(summaries: list) -> dict:
 
 def tokens_used(facts, summaries: list) -> dict:
     """Total this peer's model spend against the agreed series ceiling."""
-    spent = sum(
-        int((summary.get("tokens") or {}).get("tokens_total") or 0) for summary in summaries
-    )
+    token_blocks = [summary.get("tokens") or {} for summary in summaries]
+    spent = sum(int(block.get("tokens_total") or 0) for block in token_blocks)
+    peer_spent = sum(int(block.get("peer_tokens_total") or 0) for block in token_blocks)
     return {
         "_remark": TOKENS_REMARK,
-        "by_group": {facts.own_group_id: spent, facts.opponent_group_id: 0},
+        "by_group": {facts.own_group_id: spent, facts.opponent_group_id: peer_spent},
         "total": spent,
         "budget_per_series": facts.token_budget,
         "within_budget": not facts.token_budget or spent <= facts.token_budget,

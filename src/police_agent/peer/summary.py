@@ -28,6 +28,7 @@ SKIPPED_AUDIT = {
     "semantic_passed": False,
     "semantic_failures": ["audit was not exchanged"],
     "skipped": True,
+    "peer_tokens_total": 0,
 }
 
 # Results where there is nobody left to audit with, so asking for a reveal would
@@ -105,7 +106,7 @@ def build_summary(runtime, result: str, winner: str | None, audit: dict) -> dict
         # How far the thief's words survived contact with its own scent trail.
         # Below 0.5 is a peer that talked its way into being disbelieved.
         "opponent_reliability": round(runtime.analyst.reliability, 3),
-        "tokens": _tokens(runtime),
+        "tokens": _tokens(runtime, audit),
         # Evidence that the rate limiter was in the path, not merely present:
         # the counters say how many outbound calls it admitted, queued, retried
         # and refused, and `inbound_dos` reports how hard the opponent pushed.
@@ -123,15 +124,22 @@ def build_summary(runtime, result: str, winner: str | None, audit: dict) -> dict
     }
 
 
-def _tokens(runtime) -> dict:
+def _tokens(runtime, audit: dict) -> dict:
     """What this sub-game consumed, against the series budget (Appendix He 54).
 
     The series total is deliberately absent rather than guessed: a sub-game runs
     in its own process and cannot see its siblings' spend. It is the sum of
     `tokens_total` across the series' summaries, which is a figure the report can
     add up from files it has -- unlike one this peer would have to invent.
+
+    `peer_tokens_total` is the opponent's own figure: `audit_records()` sums it
+    from the peer's revealed, tamper-checked payloads, so it is 0 whenever the
+    peer's schema omits `tokens` or the audit did not pass -- an unverified
+    reveal proves nothing about spend.
     """
+    trusted = audit.get("passed")
     return {
         **runtime.tokens.snapshot(),
         "budget_per_series": runtime.config.get("game.token_budget_per_series"),
+        "peer_tokens_total": int(audit.get("peer_tokens_total") or 0) if trusted else 0,
     }

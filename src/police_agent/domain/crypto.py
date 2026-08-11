@@ -79,8 +79,14 @@ def audit_records(records: list[dict]) -> dict:
     collected. A record missing its nonce or commit fails like any other: an
     incomplete reveal proves nothing, and treating it as a pass would let a peer
     escape the audit simply by omitting the step it wants to hide.
+
+    `peer_tokens_total` sums whatever `tokens` each revealed payload declares --
+    0 for a peer whose payload schema omits the key (SPEC 3: not an interop
+    constraint). It is summed here rather than trusted blindly: the caller only
+    uses it when `passed` is true, since an unverified reveal proves nothing.
     """
     failed: list[int] = []
+    tokens_total = 0
     for index, record in enumerate(records):
         payload = record.get("payload")
         if not isinstance(payload, dict):
@@ -90,8 +96,10 @@ def audit_records(records: list[dict]) -> dict:
             CommitReveal.verify(payload, record.get("nonce", ""), record.get("commit", ""))
         except CryptoError:
             failed.append(payload.get("step", index))
+        tokens_total += int(payload.get("tokens") or 0)
     return {
         "passed": not failed,
         "verified_steps": len(records) - len(failed),
         "failed_steps": failed,
+        "peer_tokens_total": tokens_total,
     }

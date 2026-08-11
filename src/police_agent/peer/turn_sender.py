@@ -43,7 +43,9 @@ def take_turn(runtime, claim_response: dict | None = None, transmit: bool = True
         decision = _held_instead(decision)
 
     claim = _capture_claim(runtime, decision)
-    record = sealed_step_record(runtime.state, decision.rationale, claim)
+    record = sealed_step_record(
+        runtime.state, decision.rationale, claim, runtime.tokens.step_tokens
+    )
     runtime.records.append(record)
     if not transmit:
         return
