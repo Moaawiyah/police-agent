@@ -85,7 +85,7 @@ class TestTheResultCoversTheWholeSeries:
         paths = write_artifacts(_summary(sub_game=2), tmp_path)
 
         result = json.loads(paths["result"].read_text(encoding="utf-8"))
-        assert result["sub_games_played"] == 2
+        assert result["num_sub_games"] == 2
 
     def test_the_sub_games_are_ordered_by_number_not_by_the_directory(self, tmp_path):
         write_artifacts(_summary(sub_game=10), tmp_path)
@@ -125,7 +125,7 @@ class TestWhatTheAgreedConfigContributes:
         paths = write_artifacts(_summary(), tmp_path, config_with())
 
         result = json.loads(paths["result"].read_text(encoding="utf-8"))
-        assert result["sub_games"][0]["scores"] == {POLICE: 20, THIEF: 5}
+        assert result["sub_games"][0]["score"] == {POLICE: 20, THIEF: 5}
 
     def test_the_paths_are_derivable_without_writing_anything(self, tmp_path):
         """So a caller can say where a report will go before it exists."""

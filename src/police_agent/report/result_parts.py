@@ -2,6 +2,7 @@
 
 from police_agent.domain.scoring import aggregate, score_subgame
 from police_agent.report.artifacts import roles_of
+from police_agent.report.ids import log_filename
 
 TOKENS_REMARK = (
     "opponent is always 0: no peer can measure another's model spend, and a "
@@ -11,20 +12,46 @@ TOKENS_REMARK = (
 
 
 def subgame_block(summary: dict, scoring: dict) -> dict:
-    """Project one sub-game into the league result schema."""
+    """Project one sub-game into the league result schema.
+
+    Field names and shape mirror the sibling thief repository's own result
+    artifact (`report_type`, `score` singular, `tie`, nested `audit`, ...): the
+    grading opponent at match time is some other student's independent
+    implementation, and this is the convention both sides need to agree on for
+    `mutual_agreement.sha256` (see `agreement_core`) to ever land on the same
+    value byte-for-byte.
+    """
     roles = roles_of(summary)
     played = {group: role for role, group in roles.items() if group}
     result = summary.get("result", "")
+    winner_group = roles.get(str(summary.get("winner") or "")) or None
+    own_gid = (summary.get("identity") or {}).get("group_id", "")
+    opp_gid = (summary.get("peer_identity") or {}).get("group_id", "")
+    passed = bool((summary.get("audit") or {}).get("passed"))
+    spent = int((summary.get("tokens") or {}).get("tokens_total") or 0)
     return {
         "sub_game_number": int((summary.get("step_zero") or {}).get("sub_game_number", 1)),
         "roles": roles,
+        "started_at": summary.get("started_at", ""),
+        "ended_at": summary.get("ended_at", ""),
         "result": result,
-        "winner_group": roles.get(str(summary.get("winner") or "")) or None,
-        "scores": score_subgame(result, played, scoring),
+        "winner_group": winner_group,
+        "tie": winner_group is None,
+        "github_commit": commits_of(summary),
+        "tokens": {own_gid: spent, opp_gid: 0},
+        "score": score_subgame(result, played, scoring),
+        "audit": {"log_verified": passed, "tampered": not passed},
         "steps": summary.get("steps", 0),
-        "audit_passed": bool((summary.get("audit") or {}).get("passed")),
-        "github_commits": commits_of(summary),
     }
+
+
+def log_files_of(summary: dict, game_id: str) -> dict:
+    """Where each group's own log for this sub-game is filed, relative to `logs/`."""
+    number = int((summary.get("step_zero") or {}).get("sub_game_number", 1))
+    name = log_filename(game_id, number)
+    own_gid = (summary.get("identity") or {}).get("group_id", "")
+    opp_gid = (summary.get("peer_identity") or {}).get("group_id", "")
+    return {gid: f"{gid}/{name}" for gid in (own_gid, opp_gid) if gid}
 
 
 def series_totals(summaries: list, scoring: dict) -> dict:
@@ -33,26 +60,41 @@ def series_totals(summaries: list, scoring: dict) -> dict:
     Shared by the binding report (`report/result.py`) and the live GUI, so a
     series winner means the same thing wherever it is shown.
     """
-    scores = [subgame_block(summary, scoring)["scores"] for summary in summaries]
+    scores = [subgame_block(summary, scoring)["score"] for summary in summaries]
     return aggregate(scores, int(scoring.get("tie_score", 0)))
 
 
-def agreement_core(facts, sub_games: list, totals: dict) -> dict:
-    """Return only fields both peers can derive identically."""
+def tokens_total_series(sub_games: list) -> dict:
+    """Each group's spend, summed across the whole series (opponent always 0)."""
+    totals: dict = {}
+    for block in sub_games:
+        for group, spent in block.get("tokens", {}).items():
+            totals[group] = totals.get(group, 0) + spent
+    return totals
+
+
+def agreement_core(game_id: str, sub_games: list, totals: dict) -> dict:
+    """Return only fields both peers can derive identically.
+
+    Deliberately narrower than the full result: no `game_uid` or `groups`, and
+    each sub-game keeps only `roles`/`result`/`winner_group`/`score` -- the same
+    reduced shape the sibling thief repo hashes (`report/emit.py`'s `symmetric`
+    dict), so an independently written opponent that follows the same
+    convention reproduces this exact digest.
+    """
     return {
-        "game_id": facts.game_id,
-        "game_uid": facts.game_uid,
-        "groups": facts.groups,
+        "game_id": game_id,
+        "aggregate": totals,
         "sub_games": [
             {
                 "sub_game_number": block["sub_game_number"],
+                "roles": block["roles"],
                 "result": block["result"],
                 "winner_group": block["winner_group"],
-                "scores": block["scores"],
+                "score": block["score"],
             }
             for block in sub_games
         ],
-        "totals": totals,
     }
 
 

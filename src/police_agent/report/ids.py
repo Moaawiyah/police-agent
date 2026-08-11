@@ -88,9 +88,27 @@ def canonical_sha256(data: dict) -> str:
     return hashlib.sha256(canonical_json(data).encode()).hexdigest()
 
 
+def interop_sha256(data: dict) -> str:
+    """SHA-256 over the compact, ASCII-only canonical form.
+
+    A second signature alongside `consensus_signature`, over the same result
+    digest: escaping every non-ASCII codepoint sidesteps the one place two
+    differently implemented peers' "sorted, canonical" JSON can still disagree
+    (unicode handling), so an independently written opponent can still
+    reproduce at least one of the two.
+    """
+    encoded = json.dumps(data, sort_keys=True, ensure_ascii=True, separators=(",", ":"))
+    return hashlib.sha256(encoded.encode()).hexdigest()
+
+
 def sub_game_tag(number: int) -> str:
     """`g01`, `g02`: the zero-padded suffix per-sub-game filenames carry."""
     return f"g{int(number):02d}"
+
+
+def log_filename(game_id: str, number: int) -> str:
+    """`log_<game_id>_g<NN>.json` -- where `writer.py` files a sub-game's log."""
+    return f"log_{game_id}_{sub_game_tag(number)}.json"
 
 
 def links(identifier: str) -> dict:

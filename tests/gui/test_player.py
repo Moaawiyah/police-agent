@@ -32,12 +32,12 @@ def test_title_names_the_group_the_sub_game_and_the_port():
 
 def test_a_missing_sub_game_number_defaults_to_the_first_game_of_the_agreed_series():
     """No private `game.toml` override here, so sub_game_number falls back to
-    1 while num_games comes from the real, agreed game.json (6)."""
+    1 while num_games comes from the real, agreed game.json (2)."""
     stub = Stub(config_with())
 
     title = LivePeerApp._build_title(stub)
 
-    assert title == "POLICE - unnamed - game 1/6 - port 8801"
+    assert title == "POLICE - unnamed - game 1/2 - port 8801"
 
 
 def test_an_explicit_sub_game_number_overrides_the_static_config_value():

@@ -37,7 +37,7 @@ class LivePeerApp:
         agent.listener = self._on_event  # read when the runtime is built, on Start
         agent.controls = self._controls
         self._events: queue.Queue = queue.Queue()
-        self._summary: dict | None = None
+        self._summaries: list[dict] = []
         self._started_at: float | None = None
         self._in_progress = False  # whether a worker thread currently owns _agent
         self._title = self._build_title()
@@ -107,8 +107,7 @@ class LivePeerApp:
 
     def _worker(self) -> None:
         try:
-            summaries = self._agent.play_series()
-            self._summary = summaries[-1] if summaries else None
+            self._summaries = self._agent.play_series()
         except RestartRequested:
             # agent.play() has already unwound on this thread -- never two
             # runtimes racing. Dispatched via `after`: Tk is not thread-safe.
@@ -148,9 +147,11 @@ class LivePeerApp:
             self._window.root.title(f"{self._title} | {elapsed // 60:02d}:{elapsed % 60:02d}")
         self._window.root.after(CLOCK_INTERVAL_MS, self._tick_clock)
 
-    def run(self) -> dict | None:
-        """Show the window and block until it closes; return the summary if any."""
+    def run(self) -> list[dict]:
+        """Show the window and block until it closes; return every sub-game
+        played, in order -- the whole series, not just the last one, so a
+        caller can report it exactly the way the headless series path does."""
         self._window.set_turn(False, "READY - press Start")
         self._window.root.after(DRAIN_INTERVAL_MS, self._drain)
         self._window.root.mainloop()
-        return self._summary
+        return self._summaries

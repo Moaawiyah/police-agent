@@ -38,7 +38,7 @@ class FakeApp:
         self._agent = FakeAgent()
         self._window = FakeWindow()
         self._bar = FakeBar(bidi)
-        self._summary = {"result": "stale"}
+        self._summaries = [{"result": "stale"}]
         self.start_calls = 0
 
     def start(self) -> None:
@@ -77,7 +77,7 @@ class TestRebuildAndStart:
         app = FakeApp(in_progress=True)
         live_restart.rebuild_and_start(app)
         assert not app._in_progress
-        assert app._summary is None
+        assert app._summaries == []
 
     def test_builds_fresh_controls_and_rewires_the_agent(self):
         app = FakeApp(in_progress=True)

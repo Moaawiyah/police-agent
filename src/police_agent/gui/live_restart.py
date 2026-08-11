@@ -43,5 +43,5 @@ def rebuild_and_start(app) -> None:
     if app._bar.bidi_var.get():
         app._controls.request_enable()
     app._agent.controls = app._controls
-    app._summary = None
+    app._summaries = []
     app.start()
