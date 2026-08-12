@@ -34,7 +34,8 @@ several turns ago when the trail was fresher.
 | B5 | Normalize each incoming scent reading against *its own* peak intensity, not an absolute value, before the nonlinear boost. | `strategy/belief.py::observe_smell` |
 | B6 | Boost a cell's probability by `1 + smell_trust * reading**smell_power`; leak a small fraction of the posterior back toward uniform every observation so a stale hot cell cannot dominate forever. | `strategy/belief.py`, `DEFAULT_LEAK` |
 | B7 | Malformed or out-of-bounds wire entries are skipped, never fatal — the opponent's implementation is untrusted input. | `strategy/belief.py::_parse` |
-| B8 | The physical constants (centre intensity, decay rate, field size) are signed, agreed terms; the emission kernel's exact shape and the belief's trust/power/leak tuning are private, unsigned choices. | `peer/terms.py`, `game.toml.example` |
+| B8 | The physical constants (centre intensity, decay rate, field size) are signed, agreed terms; the emission kernel's exact shape and the belief's trust/power/leak/staleness tuning are private, unsigned choices. | `peer/terms.py`, `game.toml.example` |
+| B9 | A cell that fails to clear the support bar this turn (its own reading, peak-relative, below `stale_support`) is shrunk by an extra `stale_decay` factor on top of B6's leak — compounding turn over turn for a cell abandoned several turns running. | `strategy/belief.py`, `DEFAULT_STALE_DECAY`/`DEFAULT_STALE_SUPPORT` |
 
 ## 4. Non-functional requirements
 
@@ -45,9 +46,17 @@ several turns ago when the trail was fresher.
   (`tests/strategy/test_belief_tracking.py`): the shipped filter keeps more
   mass near the thief's *current* cell and less on cells it visited several
   turns ago than a linear, no-leak filter would, across a continuous chase.
-- **Tunable without breaking interop.** `smell_trust`/`smell_power`/`leak`
-  are read from this peer's own private config; changing them cannot desync
-  the handshake, because none of the three is a signed term.
+  `tests/strategy/test_belief_staleness.py` measures B9 on its own: a cell fed
+  evidence every turn ends up with monotonically more probability than one
+  abandoned after the first turn, by a margin that widens as `stale_decay`
+  drops (a real 30-turn game leaves most of the board's trail still
+  "supported," per B9's own threshold, so this effect is concentrated on
+  cells genuinely outside a chase's recent footprint, not a dramatic reshape
+  of a short one).
+- **Tunable without breaking interop.** `smell_trust`/`smell_power`/`leak`/
+  `stale_decay`/`stale_support` are read from this peer's own private config;
+  changing them cannot desync the handshake, because none of the five is a
+  signed term.
 
 ## 5. Explicit non-goals
 

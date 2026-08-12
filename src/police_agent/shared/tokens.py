@@ -48,6 +48,8 @@ class TokenLedger:
         self.prompt_tokens = 0
         self.completion_tokens = 0
         self.step_tokens = 0
+        self.step_prompt_tokens = 0
+        self.step_completion_tokens = 0
 
     @property
     def total(self) -> int:
@@ -56,6 +58,8 @@ class TokenLedger:
     def begin_step(self) -> None:
         """Start a new turn's accounting, leaving the sub-game total alone."""
         self.step_tokens = 0
+        self.step_prompt_tokens = 0
+        self.step_completion_tokens = 0
 
     def record(self, usage: Usage) -> None:
         """Add one call's reported consumption.
@@ -68,6 +72,8 @@ class TokenLedger:
         self.prompt_tokens += usage.prompt_tokens
         self.completion_tokens += usage.completion_tokens
         self.step_tokens += usage.total
+        self.step_prompt_tokens += usage.prompt_tokens
+        self.step_completion_tokens += usage.completion_tokens
 
     def snapshot(self) -> dict:
         """The block the end-of-game JSON carries (Appendix He 54)."""
@@ -77,4 +83,16 @@ class TokenLedger:
             "prompt_tokens": self.prompt_tokens,
             "completion_tokens": self.completion_tokens,
             "model_calls": self.calls,
+        }
+
+    def step_snapshot(self) -> dict:
+        """This step's own input/output split and the running total through
+        it -- what the sealed per-step record carries, matching the sibling
+        thief repo's own richer per-step schema (`tokens_input`/`tokens_output`/
+        `tokens_step`/`tokens_total`) rather than only a single flat figure."""
+        return {
+            "tokens_input": self.step_prompt_tokens,
+            "tokens_output": self.step_completion_tokens,
+            "tokens_step": self.step_tokens,
+            "tokens_total": self.total,
         }

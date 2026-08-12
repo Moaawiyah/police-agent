@@ -14,6 +14,7 @@ import socket
 import pytest
 
 from police_agent.constants import Role
+from police_agent.exceptions import TransportError
 from police_agent.infra.mcp_client import McpTransport
 from police_agent.infra.mcp_server import start_peer_server
 from police_agent.peer.protocol import AuditPayload, TurnMessage
@@ -92,6 +93,22 @@ def test_the_handshake_completes_when_both_peers_send(peers):
 
     assert theirs == opponent_agreement
     assert opponent._inboxes.agreements.get(timeout=10.0)["group_id"] == "police-team"
+
+
+@pytest.mark.slow
+def test_a_flooding_peer_is_rejected_over_the_real_link():
+    """Its own, low-limit pair of servers -- flooding the shared `peers`
+    fixture would trip it for every other test in this module."""
+    opponent_port = free_port()
+    opponent_inboxes = start_peer_server(Role.THIEF, HOST, opponent_port, dos_limit_per_minute=3)
+    settings = {"connect_timeout": 5.0, "retry_interval": 0.05, "reply_timeout": 2.0}
+    police = McpTransport(f"http://{HOST}:{opponent_port}/mcp", opponent_inboxes, **settings)
+
+    for step in range(3):
+        police.send_turn(a_turn(step=step, sender="police").to_dict())
+
+    with pytest.raises(TransportError):
+        police.send_turn(a_turn(step=3, sender="police").to_dict())
 
 
 @pytest.mark.slow

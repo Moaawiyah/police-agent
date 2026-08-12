@@ -109,26 +109,29 @@ class TestTheGatekeeperIsInTheRecord:
 
 
 class TestTheInboundFloodDetector:
-    def test_every_message_the_opponent_sends_is_counted(self):
+    def test_a_fake_transported_match_does_not_record_against_the_detector(self):
+        """Real inbound counting now happens in the FastMCP middleware
+        (infra/mcp_guard.py, tests/infra/test_mcp_guard.py), on the request
+        path a FakeTransport-backed runtime -- "no sockets, no threads" by
+        design -- structurally never reaches. This is not a loss of
+        coverage, just a relocation to where the real enforcement lives."""
         summary = runtime(thief_turns(4)).run()
 
-        assert summary["inbound_dos"]["peak_per_minute"] == 4.0
-
-    def test_a_repeated_turn_counts_as_traffic_even_though_it_is_not_a_turn(self):
-        """A peer that only ever repeats itself is exactly what this watches for."""
-        summary = runtime([thief_turn(1), thief_turn(1), thief_turn(2)]).run()
-
-        assert summary["inbound_dos"]["peak_per_minute"] == 3.0
+        assert summary["inbound_dos"]["peak_per_minute"] == 0.0
 
     def test_an_ordinary_match_never_looks_like_a_flood(self):
         summary = runtime(thief_turns(5)).run()
 
         assert summary["inbound_dos"]["tripped"] is False
 
-    def test_the_line_is_set_far_above_anything_a_real_game_could_reach(self):
+    def test_the_inbound_limit_matches_the_agreed_gatekeeper_floor(self):
+        """Real enforcement (infra/mcp_guard.py) uses the agreed
+        requests_per_minute floor directly -- not a loosened, report-only
+        line -- so a FakeTransport-backed runtime should see the same
+        default a real McpTransport would."""
         subject = runtime([])
 
-        assert subject.inbound_dos.limit_per_minute == 6000.0
+        assert subject.inbound_dos.limit_per_minute == 30.0
 
     def test_a_tripped_detector_still_lets_every_turn_be_played(self):
         """Defending ourselves by dropping a legal turn would lose the game."""

@@ -35,6 +35,26 @@ opponent_url    = "http://127.0.0.1:8802/mcp"       # the only thing I know abou
 # above 1, a cell that is faint relative to this reading's own peak is starved
 # harder than the peak itself, regardless of the packet's absolute scale.
 # smell_power = 3.0
+#
+# leak re-mixes a small fraction of the posterior back toward the flat prior
+# every observation, so a cell that stops being reinforced doesn't stay
+# overweighted forever.
+# leak = 0.03
+#
+# stale_decay adds an EXTRA multiplicative shrink, on top of leak, to any cell
+# whose reading this turn (same peak-relative quantity smell_power shapes)
+# fell below stale_support -- i.e. one that isn't currently being reinforced.
+# Compounds turn over turn for a cell abandoned several turns running. 1.0
+# disables it (today's flat-leak-only behaviour); lower is more aggressive.
+# stale_decay = 0.85
+# stale_support = 0.1
+
+# [reliability] -- private, per-peer liveness watchdog (spec ch. 8.4), NOT an
+# agreed term: it bounds only how long THIS peer's own turn loop may go
+# without completing a turn, independent of any single network call's own
+# timeout. Not the same thing as network.watchdog_timeout_sec (a shared,
+# per-call deadline) -- do not confuse the two.
+# loop_watchdog_timeout_seconds = 180.0
 
 # HOW the banter is produced. The MOVE is always pure Python: a language model
 # shapes text and nothing else (Appendix He 25, ch. 6.5). The shipped default is

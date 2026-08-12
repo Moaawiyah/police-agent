@@ -68,6 +68,14 @@ def test_a_handshake_with_an_unnamed_peer_still_renders():
     assert "unknown" in window.labels["hint_in"]
 
 
+def test_negotiated_marks_the_sub_game_panel_in_progress():
+    """Lives on the scene's "Sub-game" row, not in the window title -- a
+    screenshot of the title bar must not go stale mid-series."""
+    window = apply({"type": "negotiated", "sub_game_number": 3, "view": VIEW})
+
+    assert window.labels["game"] == "3 in progress"
+
+
 def test_my_move_shows_the_reason_and_only_the_head_of_the_commit():
     """The commitment is what the opponent may not see until the audit, so a
     screenshot of this window must not leak more than the wire did."""
@@ -111,6 +119,16 @@ def test_sub_game_over_reports_progress_rather_than_ending_the_session():
 
     assert window.banner == (False, "SUB-GAME 2 DONE: capture - winner police")
     assert "next sub-game" in window.labels["status"]
+    assert window.labels["game"] == "2 complete"
+
+
+def test_game_over_marks_the_sub_game_panel_with_the_final_agreed_count():
+    """The number both peers agreed on: `sub_game_number` here is `len(summaries)`
+    from `play_series`, which only reaches this event once the whole signed-term
+    `num_games` count has actually been played (see `sdk/agent.py::play_series`)."""
+    window = apply({"type": "game_over", "summary": SUMMARY, "sub_game_number": 3, "view": VIEW})
+
+    assert window.labels["game"] == "3 / 3 complete"
 
 
 def test_a_drawn_game_names_nobody_rather_than_crashing_on_a_null_winner():

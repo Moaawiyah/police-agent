@@ -35,8 +35,8 @@ from police_agent.peer.step_zero import sealed_step_zero
 from police_agent.peer.summary import build_summary, exchange_and_audit
 from police_agent.peer.terms import validate_agreement
 from police_agent.peer.turn_handler import TurnHandler
+from police_agent.peer.watchdog import Watchdog
 from police_agent.shared.gatekeeper import Gatekeeper
-from police_agent.shared.rate_limit import DosDetector
 from police_agent.shared.tokens import TokenLedger
 from police_agent.strategy import resolve_brain
 from police_agent.strategy.belief import BeliefGrid
@@ -61,6 +61,7 @@ class PoliceRuntime:
         league: bool = False,
         link=None,
         sub_game_number: int | None = None,
+        watchdog=None,
     ) -> None:
         # Validated before anything else: a missing agreed term is far cheaper to
         # discover here than three turns into a match against another group.
@@ -89,10 +90,11 @@ class PoliceRuntime:
         # from quietly running two rate limiters at twice the agreed rate.
         self.gatekeeper = Gatekeeper.from_config(config)
         self.tokens = TokenLedger()
-        # Fast enough to fill the gate's whole queue depth inside a second (100
-        # msg/s shipped) -- two orders of magnitude above a real turn's rate, so
-        # this reading must never be able to accuse an honest peer.
-        self.inbound_dos = DosDetector(self.gatekeeper.limits.queue_depth * 60.0)
+        # The real, enforcing detector lives on the transport's own inboxes
+        # (infra/mcp_guard.py runs it on the server's daemon thread, before a
+        # flood ever reaches this loop); reading it through here is what lets
+        # the match summary report on the same instance that did the guarding.
+        self.inbound_dos = transport.inbound_dos
 
         self.threat = threat or BeliefGrid.from_config(self.terms, config)
         self.brain = brain or resolve_brain(config)
@@ -105,6 +107,13 @@ class PoliceRuntime:
 
         self._listener = listener
         self.controls = controls or GameControls()
+        # Fresh per sub-game, started/stopped around _turn_loop() only: a
+        # heartbeat baseline from a possibly-long gap since the last
+        # sub-game would be meaningless carried over.
+        self.watchdog = watchdog or Watchdog.from_config(
+            config, self.controls, on_trip=self._set_abort_reason
+        )
+        self.abort_reason: str | None = None
         # Opt-in bidirectional signalling (enable/status/restart/quit). Advisory
         # only -- see control_link.py -- so building it here, unconditionally,
         # commits this peer to nothing until the GUI's checkbox turns it on.
@@ -122,6 +131,9 @@ class PoliceRuntime:
     def notify(self, event: dict) -> None:
         notify(self, event)
 
+    def _set_abort_reason(self, reason: str) -> None:
+        self.abort_reason = reason
+
     def run(self) -> dict:
         """Play one sub-game to a result and return the match summary."""
         # Handing over the declaration's digest here is what makes it binding:
@@ -135,7 +147,16 @@ class PoliceRuntime:
         self.started_monotonic = time.monotonic()  # the clock starts at agreement
         self.notify({"type": "negotiated", "peer": self.peer_identity})
 
-        self._turn_loop()
+        self.watchdog.start()
+        try:
+            self._turn_loop()
+        finally:
+            # A restart unwinds this uncaught (RestartRequested) -- the
+            # watchdog must still be joined before that propagates, or a
+            # stale thread could later call stop() against the *next*
+            # sub-game's GameControls, which run_series shares across the
+            # whole series.
+            self.watchdog.stop()
         result, winner = self._result
         result, winner, audit = exchange_and_audit(self, result, winner)
         summary = build_summary(self, result, winner, audit)

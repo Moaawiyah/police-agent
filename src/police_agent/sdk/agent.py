@@ -66,7 +66,12 @@ class PoliceAgentSDK:
     def connect(self):
         self._validate_league()
         if self._transport is None:
-            inboxes = start_peer_server(Role.POLICE, self.host, self.port)
+            inboxes = start_peer_server(
+                Role.POLICE,
+                self.host,
+                self.port,
+                dos_limit_per_minute=float(self.config.get("gatekeeper.requests_per_minute") or 30.0),
+            )
             self._open_tunnel()
             self._transport = McpTransport(self.opponent_url, inboxes, **self.transport_timeouts())
         return self._transport

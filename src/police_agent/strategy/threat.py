@@ -40,8 +40,22 @@ class ThreatEstimate(Protocol):
         """Reweight a set of cells -- evidence that did not arrive as scent."""
         ...
 
+    def exclude(self, cell: Cell) -> None:
+        """Rule a cell out entirely -- a police barrier just made it unoccupiable."""
+        ...
+
     def most_likely(self) -> Cell:
         """The cell the thief is currently believed most likely to occupy."""
+        ...
+
+    def top_cells(self, count: int = 1) -> list[tuple[Cell, float]]:
+        """The `count` likeliest cells and their probabilities, likeliest first.
+
+        The barrier policy weighs a placement across several plausible cells
+        rather than betting the wall on the argmax alone. An estimate that
+        holds a single cell answers with that one cell at full weight, which
+        is exactly the single-target behaviour.
+        """
         ...
 
     def has_scent(self) -> bool:
@@ -70,8 +84,15 @@ class PointThreat:
     def scale(self, cells, factor: float) -> None:
         """Nor from a hint. A fixed target is fixed against all evidence."""
 
+    def exclude(self, cell: Cell) -> None:
+        """Nor from a barrier. The fixed cell is asserted true regardless."""
+
     def most_likely(self) -> Cell:
         return self.cell
+
+    def top_cells(self, count: int = 1) -> list[tuple[Cell, float]]:
+        """A collapsed belief has one cell to offer, and all the weight is on it."""
+        return [(self.cell, 1.0)]
 
     def has_scent(self) -> bool:
         """Known outright, which is at least as good as a real reading."""
@@ -101,9 +122,17 @@ class UniformThreat:
     def scale(self, cells, factor: float) -> None:
         """A prior that reweighted itself on evidence would be a belief map."""
 
+    def exclude(self, cell: Cell) -> None:
+        """A prior that ruled a cell out on a barrier would be a belief map too."""
+
     def most_likely(self) -> Cell:
         middle = (self.board_size - 1) // 2
         return (middle, middle)
+
+    def top_cells(self, count: int = 1) -> list[tuple[Cell, float]]:
+        """Every cell is equally likely, so a ranking would be noise dressed as
+        evidence. The centre is offered alone, matching `most_likely`."""
+        return [(self.most_likely(), 1.0)]
 
     def has_scent(self) -> bool:
         """This is the exact "before any scent" state the name promises."""

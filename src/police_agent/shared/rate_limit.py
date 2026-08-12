@@ -11,6 +11,7 @@ tokens; the specification (ch. 9.3.1) is emphatic about not confusing the two,
 and the LLM kind is counted in `shared/tokens.py` instead.
 """
 
+import threading
 import time
 from collections import deque
 
@@ -71,6 +72,14 @@ class DosDetector:
 
     Recording stops at the trip, which is also what bounds the window's memory:
     a flood cannot make this deque grow without limit because it stops being fed.
+
+    `record()` is now called from more than one thread for an inbound-facing
+    instance (FastMCP serves each request on its own worker, `infra/
+    mcp_guard.py`) while `snapshot()` is read from the game loop's own thread
+    -- an internal lock is what keeps the sliding window itself consistent.
+    `tripped`/`peak_per_minute` are still read unlocked elsewhere: once-set
+    booleans and a monotonically-growing float are individually atomic
+    under the GIL, so only the window mutation/scan needs guarding.
     """
 
     def __init__(
@@ -82,20 +91,22 @@ class DosDetector:
         self.peak_per_minute = 0.0
         self._clock = clock
         self._events: deque[float] = deque()
+        self._lock = threading.RLock()
 
     def record(self, count: int = 1) -> bool:
         """Log `count` events and return whether traffic still looks legitimate."""
-        if self.tripped:
-            return False
-        now = self._clock()
-        self._events.extend([now] * count)
-        cutoff = now - self.window_seconds
-        while self._events and self._events[0] < cutoff:
-            self._events.popleft()
-        self.peak_per_minute = max(self.peak_per_minute, self.rate_per_minute)
-        if self.rate_per_minute > self.limit_per_minute:
-            self.tripped = True
-        return not self.tripped
+        with self._lock:
+            if self.tripped:
+                return False
+            now = self._clock()
+            self._events.extend([now] * count)
+            cutoff = now - self.window_seconds
+            while self._events and self._events[0] < cutoff:
+                self._events.popleft()
+            self.peak_per_minute = max(self.peak_per_minute, self.rate_per_minute)
+            if self.rate_per_minute > self.limit_per_minute:
+                self.tripped = True
+            return not self.tripped
 
     @property
     def rate_per_minute(self) -> float:
@@ -105,12 +116,14 @@ class DosDetector:
         innocent: a burst of 200 in five seconds reads as 2400/min, which is what
         it is, instead of hiding under a per-minute threshold it never reached.
         """
-        return len(self._events) * 60.0 / self.window_seconds
+        with self._lock:
+            return len(self._events) * 60.0 / self.window_seconds
 
     def snapshot(self) -> dict:
         """What the match summary and the GUI status line report."""
-        return {
-            "tripped": self.tripped,
-            "limit_per_minute": round(self.limit_per_minute, 1),
-            "peak_per_minute": round(self.peak_per_minute, 1),
-        }
+        with self._lock:
+            return {
+                "tripped": self.tripped,
+                "limit_per_minute": round(self.limit_per_minute, 1),
+                "peak_per_minute": round(self.peak_per_minute, 1),
+            }

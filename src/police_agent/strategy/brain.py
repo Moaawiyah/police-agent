@@ -30,6 +30,7 @@ from police_agent.domain.actions import hold, move
 from police_agent.domain.own_state import OwnGameState
 from police_agent.strategy.barrier import choose_barrier
 from police_agent.strategy.decision import Decision
+from police_agent.strategy.placement import TOP_K
 from police_agent.strategy.threat import ThreatEstimate
 
 _NO_STEP = "no legal step remains"
@@ -91,7 +92,10 @@ class PoliceBrain(PoliceBrainBase):
         if not moves:
             return Decision(hold(), _NO_STEP)
         believed = threat.most_likely()
-        wall = self._pick_barrier(state, believed, barriers_max, threat.has_scent())
+        # The wall is weighed against the top of the distribution, not the
+        # argmax alone; the chase step below still aims at the single cell.
+        belief = threat.top_cells(TOP_K)
+        wall = self._pick_barrier(state, believed, barriers_max, threat.has_scent(), belief)
         if wall is not None:
             return wall
         direction, target = self._pick_move(moves, state, threat)
@@ -126,6 +130,7 @@ class PoliceBrain(PoliceBrainBase):
         believed: Cell,
         barriers_max: int,
         has_evidence: bool = True,
+        belief: list[tuple[Cell, float]] | None = None,
     ) -> Decision | None:
         """Delegate to the barrier policy. Override to change only the walling."""
-        return choose_barrier(state, believed, barriers_max, has_evidence)
+        return choose_barrier(state, believed, barriers_max, has_evidence, belief)

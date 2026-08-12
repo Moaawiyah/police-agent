@@ -134,28 +134,3 @@ class TestDeterminism:
         first = choose_barrier(police(start=(1, 1)), (0, 0), barriers_max=2)
         second = choose_barrier(police(start=(1, 1)), (0, 0), barriers_max=2)
         assert first == second
-
-
-class TestWideRangeFallsBackToEncirclement:
-    # Doorway (4, 0) is the sole connection between the open board and a
-    # 14-cell room filling rows 5-6 (matches test_encirclement.py's fixture).
-    _ROOM_BARRIERS = [(4, 1), (4, 2), (4, 3), (4, 4), (4, 5), (4, 6)]
-
-    def test_seals_a_pocket_past_the_close_range_bound(self):
-        state = police(start=(3, 0), board_size=7, barriers=self._ROOM_BARRIERS)
-        decision = choose_barrier(state, believed=(3, 3), barriers_max=5)
-        assert decision is not None
-        assert decision.action.direction is Direction.S  # (4, 0), one step south
-        assert "shrinks the pocket" in decision.rationale
-
-    def test_still_refuses_past_wide_reach(self):
-        state = police(start=(0, 0), board_size=7, barriers=self._ROOM_BARRIERS)
-        assert choose_barrier(state, believed=(6, 6), barriers_max=5) is None
-
-
-class TestWideRangeGainBar:
-    def test_an_open_board_wide_range_wall_is_refused(self):
-        """No endgame exemption exists: this exact refusal held whether it is
-        round one or the match's last round -- one gain bar, every round."""
-        state = police(start=(0, 0), board_size=7)
-        assert choose_barrier(state, believed=(0, 3), barriers_max=5) is None

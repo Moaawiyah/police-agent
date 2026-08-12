@@ -32,7 +32,7 @@ def record_wiring(monkeypatch) -> tuple[list, list]:
     opened: list = []
     dialled: list = []
 
-    def start(role, host, port):
+    def start(role, host, port, dos_limit_per_minute=30.0):
         opened.append((role, host, port))
         return "inboxes"
 
