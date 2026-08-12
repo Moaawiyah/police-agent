@@ -32,12 +32,19 @@ def replay_audit(
     thief, police = cell(thief_start), cell(police_start)
     if thief is None or police is None or not board.in_bounds(thief) or not board.in_bounds(police):
         return result(["agreed starting positions are invalid"], corrections, None)
-    remote, local = turns(revealed_records, "revealed", failures), turns(local_records, "local", failures)
+    remote, local = (
+        turns(revealed_records, "revealed", failures),
+        turns(local_records, "local", failures),
+    )
     received_messages, trailing_claim = split_trailing_claim(remote, received_messages)
     received = messages(received_messages, failures)
     match_messages(remote, received, failures)
     local_by_step = {step: payload for step, payload, _ in local}
-    log_by_step = {entry["step"]: entry for entry in local_move_log or [] if isinstance(entry, dict) and isinstance(entry.get("step"), int)}
+    log_by_step = {
+        entry["step"]: entry
+        for entry in local_move_log or []
+        if isinstance(entry, dict) and isinstance(entry.get("step"), int)
+    }
     if len(log_by_step) != len(local_move_log or []):
         failures.append("local move log is missing an integer step")
     barriers: set[tuple[int, int]] = set()
@@ -57,7 +64,9 @@ def replay_audit(
         claim_response(step, message, local_by_step, positions, failures)
         terminal = _survival(step, message, rules, terminal, failures)
         if (record := local_by_step.get(step)) is not None:
-            police, placed = police_turn(step, record, log_by_step.get(step), police, barriers, board, failures)
+            police, placed = police_turn(
+                step, record, log_by_step.get(step), police, barriers, board, failures
+            )
             terminal = _barrier_capture(step, placed, thief, barriers, board, terminal)
         response = message.get("claim_response")
         if isinstance(response, dict) and response.get("caught") and terminal is None:
@@ -70,7 +79,12 @@ def replay_audit(
         # its own, so it answers as if it had (claim_step + 1, looked up via -1).
         claim_response(claim_step + 1, claim_message, local_by_step, positions, failures)
         if len(failures) == before:
-            terminal = {"result": CAPTURE, "winner": "police", "step": claim_step, "reason": "claim"}
+            terminal = {
+                "result": CAPTURE,
+                "winner": "police",
+                "step": claim_step,
+                "reason": "claim",
+            }
     check_local_coverage(local, log_by_step, failures)
     expected = terminal or _ceiling_result(local, rules)
     _check_reported(expected, reported_result, corrections, failures)
@@ -79,7 +93,9 @@ def replay_audit(
 
 def _after_terminal(step, terminal, failures):
     if terminal is not None:
-        ended_by = "survival" if terminal["reason"] == "survival" else f"{terminal['reason']} capture"
+        ended_by = (
+            "survival" if terminal["reason"] == "survival" else f"{terminal['reason']} capture"
+        )
         failures.append(f"turn {step} occurs after {ended_by}")
 
 
@@ -109,7 +125,12 @@ def _ceiling_result(local, rules):
     if not local or local[-1][0] < rules.max_steps:
         return None
     game_result = SURVIVAL if rules.thief_survived(local[-1][0]) else TIMEOUT
-    return {"result": game_result, "winner": "thief" if game_result == SURVIVAL else None, "step": local[-1][0], "reason": "ceiling"}
+    return {
+        "result": game_result,
+        "winner": "thief" if game_result == SURVIVAL else None,
+        "step": local[-1][0],
+        "reason": "ceiling",
+    }
 
 
 def _check_reported(expected, reported, corrections, failures):

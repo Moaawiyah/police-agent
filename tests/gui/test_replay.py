@@ -130,6 +130,7 @@ def test_the_opponent_is_drawn_only_when_its_revealed_log_was_supplied():
 
     assert window.views[-1]["opponent_position"] == (3, 3)
     assert window.views[-1]["opponent_role"] == "thief"
+    assert "Verified OK" in window.labels["status"]
     assert "both agents shown" in window.labels["status"]
 
 
@@ -140,6 +141,14 @@ def test_without_the_opponent_log_the_board_says_so():
 
     assert window.views[-1]["opponent_position"] is None
     assert "not supplied" in window.labels["status"]
+
+
+def test_failed_audit_is_never_labelled_verified():
+    app, window = player({**log_of(1), "audit": {"passed": False}})
+
+    app.advance()
+
+    assert window.labels["status"].startswith("step 1/1 | Verification FAILED")
 
 
 def test_playback_runs_to_the_longer_track_and_freezes_the_shorter():

@@ -30,6 +30,7 @@ _FALLBACK_LINES = (
     "Sooner or later you turn a corner and I am there.",
 )
 
+
 class HintWriter:
     """Writes one taunt per turn, with a local model when there is one."""
 

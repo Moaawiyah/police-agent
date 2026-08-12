@@ -46,13 +46,14 @@ bounded retry, and one reconnect boundary for a transport drop. Repeated
 terminal or post-survival messages are drained and audited without being
 mistaken for an additional Police turn.
 
-## Reference-v3 compatibility
+## Compatibility boundary
 
-`peer/reference_v3.py` isolates the reference dialect: compact sorted JSON,
-reference commit bytes, strict turn validation, optional-field translation,
-and audit handling. The native protocol remains available to local fakes and
-older Police peers. Compatibility-sensitive details include tool names,
-field names, scent timing, and terminal-message handling.
+The current checkout implements one native protocol shared with the companion
+Thief repository. Compatibility depends on the complete contract: tool and
+field names, signed terms, commitment bytes, scent timing, terminal messages,
+and audit coverage. Matching only the shared config hash or MCP tool names is
+not interoperability proof; both processes must complete and agree on a
+verified result.
 
 ## Public networking
 

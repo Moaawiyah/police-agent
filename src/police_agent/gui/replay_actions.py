@@ -57,16 +57,14 @@ def render(app, index: int, total: int) -> None:
             "visited": app._visited,
             "barriers": app._barriers,
             "belief": app._belief.as_matrix(),
-            "opponent_position": tuple(app._opponent[min(index, theirs - 1)])
-            if theirs
-            else None,
+            "opponent_position": tuple(app._opponent[min(index, theirs - 1)]) if theirs else None,
             "opponent_role": "thief",
             "message": frozen_message(index, mine, theirs),
         }
     )
     both = "both agents shown" if app._opponent else "opponent log not supplied"
-    passed = "PASSED" if app._audit.get("passed") else "FAILED"
-    app._window.set_label("status", f"step {index + 1}/{total} | audit {passed} | {both}")
+    verification = "Verified OK" if app._audit.get("passed") else "Verification FAILED"
+    app._window.set_label("status", f"step {index + 1}/{total} | {verification} | {both}")
 
 
 def restart(app) -> None:

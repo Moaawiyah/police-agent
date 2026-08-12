@@ -16,7 +16,7 @@ def _clean(reply: str, max_words: int) -> str:
     if _COORDINATES.search(text):
         return ""
     line = next((part.strip() for part in text.splitlines() if part.strip()), "")
-    return _cap(line.strip('"\'` ').replace("*", ""), max_words)
+    return _cap(line.strip("\"'` ").replace("*", ""), max_words)
 
 
 def _cap(hint: str, max_words: int) -> str:

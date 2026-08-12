@@ -9,8 +9,14 @@ from police_agent.infra.hardware_probes import darwin, nvidia, windows
 
 UNKNOWN = "unknown"
 FIELDS = (
-    "os", "cpu_type", "cpu_cores", "cpu_freq_mhz", "ram_gb", "gpu_type",
-    "gpu_cores_or_cuda", "vram_gb",
+    "os",
+    "cpu_type",
+    "cpu_cores",
+    "cpu_freq_mhz",
+    "ram_gb",
+    "gpu_type",
+    "gpu_cores_or_cuda",
+    "vram_gb",
 )
 _TIMEOUT, _SLOW_TIMEOUT = 2.0, 4.0
 _BYTES_PER_GB, _MIB_PER_GB = 1024**3, 1024

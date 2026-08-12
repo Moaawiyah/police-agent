@@ -42,7 +42,9 @@ def wire(runtime, config, transport, sub_game_number, league, **components) -> N
     # survival_threshold is deliberately not a signed term (matching the
     # reference's term list is what lets the handshake succeed), but still
     # comes from the shared game.json, so both peers agree in practice.
-    runtime.rules = GameRules(runtime.terms["max_steps"], config.require("rules.survival_threshold"))
+    runtime.rules = GameRules(
+        runtime.terms["max_steps"], config.require("rules.survival_threshold")
+    )
     runtime.barriers_max = runtime.terms["barriers_max"]
 
     # One gate and one ledger for the whole match. Every outbound call to

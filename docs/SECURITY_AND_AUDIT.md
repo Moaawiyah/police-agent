@@ -15,11 +15,10 @@ fresh nonce. The public turn carries only the digest. At audit time the peer
 receives the payload, nonce, and original commit, recomputes the digest, and
 reports every failure rather than stopping at the first one.
 
-The normal Police commitment is implemented by
-[`domain/crypto.py`](../src/police_agent/domain/crypto.py). The reference-v3
-dialect uses its exact compact sorted-JSON bytes in
-[`peer/reference_v3.py`](../src/police_agent/peer/reference_v3.py). These are
-wire compatibility rules, not interchangeable hash formats.
+The Police commitment is implemented by
+[`domain/crypto.py`](../src/police_agent/domain/crypto.py). Its canonical bytes
+are part of the native wire contract shared with the companion Thief; changing
+serialization is a protocol change, even if the decoded fields look identical.
 
 ## Step-zero declaration
 
@@ -61,7 +60,8 @@ positions.
   and [`tests/peer/test_replay_guard.py`](../tests/peer/test_replay_guard.py).
 - Semantic audit tests: `tests/domain/test_semantic_audit*.py` and
   `tests/peer/test_reporting_gates.py`.
-- Reference-v3 tests: [`tests/peer/test_reference_v3_interop.py`](../tests/peer/test_reference_v3_interop.py).
+- Transport and contract tests: [`tests/peer/`](../tests/peer/) and
+  [`tests/infra/`](../tests/infra/).
 
 ## Open boundaries
 

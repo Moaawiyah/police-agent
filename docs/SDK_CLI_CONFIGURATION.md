@@ -31,7 +31,6 @@ The `police-agent` command supports:
 - `--replay` with optional `--opponent-log`;
 - `--export` for GIF/MP4 replay output;
 - `--summary`, `--report`, and `--report-dir` for artifacts/email;
-- `--authorize-gmail` for one-time OAuth consent;
 - `--tunnel` and `--league` for public/league validation;
 - `--host`, `--port`, `--opponent`, and `--config-dir` overrides.
 

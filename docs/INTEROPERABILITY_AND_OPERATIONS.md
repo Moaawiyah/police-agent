@@ -40,10 +40,8 @@ tunnel owned by the run when cleanup is needed.
 
 An external thief must honor the agreed terms, public turn fields, commit/reveal
 shape, one-turn scent timing, capture claim echo, terminal-message behavior,
-and audit record coverage. Reference-v3 compatibility is isolated in
-[`peer/reference_v3.py`](../src/police_agent/peer/reference_v3.py) so exact
-commit bytes and strict validation are not accidentally changed by native
-protocol work.
+and audit record coverage. This checkout has no separate reference-v3 adapter;
+claims are limited to peers that implement the current native contract.
 
 The strongest acceptance evidence is a completed two-process match with
 mutually agreed results, verified replays/audits, and closed ports. A started
@@ -65,8 +63,8 @@ committed source diff unless they are explicitly required as evidence.
 
 ## Current evidence boundary
 
-Automated tests cover the protocol, reference dialect, reporting, GUI seams,
-and failure paths. Police-as-cop reference interoperability is a narrower
-claim than full role-swapping support; this repository contains no thief-role
-engine. Live Gmail delivery, authenticated reserved-domain tunneling, and
-submission screenshots require their own deliberate runs.
+Automated tests cover the native protocol, reporting, GUI seams, and failure
+paths. A local match against the companion Thief is narrower than league-wide
+interoperability; this repository contains no thief-role engine. Live Gmail
+delivery, authenticated reserved-domain tunneling, and matches against other
+groups require their own deliberate runs.

@@ -19,7 +19,7 @@ for the official course specification.
 | SDK, CLI, and configuration | [SDK_CLI_CONFIGURATION.md](SDK_CLI_CONFIGURATION.md) | [`sdk/`](../src/police_agent/sdk/), [`__main__.py`](../src/police_agent/__main__.py), [`shared/config.py`](../src/police_agent/shared/config.py) | [`tests/sdk/`](../tests/sdk/), [`tests/shared/test_config.py`](../tests/shared/test_config.py) |
 | GUI, replay, and export | [GUI_REPLAY_EXPORT.md](GUI_REPLAY_EXPORT.md) | [`gui/`](../src/police_agent/gui/) and [`peer/view.py`](../src/police_agent/peer/view.py) | [`tests/gui/`](../tests/gui/) |
 | Series, artifacts, and email | [REPORTING_AND_SERIES.md](REPORTING_AND_SERIES.md) and [GMAIL_SETUP.md](GMAIL_SETUP.md) | [`report/`](../src/police_agent/report/), [`sdk/reporting.py`](../src/police_agent/sdk/reporting.py), [`infra/gmail.py`](../src/police_agent/infra/gmail.py) | [`tests/report/`](../tests/report/), Gmail and series tests |
-| Operations and interoperability | [INTEROPERABILITY_AND_OPERATIONS.md](INTEROPERABILITY_AND_OPERATIONS.md) | [`sdk/league.py`](../src/police_agent/sdk/league.py), [`infra/tunnel.py`](../src/police_agent/infra/tunnel.py), [`peer/reference_v3.py`](../src/police_agent/peer/reference_v3.py) | reference-v3 tests, socket tests, and completed match artifacts when available |
+| Operations and interoperability | [INTEROPERABILITY_AND_OPERATIONS.md](INTEROPERABILITY_AND_OPERATIONS.md) | [`sdk/league.py`](../src/police_agent/sdk/league.py), [`infra/tunnel.py`](../src/police_agent/infra/tunnel.py), and [`infra/mcp_client.py`](../src/police_agent/infra/mcp_client.py) | socket tests and completed match artifacts when available |
 
 ## Status vocabulary
 
