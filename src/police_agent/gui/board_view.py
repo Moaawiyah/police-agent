@@ -35,6 +35,7 @@ class BoardView(tk.Canvas):
     """A square grid canvas for one peer's view of the board."""
 
     def __init__(self, parent, board_size: int) -> None:
+        """A square canvas sized for `board_size` cells."""
         self.board_size = board_size
         side = board_size * CELL_PIXELS
         super().__init__(

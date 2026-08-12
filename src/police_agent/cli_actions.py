@@ -4,6 +4,7 @@ import sys
 
 
 def report(agent, summary: dict, base: str) -> None:
+    """Write one sub-game's report artifacts, then mail them."""
     _mail_report(agent, agent.write_artifacts(summary, base))
 
 
@@ -26,12 +27,14 @@ def _mail_report(agent, paths: dict) -> None:
 
 
 def play_headless(agent) -> dict:
+    """Connect and play one sub-game with no GUI."""
     agent.connect()
     _announce_listening(agent)
     return agent.play()
 
 
 def play_series_headless(agent) -> list[dict]:
+    """Connect and play the whole agreed series with no GUI."""
     agent.connect()
     _announce_listening(agent)
     return agent.play_series()
@@ -46,6 +49,7 @@ def _announce_listening(agent) -> None:
 
 
 def announce_tunnel(agent) -> None:
+    """Print the public ngrok URL to give the opponent, if a tunnel is up."""
     if agent.public_url is None:
         return
     print(f"public URL (give this to the opposing team): {agent.public_url}", file=sys.stderr)
@@ -66,6 +70,7 @@ def play_with_window(agent):
 
 
 def replay(agent, args) -> int:
+    """Open a saved log in the replay window, or export it headlessly."""
     opponent = agent.load_summary(args.opponent_log) if args.opponent_log else None
     log_data = agent.load_summary(args.replay)
     if args.export:

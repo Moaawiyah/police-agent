@@ -27,6 +27,7 @@ __all__ = ["render_frame"]
 
 
 def render_frame(view: dict, board_size: int) -> Image.Image:
+    """Draw one view dict to a PIL image, the same four layers `board_view.py` draws."""
     side = board_size * CELL_PIXELS
     image = Image.new("RGB", (side, side), "white")
     draw = ImageDraw.Draw(image)

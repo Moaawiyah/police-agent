@@ -39,6 +39,7 @@ class ControlLink:
     """Enable-handshake + status/restart/quit signalling for this peer."""
 
     def __init__(self, role: str, transport, controls, listener=None) -> None:
+        """Track this peer's enable/status state against `transport` and `controls`."""
         self._role = role
         self._transport = transport
         self._controls = controls
@@ -57,14 +58,17 @@ class ControlLink:
 
     @property
     def i_enabled(self) -> bool:
+        """Whether THIS peer has opted in to the channel."""
         return self._i_enabled
 
     @property
     def opponent(self) -> dict:
+        """The opponent's last-known status, as a plain dict."""
         return dict(self._opponent)
 
     @property
     def opponent_quit(self) -> bool:
+        """Whether the opponent has sent a clean quit."""
         return self._opponent_quit
 
     def take_pending_restart(self) -> bool:
@@ -88,9 +92,11 @@ class ControlLink:
         self._send("status", status=status, sub_game_number=sub_game_number)
 
     def send_restart(self) -> None:
+        """Announce a restart request."""
         self._send("restart")
 
     def send_quit(self) -> None:
+        """Announce a clean quit."""
         self._send("quit", status=QUIT)
 
     def drain(self) -> list[dict[str, Any]]:

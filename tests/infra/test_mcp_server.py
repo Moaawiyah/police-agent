@@ -39,8 +39,10 @@ class TestInboxes:
         assert inboxes.audits.empty()
         assert inboxes.controls.empty()
 
-    def test_the_inbound_dos_limit_defaults_to_the_agreed_gatekeeper_floor(self):
-        assert PeerInboxes().inbound_dos.limit_per_minute == 30.0
+    def test_the_inbound_dos_limit_defaults_to_the_queue_depth_derived_floor(self):
+        """Not gatekeeper.requests_per_minute (30): that budgets the outbound
+        Gmail-reporting gate, an unrelated pipeline with an unrelated cadence."""
+        assert PeerInboxes().inbound_dos.limit_per_minute == 6000.0
 
 
 class TestReceiveTools:

@@ -129,6 +129,7 @@ def ollama_asker(
     allowance = timeout if budget is None else budget
 
     def ask(prompt: str, system: str = "") -> str:
+        """One gated completion: admitted through `gate`, its usage recorded to `ledger`."""
         reply, usage = gate.submit(
             lambda: ask_ollama_usage(prompt, system, model=model, url=url, timeout=timeout),
             budget=allowance,

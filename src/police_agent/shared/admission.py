@@ -36,6 +36,7 @@ class AdmissionQueue:
     """FIFO admission control over a token bucket and a concurrency cap."""
 
     def __init__(self, bucket, concurrency: int, depth: int, clock=time.monotonic) -> None:
+        """A FIFO queue over `bucket`, admitting at most `concurrency` at once, refusing past `depth`."""
         self._bucket = bucket
         self._concurrency = max(1, int(concurrency))
         self._depth = max(1, int(depth))

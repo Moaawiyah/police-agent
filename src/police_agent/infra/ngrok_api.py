@@ -9,6 +9,7 @@ API_URL = "http://127.0.0.1:4040/api/tunnels"
 
 
 def published_url(port: int, tunnels_getter=None) -> str | None:
+    """The https URL ngrok is forwarding to `port`, or None if it isn't up yet."""
     get_tunnels = tunnels_getter or _agent_tunnels
     urls = [
         str(tunnel["public_url"])

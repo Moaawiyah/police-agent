@@ -9,6 +9,7 @@ from police_agent.report.writer import write_artifacts as write_report_artifacts
 
 
 def load_summary(path: str | Path) -> dict:
+    """Read a saved match summary from `path`."""
     try:
         return json.loads(Path(path).read_text(encoding="utf-8"))
     except FileNotFoundError as exc:
@@ -18,15 +19,18 @@ def load_summary(path: str | Path) -> dict:
 
 
 def save_summary(summary: dict, path: str | Path) -> Path:
+    """Write `summary` to `path` as JSON."""
     destination = Path(path)
     destination.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     return destination
 
 
 def write_artifacts(summary: dict, base: str | Path, config) -> dict:
+    """Write this match's mandatory report artifacts under `base`."""
     return write_report_artifacts(summary, base, config)
 
 
 def email_report(paths: dict, config) -> str | None:
+    """Mail (or draft) the report at `paths`, per this peer's `[email]` config."""
     report = paths.get("result")
     return gmail_reporter(config)(report) if report else None

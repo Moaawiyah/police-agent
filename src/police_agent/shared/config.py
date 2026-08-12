@@ -29,6 +29,7 @@ class Config:
     """Merged configuration, read by dotted key."""
 
     def __init__(self, data: dict, shared: dict | None = None) -> None:
+        """Wrap already-merged config `data`, keeping the raw agreed `shared` block too."""
         self._data = data
         self._shared = shared or {}
 

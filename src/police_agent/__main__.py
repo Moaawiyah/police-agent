@@ -32,6 +32,7 @@ _announce_tunnel = announce_tunnel
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Parse argv, run one match (or series/GUI/replay) through the SDK, and print the result."""
     args = _parse_args(argv)
     try:
         agent = PoliceAgentSDK(_options(args))

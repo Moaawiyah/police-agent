@@ -40,6 +40,7 @@ class ScentField:
         emit_intensity: float,
         min_center: float,
     ) -> None:
+        """An empty field over a `board_size` board, tuned by the four agreed constants."""
         if board_size < 1:
             raise ValueError(f"Board size must be positive, got {board_size}")
         if grid_size < 1 or grid_size % 2 == 0:
@@ -122,6 +123,7 @@ class ScentField:
                 del self._values[cell]
 
     def intensity_at(self, cell: Cell) -> float:
+        """This cell's current trail strength, or 0.0 if it has none."""
         return self._values.get(cell, 0.0)
 
     def snapshot(self) -> dict[str, float]:

@@ -31,6 +31,7 @@ class GateLimits:
 
     @classmethod
     def from_getter(cls, get) -> "GateLimits":
+        """Build from a `config.get`-shaped getter, falling back to these defaults."""
         return cls(
             requests_per_minute=int(get("gatekeeper.requests_per_minute") or 30),
             concurrent_requests=int(get("gatekeeper.concurrent_requests") or 2),
@@ -44,6 +45,7 @@ class Gatekeeper:
     """Admit, retry, count and report one outbound call at a time."""
 
     def __init__(self, limits=None, sleep=time.sleep, clock=time.monotonic, quota=None):
+        """Build the bucket, admission queue and DOS detector from `limits`."""
         self.limits = limits or GateLimits()
         self.quota = quota
         rate = self.limits.requests_per_minute
@@ -57,10 +59,12 @@ class Gatekeeper:
 
     @classmethod
     def from_config(cls, config=None) -> "Gatekeeper":
+        """Build a Gatekeeper from the agreed `gatekeeper.*` config keys."""
         get = config.get if config is not None else (lambda _key, default=None: default)
         return cls(GateLimits.from_getter(get))
 
     def submit(self, call, budget=None):
+        """Admit, attempt (with retries) and count one outbound `call`."""
         self.counts["submitted"] += 1
         self._spend_quota()
         self._check_lock()
@@ -76,6 +80,7 @@ class Gatekeeper:
             self._queue.release()
 
     def snapshot(self) -> dict:
+        """What the match summary and the GUI status line report."""
         return {
             "limits": asdict(self.limits),
             **self.counts,

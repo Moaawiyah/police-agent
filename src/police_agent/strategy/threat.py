@@ -73,6 +73,7 @@ class PointThreat:
     """
 
     def __init__(self, cell: Cell) -> None:
+        """A belief collapsed entirely onto `cell`."""
         self.cell = cell
 
     def diffuse(self, barriers: set[Cell] | None = None) -> None:
@@ -88,6 +89,7 @@ class PointThreat:
         """Nor from a barrier. The fixed cell is asserted true regardless."""
 
     def most_likely(self) -> Cell:
+        """The one cell this estimate is certain of."""
         return self.cell
 
     def top_cells(self, count: int = 1) -> list[tuple[Cell, float]]:
@@ -109,6 +111,7 @@ class UniformThreat:
     """
 
     def __init__(self, board_size: int) -> None:
+        """A flat prior over a `board_size` board."""
         if board_size < 1:
             raise ValueError(f"Board size must be positive, got {board_size}")
         self.board_size = board_size
@@ -126,6 +129,7 @@ class UniformThreat:
         """A prior that ruled a cell out on a barrier would be a belief map too."""
 
     def most_likely(self) -> Cell:
+        """The board centre -- the tie-break that minimises worst-case distance."""
         middle = (self.board_size - 1) // 2
         return (middle, middle)
 

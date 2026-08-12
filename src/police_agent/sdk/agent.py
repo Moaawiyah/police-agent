@@ -3,17 +3,12 @@
 from pathlib import Path
 
 from police_agent.constants import Role
-from police_agent.infra.mcp_client import McpTransport
+from police_agent.infra.mcp_client import McpTransport, peer_gate
 from police_agent.infra.mcp_server import start_peer_server
 from police_agent.infra.tunnel import open_tunnel
+from police_agent.peer.controls import GameControls
 from police_agent.peer.runtime import PoliceRuntime
-from police_agent.report.result import scoring_from
-from police_agent.report.result_parts import series_totals
-from police_agent.sdk.league import (
-    validate_league,
-    validate_public_opponent,
-    validate_tunnel_endpoint,
-)
+from police_agent.sdk.league import validate_league, validate_tunnel_endpoint
 from police_agent.sdk.options import MatchOptions
 from police_agent.sdk.reporting import (
     email_report,
@@ -21,7 +16,16 @@ from police_agent.sdk.reporting import (
     save_summary,
     write_artifacts,
 )
+from police_agent.sdk.series import play_series
 from police_agent.shared.config import load_config
+
+__all__ = [
+    "DEFAULT_CONNECT_TIMEOUT",
+    "DEFAULT_REPLY_TIMEOUT",
+    "DEFAULT_REPORT_DIR",
+    "GameControls",
+    "PoliceAgentSDK",
+]
 
 DEFAULT_REPORT_DIR = "logs"
 DEFAULT_CONNECT_TIMEOUT = 60.0
@@ -34,6 +38,7 @@ class PoliceAgentSDK:
     def __init__(
         self, options=None, *, config=None, transport=None, listener=None, controls=None
     ) -> None:
+        """Hold this match's options and config; nothing connects until `connect()`."""
         self.options = options or MatchOptions()
         self.config = config if config is not None else load_config(self.options.config_dir)
         self._transport = transport
@@ -44,55 +49,62 @@ class PoliceAgentSDK:
 
     @property
     def host(self) -> str:
+        """The bind host for this peer's own MCP server."""
         return self.options.host
 
     @property
     def port(self) -> int:
+        """The bind port for this peer's own MCP server."""
         return int(self.options.port or self.config.require("network.my_port"))
 
     @property
     def opponent_url(self) -> str:
+        """The URL this peer pushes turns to."""
         return str(self.options.opponent_url or self.config.require("network.opponent_url"))
 
     @property
     def tunnel_domain(self) -> str | None:
+        """The reserved ngrok domain to publish on, if configured."""
         domain = self.config.get("network.tunnel_domain")
         return str(domain) if domain else None
 
     @property
     def public_url(self) -> str | None:
+        """This peer's public tunnel URL, once one is open."""
         return self._tunnel.mcp_url if self._tunnel else None
 
     def connect(self):
-        self._validate_league()
+        """Open this peer's own server and build the transport to the opponent, once."""
+        validate_league(self, DEFAULT_CONNECT_TIMEOUT)
         if self._transport is None:
             inboxes = start_peer_server(
                 Role.POLICE,
                 self.host,
                 self.port,
-                dos_limit_per_minute=float(self.config.get("gatekeeper.requests_per_minute") or 30.0),
+                # queue_depth, not requests_per_minute: the latter budgets the
+                # OUTBOUND Gmail-reporting gate (ch. 9.3.1), an unrelated
+                # pipeline with an unrelated cadence. See mcp_server.py's
+                # DEFAULT_DOS_LIMIT_PER_MINUTE for the full reasoning.
+                dos_limit_per_minute=float(self.config.get("gatekeeper.queue_depth") or 100.0)
+                * 60.0,
             )
             self._open_tunnel()
-            self._transport = McpTransport(self.opponent_url, inboxes, **self.transport_timeouts())
+            self._transport = McpTransport(
+                self.opponent_url,
+                inboxes,
+                gate=peer_gate(self.config),
+                **self.transport_timeouts(),
+            )
         return self._transport
 
     def _open_tunnel(self) -> None:
         if self.options.tunnel and self._tunnel is None:
             self._tunnel = open_tunnel(self.port, self.tunnel_domain)
             if self.options.league:
-                self._validate_tunnel_endpoint()
-
-    def _validate_league(self) -> None:
-        validate_league(self, DEFAULT_CONNECT_TIMEOUT)
-
-    @staticmethod
-    def _validate_public_opponent(url: str) -> None:
-        validate_public_opponent(url)
-
-    def _validate_tunnel_endpoint(self) -> None:
-        validate_tunnel_endpoint(self)
+                validate_tunnel_endpoint(self)
 
     def transport_timeouts(self) -> dict:
+        """The agreed connect/reply timeouts, read from config."""
         return {
             "connect_timeout": float(
                 self.config.get("network.watchdog_timeout_seconds") or DEFAULT_CONNECT_TIMEOUT
@@ -104,6 +116,7 @@ class PoliceAgentSDK:
 
     @property
     def runtime(self) -> PoliceRuntime:
+        """The active `PoliceRuntime`, building one (and connecting) on first use."""
         if self._runtime is None:
             self._runtime = PoliceRuntime(
                 self.config,
@@ -115,50 +128,12 @@ class PoliceAgentSDK:
         return self._runtime
 
     def play(self) -> dict:
+        """Play one sub-game to a result."""
         return self.runtime.run()
 
     def play_series(self) -> list[dict]:
-        """Play every sub-game of the agreed series over one held connection.
-
-        Each sub-game's own `game_over` is relabelled `sub_game_over` on the
-        way to the listener -- the GUI already treats `game_over` as "the
-        whole match is finished" (see `gui/player.py::_drain`), and only the
-        series as a whole is that. A real `game_over` is raised once more,
-        here, after the last sub-game actually ends.
-        """
-        from police_agent.peer.series import run_series
-
-        summaries = run_series(
-            self.config,
-            self.connect(),
-            listener=self._series_listener(),
-            controls=self.controls,
-            league=self.options.league,
-        )
-        if self.listener is not None:
-            totals = series_totals(summaries, scoring_from(self.config))
-            self.listener(
-                {
-                    "type": "game_over",
-                    "summary": summaries[-1],
-                    "summaries": summaries,
-                    "sub_game_number": len(summaries),
-                    "totals": totals,
-                }
-            )
-        return summaries
-
-    def _series_listener(self):
-        if self.listener is None:
-            return None
-
-        def relabel(event: dict) -> None:
-            if event.get("type") == "game_over":
-                self.listener({**event, "type": "sub_game_over"})
-                return
-            self.listener(event)
-
-        return relabel
+        """Play the whole agreed series."""
+        return play_series(self)
 
     def restart(self) -> None:
         """Drop the finished runtime so the next `play()` builds a fresh one.
@@ -173,13 +148,17 @@ class PoliceAgentSDK:
         self._runtime = None
 
     def load_summary(self, path: str | Path) -> dict:
+        """Read a saved match summary from `path`."""
         return load_summary(path)
 
     def save_summary(self, summary: dict, path: str | Path) -> Path:
+        """Write `summary` to `path` as JSON."""
         return save_summary(summary, path)
 
     def write_artifacts(self, summary: dict, base: str | Path = DEFAULT_REPORT_DIR) -> dict:
+        """Write this match's mandatory report artifacts under `base`."""
         return write_artifacts(summary, base, self.config)
 
     def email_report(self, paths: dict) -> str | None:
+        """Mail (or draft) the report at `paths`, per this peer's `[email]` config."""
         return email_report(paths, self.config)

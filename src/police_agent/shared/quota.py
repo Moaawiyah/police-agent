@@ -50,6 +50,7 @@ class DailyQuota:
     """A counter of calls made today, persisted so a restart does not forget."""
 
     def __init__(self, limit: int, path: str | Path | None = None, today=_today) -> None:
+        """A `limit`-call daily allowance, loading today's tally from `path` if one exists."""
         self.limit = int(limit)
         self.path = Path(path) if path else None
         self._today = today
@@ -72,6 +73,7 @@ class DailyQuota:
 
     @property
     def remaining(self) -> int:
+        """How many calls remain in today's allowance."""
         self._roll_over()
         return max(0, self.limit - self._count)
 

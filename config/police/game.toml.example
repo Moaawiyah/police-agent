@@ -49,11 +49,12 @@ opponent_url    = "http://127.0.0.1:8802/mcp"       # the only thing I know abou
 # stale_decay = 0.85
 # stale_support = 0.1
 
-# [reliability] -- private, per-peer liveness watchdog (spec ch. 8.4), NOT an
-# agreed term: it bounds only how long THIS peer's own turn loop may go
-# without completing a turn, independent of any single network call's own
-# timeout. Not the same thing as network.watchdog_timeout_sec (a shared,
-# per-call deadline) -- do not confuse the two.
+# [reliability] -- private OVERRIDE for the loop-liveness watchdog (spec ch.
+# 8.4.2 / Appendix Vav table 19 item 7, "time until deadlock -> Watchdog
+# intervention"). Defaults to the AGREED network.watchdog_timeout_sec (60s)
+# when unset; set this only if THIS peer wants its own loop watched more or
+# less strictly than that shared default. Never sent to the opponent, never
+# belongs in game.json.
 # loop_watchdog_timeout_seconds = 180.0
 
 # HOW the banter is produced. The MOVE is always pure Python: a language model

@@ -6,9 +6,16 @@ normalising restores a distribution) -- ch. 6.4's `b(s) = P(thief = s | observat
 That order matters: sharpening then blurring would throw evidence away the turn it
 arrived. `scale()` opens the same update to non-scent evidence (`strategy/bluff.py`).
 Inference only, holding no opinion about directions or who is lying.
+
+The read-side queries (`scale`, `exclude`, `most_likely`, `top_cells`, `as_matrix`,
+`has_scent`) live in `belief_queries.py`, split out to keep this file -- the
+update pipeline itself -- under the project's line budget. Each takes the grid
+as its first argument and reaches back into its private state exactly as a
+bound method would, the same pattern `infra/mcp_client_ops.py` uses.
 """
 
 from police_agent.constants import Cell
+from police_agent.strategy import belief_queries as queries
 
 # Weight a scent reading carries against the prior -- private, lives in game.toml, not agreed.
 DEFAULT_SMELL_TRUST = 4.0
@@ -33,7 +40,6 @@ DEFAULT_LEAK = 0.03
 # leak's mass-conservation and, once renormalized, was pulling stale cells back
 # UP through the same global rescale that repairs the total; this shrinks
 # straight into the numerator, which normalize() then divides through cleanly.
-#
 # Swept on BeliefGrid(7): one strong hit at (3,3), then real evidence at a
 # fixed far cell (0,0) every turn for 30 turns, reading the (0,0)/(3,3) ratio:
 # 1.0->522, 0.9->596, 0.85->635, 0.8->675, 0.7->759, 0.5->947 -- monotonic and
@@ -66,6 +72,7 @@ class BeliefGrid:
         stale_decay: float = DEFAULT_STALE_DECAY,
         stale_support: float = DEFAULT_STALE_SUPPORT,
     ) -> None:
+        """A flat prior over `board_size` cells, tuned by the five constants above."""
         if board_size < 1:
             raise ValueError(f"Board size must be positive, got {board_size}")
         self._size = board_size
@@ -91,11 +98,10 @@ class BeliefGrid:
     def observe_smell(self, cells: dict | None) -> None:
         """`1 + trust*reading**power` per smelly cell, where `reading` is that
         cell's intensity relative to THIS snapshot's own peak, not an absolute
-        value. A field that has broadly faded (lag, distance, time since the
-        last deposit) still has a relatively freshest cell, and that is the one
-        evidence should concentrate on -- an absolute reading would starve it
-        just because the whole field is dim right now. Then normalise and leak
-        toward uniform. No reading leaves a cell alone, not ruled out -- silence
+        value -- a broadly faded field (lag, distance, time since deposit) still
+        has a relatively freshest cell, and evidence should concentrate there,
+        since an absolute reading would starve it for being dim overall. Then
+        normalise and leak toward uniform. No reading rules a cell out -- silence
         is not evidence of absence. Malformed entries are skipped, not fatal."""
         parsed: dict = {}
         for key, value in (cells or {}).items():
@@ -114,7 +120,7 @@ class BeliefGrid:
                     supported.add(cell)
         self._shrink_unsupported(supported)
         self._normalize()
-        self._leak_toward_uniform()
+        queries.leak_toward_uniform(self)
 
     def _shrink_unsupported(self, supported: set) -> None:
         """Every cell this reading didn't clear the support bar for loses a
@@ -155,38 +161,27 @@ class BeliefGrid:
 
     def scale(self, cells, factor: float) -> None:
         """Reweight cells for non-scent evidence, then renormalise -- caller's judgement."""
-        for cell in cells:
-            if self._in_bounds(cell):
-                self._probs[cell[0]][cell[1]] *= factor
-        self._normalize()
+        queries.scale(self, cells, factor)
 
     def exclude(self, cell: Cell) -> None:
         """Rule a cell out entirely -- something proved the thief is not standing there."""
-        if self._in_bounds(cell):
-            self._probs[cell[0]][cell[1]] = 0.0
-            self._normalize()
+        queries.exclude(self, cell)
 
     def most_likely(self) -> Cell:
         """The argmax; ties break row-major so the same evidence always answers the same."""
-        return self.top_cells(1)[0][0]
+        return queries.most_likely(self)
 
     def top_cells(self, count: int = 1) -> list[tuple[Cell, float]]:
-        """The `count` likeliest cells and their probabilities, likeliest first.
-
-        The argmax alone is a point estimate of a distribution that is rarely
-        peaked, so the barrier policy weighs a wall against several cells.
-        Ordering by `(-prob, cell)` keeps the row-major tie-break `most_likely`
-        has always had, so this stays recomputable in the end-of-game audit."""
-        cells = ((row, col) for row in range(self._size) for col in range(self._size))
-        ranked = sorted(cells, key=lambda c: (-self._probs[c[0]][c[1]], c))
-        return [(cell, self._probs[cell[0]][cell[1]]) for cell in ranked[:count]]
+        """The `count` likeliest cells and their probabilities, likeliest first."""
+        return queries.top_cells(self, count)
 
     def as_matrix(self) -> list[list[float]]:
         """A copy of the distribution, for the heatmap and the game log."""
-        return [row[:] for row in self._probs]
+        return queries.as_matrix(self)
 
     def has_scent(self) -> bool:
-        return self._observed
+        """Whether any real scent evidence has been observed yet."""
+        return queries.has_scent(self)
 
     def _normalize(self) -> None:
         total = sum(sum(row) for row in self._probs)
@@ -195,16 +190,6 @@ class BeliefGrid:
             self._probs = [[uniform] * self._size for _ in range(self._size)]
             return
         self._probs = [[prob / total for prob in row] for row in self._probs]
-
-    def _leak_toward_uniform(self) -> None:
-        """Only observe_smell leaks -- others already normalise; twice would double it."""
-        if self._leak <= 0.0:
-            return
-        uniform = 1.0 / (self._size * self._size)
-        self._probs = [
-            [(1.0 - self._leak) * prob + self._leak * uniform for prob in row]
-            for row in self._probs
-        ]
 
     def _in_bounds(self, cell: Cell) -> bool:
         return 0 <= cell[0] < self._size and 0 <= cell[1] < self._size

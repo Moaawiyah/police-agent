@@ -16,7 +16,7 @@ from PIL import Image
 from police_agent.exceptions import ConfigError
 from police_agent.gui.export_frames import build_views
 from police_agent.gui.export_render import render_frame
-from police_agent.strategy.belief import (
+from police_agent.sdk.replay import (
     DEFAULT_LEAK,
     DEFAULT_SMELL_POWER,
     DEFAULT_SMELL_TRUST,

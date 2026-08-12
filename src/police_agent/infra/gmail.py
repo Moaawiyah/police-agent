@@ -103,6 +103,7 @@ def gmail_reporter(config=None, gate: Gatekeeper | None = None):
     gate = gate or _mail_gate(options)
 
     def report(attachment) -> str | None:
+        """Mail (or draft) `attachment`'s report, per this peer's `[email]` config."""
         if not options["enabled"]:
             return None
         # `config` is never None here: `enabled` only turns True through a real

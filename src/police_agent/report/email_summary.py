@@ -17,11 +17,13 @@ __all__ = ["build_subject", "build_body"]
 
 
 def build_subject(result_json: dict, own: dict) -> str:
+    """The mandatory report email's subject line."""
     group_id = own.get("group_id", "unknown-group")
     return f"[UOH26 Final Game] {result_json.get('game_id')} — {group_id} result report"
 
 
 def build_body(result_json: dict, own: dict) -> str:
+    """The mandatory report email's plain-text body, summarising `result_json`."""
     final = result_json.get("final_result", {})
     own_group_id = own.get("group_id", "unknown-group")
     repos = result_json.get("repositories", {}).get(own_group_id, {})

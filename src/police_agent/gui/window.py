@@ -42,6 +42,7 @@ class PeerWindow:
     """One peer's window: banner, board, fact panel, speed slider."""
 
     def __init__(self, title: str, board_size: int, speed: float) -> None:
+        """Build the banner, board and fact panel for one peer's window."""
         self.root = tk.Tk()
         self.root.title(title)
         self.banner = tk.Label(
@@ -122,6 +123,7 @@ class PeerWindow:
         )
 
     def set_label(self, key: str, value: str) -> None:
+        """Set one fact-panel label by its key."""
         self.labels[key].config(text=value)
 
     def render(self, view: dict) -> None:

@@ -12,18 +12,35 @@ methods without a socket in sight.
 
 Every timeout is a constructor argument, defaulted from config/police/game.json
 (`response_timeout_sec` = 30, `watchdog_timeout_sec` = 60), so no policy is
-frozen into a method body.
+frozen into a method body. The public methods themselves live in
+`mcp_client_ops.py`, split out to keep this file under the project's line
+budget -- see that module's docstring for why monkeypatching `_call` still
+reaches them.
+
+Every outbound call is admitted through a `Gatekeeper` (`shared/gatekeeper.py`)
+before it touches the socket -- the same rule ch. 9.3.1 already applies to the
+Gmail and Ollama channels (`infra/gmail.py`, `infra/ollama.py`). This gate's
+`max_retries` is forced to 0: `_send_with_retry` below is this channel's own
+retry policy, tuned for "the opponent has not started yet" rather than a slow
+external API, and letting the gate retry too would silently double it.
 """
 
 import asyncio
-import contextlib
-import queue
 import time
+from dataclasses import replace
 
 from fastmcp import Client
 
 from police_agent.exceptions import TransportError
+from police_agent.infra import mcp_client_ops as ops
 from police_agent.infra.mcp_server import PeerInboxes
+from police_agent.shared.gatekeeper import Gatekeeper, GateLimits
+
+
+def peer_gate(config=None) -> Gatekeeper:
+    """The outbound MCP channel's gate: the agreed `gatekeeper.*` limits, minus retrying."""
+    get = config.get if config is not None else (lambda _key, default=None: default)
+    return Gatekeeper(replace(GateLimits.from_getter(get), max_retries=0))
 
 
 class McpTransport:
@@ -39,7 +56,9 @@ class McpTransport:
         audit_send_timeout: float = 10.0,
         call_timeout: float = 10.0,
         control_send_timeout: float = 3.0,
+        gate: Gatekeeper | None = None,
     ) -> None:
+        """Store this peer's wire timeouts and build (or accept) its outbound gate."""
         self._url = opponent_url
         self._inboxes = inboxes
         self._connect_timeout = connect_timeout
@@ -48,6 +67,7 @@ class McpTransport:
         self._audit_send_timeout = audit_send_timeout
         self._call_timeout = call_timeout
         self._control_send_timeout = control_send_timeout
+        self._gate = gate or peer_gate()
 
     @property
     def inbound_dos(self):
@@ -64,10 +84,11 @@ class McpTransport:
         budget = self._call_timeout if timeout is None else timeout
 
         async def invoke() -> None:
+            """One connect-call-disconnect cycle over FastMCP."""
             async with Client(self._url, timeout=budget, init_timeout=budget) as client:
                 await client.call_tool(tool, arguments)
 
-        asyncio.run(invoke())
+        self._gate.submit(lambda: asyncio.run(invoke()), budget=budget)
 
     def _send_with_retry(self, tool: str, arguments: dict, timeout: float | None = None) -> None:
         """Retry until the opponent answers or the deadline passes.
@@ -89,65 +110,29 @@ class McpTransport:
                 time.sleep(self._retry_interval)
 
     def exchange_agreement(self, signed: dict) -> dict:
-        """Send my signed agreement and block until the opponent's arrives.
-
-        The handshake is where startup skew is largest, so it waits the full
-        connect budget rather than the shorter per-turn reply budget.
-        """
-        self._send_with_retry("negotiate", {"message": signed})
-        try:
-            return self._inboxes.agreements.get(timeout=self._connect_timeout)
-        except queue.Empty as exc:
-            raise TransportError(f"No agreement from the opponent at {self._url}") from exc
+        """Send my signed agreement and return the opponent's."""
+        return ops.exchange_agreement(self, signed)
 
     def send_turn(self, message: dict) -> None:
-        """Hand my turn -- and with it the right to move -- to the opponent."""
-        self._send_with_retry("receive_turn", {"message": message})
+        """Hand my turn to the opponent."""
+        ops.send_turn(self, message)
 
     def poll_turn(self, timeout: float) -> dict | None:
-        """Wait for the opponent's turn. None means it ran out of time, not that it lost."""
-        try:
-            return self._inboxes.turns.get(timeout=timeout)
-        except queue.Empty:
-            return None
+        """Wait up to `timeout` for the opponent's turn."""
+        return ops.poll_turn(self, timeout)
 
     def poll_control(self) -> dict | None:
-        """Take one advisory session signal if any is waiting; never blocks the game."""
-        try:
-            return self._inboxes.controls.get_nowait()
-        except queue.Empty:
-            return None
+        """Take one queued control signal, if any, without blocking."""
+        return ops.poll_control(self)
 
     def send_control(self, message: dict) -> None:
-        """Best-effort control send: a short timeout and swallowed errors, since
-        this is advisory only and must never stall the game the way a missed
-        turn or audit reveal would."""
-        with contextlib.suppress(Exception):
-            self._call("receive_control", {"message": message}, timeout=self._control_send_timeout)
+        """Best-effort send of an advisory control signal."""
+        ops.send_control(self, message)
 
     def exchange_audit(self, payload: dict) -> dict | None:
-        """Reveal my sealed records and collect the opponent's, if it still answers.
-
-        The send is best-effort on a short budget: a peer that already knows it
-        won may exit the moment it has read its inbox, killing its server while
-        our call is in flight even though the payload landed. Their reveal may
-        well be sitting in our inbox regardless, so we always look.
-        """
-        with contextlib.suppress(TransportError):
-            self._send_with_retry("submit_audit", {"payload": payload}, self._audit_send_timeout)
-        try:
-            return self._inboxes.audits.get(timeout=self._reply_timeout)
-        except queue.Empty:
-            return None
+        """Reveal my sealed records and collect the opponent's, if it answers."""
+        return ops.exchange_audit(self, payload)
 
     def drain_inboxes(self) -> None:
-        """Discard stale mail so a restarted sub-game cannot inherit the last one's.
-
-        Agreements are left alone: both peers drain before re-negotiating, and no
-        turn is sent until the fresh handshake has completed, so a queued
-        agreement here is always the new one.
-        """
-        for inbox in (self._inboxes.turns, self._inboxes.controls, self._inboxes.audits):
-            with contextlib.suppress(queue.Empty):
-                while True:
-                    inbox.get_nowait()
+        """Discard any stale turns, controls and audits left from a prior sub-game."""
+        ops.drain_inboxes(self)

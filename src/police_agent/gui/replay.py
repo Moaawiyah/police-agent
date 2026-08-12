@@ -2,15 +2,16 @@
 
 from police_agent.gui import replay_actions
 from police_agent.gui.replay_controls import build_controls
-from police_agent.gui.replay_data import normalize_log, opponent_positions
 from police_agent.gui.window import PeerWindow
-from police_agent.strategy.belief import (
+from police_agent.sdk.replay import (
     DEFAULT_LEAK,
     DEFAULT_SMELL_POWER,
     DEFAULT_SMELL_TRUST,
     DEFAULT_STALE_DECAY,
     DEFAULT_STALE_SUPPORT,
     BeliefGrid,
+    normalize_log,
+    opponent_positions,
 )
 
 DEFAULT_STEP_SECONDS = 0.5
@@ -20,6 +21,7 @@ class ReplayApp:
     """Hold replay state and delegate playback actions to the small action module."""
 
     def __init__(self, config, log_data: dict, opponent_log: dict | None = None, window=None):
+        """Load `log_data` (and an optional opponent reveal), then open the window."""
         self._size = int(config.require("board.size"))
         self._trust = float(config.get("belief.smell_trust", DEFAULT_SMELL_TRUST))
         self._power = float(config.get("belief.smell_power", DEFAULT_SMELL_POWER))
@@ -61,6 +63,7 @@ class ReplayApp:
         return max(len(self._my_log), len(self._history), len(self._opponent))
 
     def advance(self) -> None:
+        """Step the replay forward by one recorded turn."""
         replay_actions.advance(self)
 
     def _apply_my_step(self, index: int) -> None:
@@ -73,19 +76,23 @@ class ReplayApp:
         replay_actions.render(self, index, total)
 
     def restart(self) -> None:
+        """Reset playback to step zero."""
         replay_actions.restart(self)
 
     def _render_empty(self) -> None:
         replay_actions.render_empty(self)
 
     def goto(self, step: int) -> None:
+        """Jump playback to a specific step."""
         replay_actions.goto(self, step)
 
     def toggle(self) -> None:
+        """Start or pause auto-play."""
         replay_actions.toggle(self)
 
     def _tick(self) -> None:
         replay_actions.tick(self)
 
     def run(self) -> None:
+        """Show the window and block until it closes."""
         replay_actions.run(self)

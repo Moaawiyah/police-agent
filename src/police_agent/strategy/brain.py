@@ -40,6 +40,7 @@ class PoliceBrainBase:
     """The police decision policy. Override one of the two hooks to replace it."""
 
     def __init__(self, rng: random.Random | None = None) -> None:
+        """Hold the RNG used only to break a genuine movement tie."""
         # PoliceBrain draws from this only to break a genuine movement tie,
         # never to choose among moves that are not already equally good.
         # Accepting it here rather than seeding internally is what lets the
@@ -118,6 +119,7 @@ class PoliceBrain(PoliceBrainBase):
         believed = threat.most_likely()
 
         def key(candidate: tuple[Direction, Cell]) -> tuple[int, bool]:
+            """Sort key: distance to the believed cell first, then unvisited preferred."""
             return (state.board.distance(candidate[1], believed), candidate[1] in state.visited)
 
         best = min(key(m) for m in moves)

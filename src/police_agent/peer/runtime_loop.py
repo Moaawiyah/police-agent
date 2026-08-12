@@ -8,6 +8,7 @@ from police_agent.peer.view import belief_matrix, snapshot
 
 
 def notify(runtime, event: dict) -> None:
+    """Forward `event` (plus the sub-game number and a fresh view) to the listener."""
     if runtime._listener is not None:
         runtime._listener(
             {**event, "sub_game_number": runtime.sub_game_number, "view": snapshot(runtime)}
@@ -15,6 +16,7 @@ def notify(runtime, event: dict) -> None:
 
 
 def turn_loop(runtime) -> None:
+    """Wait for the opponent's turn, fold it in, and repeat until a result is set."""
     timeout = runtime._turn_timeout()
     while runtime._result is None:
         # Pumped once per round rather than continuously: a restart or quit is
@@ -37,6 +39,7 @@ def turn_loop(runtime) -> None:
 
 
 def apply_incoming(runtime, message: TurnMessage) -> None:
+    """Fold one incoming turn into the game state and react to what it settles."""
     outcome = runtime.handler.process(message)
     runtime.disputes.extend(outcome.disputes)
     if outcome.replayed:
@@ -75,12 +78,14 @@ def apply_incoming(runtime, message: TurnMessage) -> None:
 
 
 def ceiling_result(runtime) -> tuple[str, str | None]:
+    """The result once the step ceiling is reached: survival, or a timeout."""
     if runtime.rules.thief_survived(runtime.state.step_number):
         return (SURVIVAL, "thief")
     return (TIMEOUT, None)
 
 
 def turn_timeout(runtime) -> float:
+    """How long to wait for the opponent's next turn, from the agreed config."""
     if runtime.league:
         return float(runtime.config.get("network.watchdog_timeout_seconds") or 60.0)
     return float(

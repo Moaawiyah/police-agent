@@ -22,12 +22,14 @@ class Action:
     direction: Direction | None = None
 
     def __post_init__(self) -> None:
+        """Reject a missing direction on MOVE, or a present one on HOLD."""
         if self.move_type is MoveType.MOVE and self.direction is None:
             raise ValueError("MOVE requires a direction")
         if self.move_type is MoveType.HOLD and self.direction is not None:
             raise ValueError("HOLD must not carry a direction")
 
     def __str__(self) -> str:
+        """The wire form other peers and the game log read, e.g. `"MOVE:N"`."""
         return f"{self.move_type.value}:{self.direction.value if self.direction else '-'}"
 
 

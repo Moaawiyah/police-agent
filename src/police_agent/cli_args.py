@@ -6,6 +6,7 @@ from police_agent.sdk import DEFAULT_CONFIG_DIR, DEFAULT_HOST, DEFAULT_REPORT_DI
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Define and parse every police-agent command-line flag."""
     parser = argparse.ArgumentParser(prog="police-agent", description="Play the police side.")
     parser.add_argument("--config-dir", default=DEFAULT_CONFIG_DIR)
     parser.add_argument("--host", default=DEFAULT_HOST)

@@ -19,7 +19,7 @@ from police_agent.gui.game_mode import mode_and_model
 from police_agent.gui.live_apply import apply_event
 from police_agent.gui.live_controls import LiveControls
 from police_agent.gui.window import PeerWindow
-from police_agent.peer.controls import GameControls
+from police_agent.sdk import GameControls
 from police_agent.shared.version import CODE_VERSION
 
 DRAIN_INTERVAL_MS = 100
@@ -32,6 +32,7 @@ class LivePeerApp:
     """Runs the police agent in a thread and shows what it is doing."""
 
     def __init__(self, agent, controls=None) -> None:
+        """Build the window for `agent`; nothing touches the network until Start."""
         self._agent = agent
         self._controls = controls or GameControls()
         agent.listener = self._on_event  # read when the runtime is built, on Start
@@ -81,10 +82,12 @@ class LivePeerApp:
         self._window.set_turn(False, "PAUSED - the thief's clock is still running")
 
     def play(self) -> None:
+        """Resume a paused match."""
         self._controls.play()
         self._window.set_turn(False, "RESUMED")
 
     def stop(self) -> None:
+        """Abandon the running sub-game."""
         self._controls.stop()
         self._window.set_turn(False, "STOPPING - abandoning this sub-game...")
 
@@ -95,9 +98,11 @@ class LivePeerApp:
         self._window.root.after(QUIT_GRACE_MS, self._window.root.destroy)
 
     def restart(self) -> None:
+        """Request a fresh sub-game -- mid-game or after one has ended."""
         live_restart.restart(self)
 
     def toggle_bidirectional(self) -> None:
+        """Opt in to the bidirectional restart/quit control channel."""
         live_restart.toggle_bidirectional(self)
 
     def _worker(self) -> None:

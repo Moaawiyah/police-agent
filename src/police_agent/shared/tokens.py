@@ -32,6 +32,7 @@ class Usage:
 
     @property
     def total(self) -> int:
+        """This call's combined prompt + completion tokens."""
         return self.prompt_tokens + self.completion_tokens
 
 
@@ -44,6 +45,7 @@ class TokenLedger:
     """
 
     def __init__(self) -> None:
+        """An empty tally, ready to record calls as they happen."""
         self.calls = 0
         self.prompt_tokens = 0
         self.completion_tokens = 0
@@ -53,6 +55,7 @@ class TokenLedger:
 
     @property
     def total(self) -> int:
+        """This sub-game's combined prompt + completion tokens so far."""
         return self.prompt_tokens + self.completion_tokens
 
     def begin_step(self) -> None:

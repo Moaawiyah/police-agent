@@ -16,6 +16,7 @@ class OwnGameState:
     """The police peer's private game state and its per-step move log."""
 
     def __init__(self, start: Cell, board_size: int) -> None:
+        """Start at `start` on a `board_size` board, with an empty move log."""
         self.board = Board(board_size)
         if not self.board.in_bounds(start):
             raise ValueError(f"Start cell {start} is off a {board_size}x{board_size} board")
