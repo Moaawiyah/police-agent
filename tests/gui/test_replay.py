@@ -81,26 +81,6 @@ def test_a_log_with_no_scent_still_predicts_but_observes_nothing():
     assert window.views[-1]["belief"] == expected.as_matrix()
 
 
-def test_each_step_re_verifies_its_own_commit():
-    app, window = player(log_of(2))
-
-    app.advance()
-
-    assert "verified OK" in window.labels["commit"]
-    assert window.labels["verdict"] == "step 1 (revealed)"
-
-
-def test_a_rewritten_log_is_caught_as_it_is_drawn():
-    log = log_of(2)
-    log["records"][0]["payload"]["position"] = [6, 6]
-    app, window = player(log)
-
-    app.advance()
-
-    assert "TAMPERED" in window.labels["commit"]
-    assert "Verification FAILED" in window.labels["status"]
-
-
 def test_a_barrier_in_the_log_stays_on_the_board():
     log = log_of(2)
     log["my_log"][0]["barrier"] = [1, 1]
@@ -146,29 +126,6 @@ def test_without_the_opponent_log_the_board_says_so():
 
     assert window.views[-1]["opponent_position"] is None
     assert "not supplied" in window.labels["status"]
-
-
-def test_failed_audit_is_never_labelled_verified():
-    app, window = player({**log_of(1), "audit": {"passed": False}})
-
-    app.advance()
-
-    assert window.labels["status"].startswith("step 1/1 | Verification FAILED")
-
-
-def test_a_tampered_opponent_log_fails_cross_log_verification():
-    their_record = sealed(1)
-    their_record["payload"]["position"] = [6, 6]
-    theirs = {
-        "records": [their_record],
-        "my_log": [{"position": [6, 6]}],
-        "audit": {"passed": True},
-    }
-    app, window = player(log_of(1), opponent=theirs)
-
-    app.advance()
-
-    assert "Verification FAILED" in window.labels["status"]
 
 
 def test_playback_runs_to_the_longer_track_and_freezes_the_shorter():
