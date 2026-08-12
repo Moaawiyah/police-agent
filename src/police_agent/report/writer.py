@@ -24,6 +24,13 @@ declared commit for a game this process never saw.
 Sub-games are read back by number rather than by directory order, and the current
 one always replaces its own file, so a replayed sub-game corrects the series
 rather than appearing in it twice.
+
+## A rematch against the same opponent is a different problem
+
+`game_id` has no clock in it, so a second series against a group we have
+already played would land on the first series' files too -- not a replay to
+correct, but a different match to keep. Sub-game 1 checks for that first;
+see `report/history.py`.
 """
 
 import json
@@ -32,6 +39,7 @@ from pathlib import Path
 from police_agent.report.artifacts import build_config, build_log
 from police_agent.report.declaration import build_declaration
 from police_agent.report.facts import facts_from
+from police_agent.report.history import archive_completed_series
 from police_agent.report.ids import sub_game_tag
 from police_agent.report.result import build_result, scoring_from
 
@@ -42,10 +50,13 @@ def write_artifacts(summary: dict, base: str | Path = "logs", config=None) -> di
     """Write all four artifacts for this sub-game, and return where each landed.
 
     The result covers the whole series: this sub-game's record plus every sibling
-    already filed under the same `game_id`.
+    already filed under the same `game_id`. Sub-game 1 first archives a finished
+    prior series against this opponent, if one is sitting in the way.
     """
     facts = facts_from(summary, config)
     directory = report_dir(base, facts.own_group_id)
+    if facts.sub_game_number == 1:
+        archive_completed_series(directory, facts)
     paths = artifact_paths(directory, facts)
 
     _write(paths["record"], summary)
