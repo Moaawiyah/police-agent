@@ -124,14 +124,15 @@ class TestTheInboundFloodDetector:
 
         assert summary["inbound_dos"]["tripped"] is False
 
-    def test_the_inbound_limit_matches_the_agreed_gatekeeper_floor(self):
-        """Real enforcement (infra/mcp_guard.py) uses the agreed
-        requests_per_minute floor directly -- not a loosened, report-only
-        line -- so a FakeTransport-backed runtime should see the same
-        default a real McpTransport would."""
+    def test_the_inbound_limit_matches_the_real_transports_default(self):
+        """Real enforcement (infra/mcp_guard.py) derives its limit from
+        queue_depth, not gatekeeper.requests_per_minute -- that floor budgets
+        the unrelated outbound Gmail-reporting gate (ch. 9.3.1). A
+        FakeTransport-backed runtime should still see the same default a real
+        McpTransport would."""
         subject = runtime([])
 
-        assert subject.inbound_dos.limit_per_minute == 30.0
+        assert subject.inbound_dos.limit_per_minute == 6000.0
 
     def test_a_tripped_detector_still_lets_every_turn_be_played(self):
         """Defending ourselves by dropping a legal turn would lose the game."""

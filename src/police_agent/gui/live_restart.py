@@ -7,7 +7,7 @@ the app was started, and keeping it here makes the mid-game/post-game split
 testable without a real Tk root.
 """
 
-from police_agent.peer.controls import GameControls
+from police_agent.sdk import GameControls
 
 
 def restart(app) -> None:

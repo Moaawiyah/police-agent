@@ -34,6 +34,7 @@ class NgrokTunnel:
     """A public address for this peer's MCP server, and the process holding it."""
 
     def __init__(self, public_url: str, process=None, log: Path | None = None) -> None:
+        """Wrap an already-running (or adopted) ngrok tunnel at `public_url`."""
         self.public_url = public_url
         self._process = process
         self._log = log

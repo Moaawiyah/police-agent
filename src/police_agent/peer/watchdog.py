@@ -23,7 +23,13 @@ from collections.abc import Callable
 
 from police_agent.peer.controls import GameControls
 
-DEFAULT_TIMEOUT_SEC = 180.0  # spec's own sketch value
+# Last-resort fallback only, for a Watchdog built without a config (see
+# tests) or against a config missing the agreed network.watchdog_timeout_seconds
+# entirely. ch. 8.4.2's illustrative snippet uses this same number, but
+# Appendix Vav's own preamble is explicit that a value is authoritative only
+# in its tables (Table 19 item 7 = 60s) -- never in body-text example code.
+DEFAULT_TIMEOUT_SEC = 180.0
+WATCHDOG_POLL_SECONDS = 5.0
 WATCHDOG_POLL_SECONDS = 5.0
 
 
@@ -38,6 +44,7 @@ class Watchdog:
         clock=time.monotonic,
         on_trip: Callable[[str], None] | None = None,
     ) -> None:
+        """Watch `controls` for a stalled loop; call `on_trip` and stop it past `timeout_sec`."""
         self._controls = controls
         self._timeout_sec = timeout_sec
         self._poll_sec = poll_sec
@@ -51,15 +58,23 @@ class Watchdog:
 
     @property
     def timeout_sec(self) -> float:
+        """How long the loop may go without a heartbeat before this trips."""
         return self._timeout_sec
 
     @classmethod
     def from_config(cls, config, controls: GameControls, on_trip=None) -> "Watchdog":
-        """The timeout is private, per-peer tuning (`[reliability]` in
-        game.toml) -- not the agreed network.watchdog_timeout_seconds, which
-        is a different thing: a per-call deadline, not loop liveness."""
+        """Defaults to the AGREED `network.watchdog_timeout_seconds` (Table 19
+        item 7, "time until deadlock -> Watchdog intervention", 60s, shared
+        and negotiable) -- ch. 8.4.2 names this exact field as the loop-
+        liveness threshold, not `response_timeout_sec`/item 6's per-call
+        deadline. `[reliability]` in the private TOML can still override it
+        locally, for a peer that wants its OWN loop watched more or less
+        strictly than the shared default; that override never touches the
+        agreed file and the opponent never sees it."""
         timeout = float(
-            config.get("reliability.loop_watchdog_timeout_seconds") or DEFAULT_TIMEOUT_SEC
+            config.get("reliability.loop_watchdog_timeout_seconds")
+            or config.get("network.watchdog_timeout_seconds")
+            or DEFAULT_TIMEOUT_SEC
         )
         return cls(controls, timeout_sec=timeout, on_trip=on_trip)
 

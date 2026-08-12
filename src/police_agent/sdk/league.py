@@ -7,6 +7,7 @@ from police_agent.exceptions import ConfigError
 
 
 def validate_league(agent, default_connect_timeout: float) -> None:
+    """Enforce the league profile's requirements on `agent`, or raise `ConfigError`."""
     if not agent.options.league:
         return
     if not agent.options.tunnel:
@@ -21,6 +22,7 @@ def validate_league(agent, default_connect_timeout: float) -> None:
 
 
 def validate_public_opponent(url: str) -> None:
+    """Reject an opponent URL that is not a real public HTTPS address."""
     parsed = urlparse(url)
     host = parsed.hostname
     if parsed.scheme != "https" or not host:
@@ -37,6 +39,7 @@ def validate_public_opponent(url: str) -> None:
 
 
 def validate_tunnel_endpoint(agent) -> None:
+    """Confirm the opened tunnel actually landed on the reserved domain."""
     parsed = urlparse(agent._tunnel.public_url)
     if parsed.scheme != "https" or parsed.hostname != agent.tunnel_domain:
         raise ConfigError("league tunnel did not acquire the configured HTTPS reserved domain")

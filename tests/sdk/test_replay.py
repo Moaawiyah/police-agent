@@ -1,7 +1,7 @@
 """Reading a saved log back: normalisation, re-verification, labels."""
 
 from police_agent.domain.crypto import CommitReveal
-from police_agent.gui.replay_data import (
+from police_agent.sdk.replay import (
     TAMPERED,
     VERIFIED,
     frozen_message,

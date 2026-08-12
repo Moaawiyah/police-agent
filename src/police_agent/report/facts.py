@@ -33,6 +33,7 @@ class ReportFacts:
 
     @property
     def links(self) -> dict:
+        """The report/replay/log links for this game, keyed by `game_id`."""
         return links(self.game_id)
 
     @property

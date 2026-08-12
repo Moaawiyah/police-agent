@@ -1,11 +1,12 @@
 """Playback actions for :class:`police_agent.gui.replay.ReplayApp`."""
 
-from police_agent.gui.replay_data import frozen_message, move_labels, verify_record
+from police_agent.sdk.replay import frozen_message, move_labels, verify_record
 
 MIN_TICK_MS = 50
 
 
 def advance(app) -> None:
+    """Apply one more recorded step, or announce the replay is done."""
     total = app._total_steps()
     if app._index >= total:
         app._playing = False
@@ -21,6 +22,7 @@ def advance(app) -> None:
 
 
 def apply_my_step(app, index: int) -> None:
+    """Fold this peer's own logged step into the visited/barrier trail and panel labels."""
     if index >= len(app._my_log):
         return
     entry = app._my_log[index]
@@ -33,6 +35,7 @@ def apply_my_step(app, index: int) -> None:
 
 
 def apply_opponent_step(app, index: int) -> None:
+    """Advance the belief filter with the opponent's step and update the hint label."""
     if index >= len(app._history):
         return
     message = app._history[index]
@@ -44,6 +47,7 @@ def apply_opponent_step(app, index: int) -> None:
 
 
 def render(app, index: int, total: int) -> None:
+    """Draw the current step and the status line under it."""
     mine, theirs = len(app._my_log), len(app._opponent)
     app._window.render(
         {
@@ -66,6 +70,7 @@ def render(app, index: int, total: int) -> None:
 
 
 def restart(app) -> None:
+    """Reset all replay state and redraw the empty board."""
     app._reset_state()
     app._playing = False
     render_empty(app)
@@ -73,6 +78,7 @@ def restart(app) -> None:
 
 
 def render_empty(app) -> None:
+    """Draw the board with nothing on it yet."""
     app._window.render(
         {
             "role": app._role,
@@ -86,18 +92,21 @@ def render_empty(app) -> None:
 
 
 def goto(app, step: int) -> None:
+    """Replay from the start up to `step`."""
     app._reset_state()
     for _ in range(max(1, min(step, app._total_steps()))):
         app.advance()
 
 
 def toggle(app) -> None:
+    """Start or pause auto-play."""
     app._playing = not app._playing
     if app._playing:
         app._tick()
 
 
 def tick(app) -> None:
+    """One auto-play frame, rescheduled at the current speed."""
     if not app._playing:
         return
     app.advance()
@@ -105,5 +114,6 @@ def tick(app) -> None:
 
 
 def run(app) -> None:
+    """Show the window and block until it closes."""
     app._window.set_turn(False, "REPLAY - press Play")
     app._window.root.mainloop()

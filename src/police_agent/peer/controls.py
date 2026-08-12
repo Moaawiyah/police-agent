@@ -28,6 +28,7 @@ class GameControls:
     """Thread-safe switches shared by a front end and the runtime it drives."""
 
     def __init__(self) -> None:
+        """Running, unpaused, unstopped -- the state a fresh sub-game starts in."""
         self._resume = threading.Event()
         self._resume.set()  # running unless something pauses it
         self._stop = threading.Event()
@@ -39,22 +40,27 @@ class GameControls:
 
     @property
     def paused(self) -> bool:
+        """Whether the runtime is currently held."""
         return not self._resume.is_set()
 
     @property
     def stopped(self) -> bool:
+        """Whether the sub-game has been abandoned."""
         return self._stop.is_set()
 
     @property
     def restart_requested(self) -> bool:
+        """Whether a fresh sub-game has been requested."""
         return self._restart.is_set()
 
     @property
     def quit_requested(self) -> bool:
+        """Whether a clean quit has been requested."""
         return self._quit.is_set()
 
     @property
     def enable_requested(self) -> bool:
+        """Whether this peer opted in to the bidirectional control channel."""
         return self._enable.is_set()
 
     def pause(self) -> None:
@@ -81,21 +87,26 @@ class GameControls:
         self._resume.set()
 
     def clear_restart(self) -> None:
+        """Consume the restart flag once the runtime has acted on it."""
         self._restart.clear()
 
     def request_quit(self) -> None:
+        """Ask the runtime to quit cleanly, notifying the opponent."""
         self._quit.set()
         self._resume.set()
 
     def request_enable(self) -> None:
+        """Opt in to the bidirectional control channel."""
         self._enable.set()
 
     def set_status(self, status: str) -> None:
+        """Record this peer's current status for the control channel to broadcast."""
         with self._status_lock:
             self._status = status
 
     @property
     def status(self) -> str:
+        """This peer's last-recorded status."""
         with self._status_lock:
             return self._status
 

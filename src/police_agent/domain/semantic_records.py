@@ -4,6 +4,7 @@ from police_agent.peer.step_zero import turn_records
 
 
 def turns(records, label, failures):
+    """Parse `records` into `(step, payload, record)` triples, flagging gaps in `failures`."""
     output = []
     previous = 0
     for record in turn_records(records):
@@ -20,6 +21,7 @@ def turns(records, label, failures):
 
 
 def messages(source, failures):
+    """Parse received messages into `(step, message)` pairs, flagging gaps in `failures`."""
     output = []
     previous = 0
     for message in source or []:
@@ -35,6 +37,7 @@ def messages(source, failures):
 
 
 def match_messages(remote, received, failures):
+    """Check that each revealed record's commitment matches what was actually received."""
     if len(remote) != len(received):
         failures.append("revealed record count does not match received turns")
     for record, message in zip(remote, received, strict=False):
@@ -65,17 +68,20 @@ def split_trailing_claim(remote, received_messages):
 
 
 def check_local_coverage(local, log_by_step, failures):
+    """Check the revealed record count matches this peer's own move log."""
     if len(local) != len(log_by_step):
         failures.append("local sealed record count does not match the move log")
 
 
 def cell(value):
+    """Parse a `[row, col]` wire value into a `(row, col)` tuple, or None."""
     if not isinstance(value, (list, tuple)) or len(value) != 2 or not all(isinstance(item, int) for item in value):
         return None
     return tuple(value)
 
 
 def result(failures, corrections, terminal):
+    """Bundle the semantic-audit outcome into the summary's expected shape."""
     return {
         "semantic_passed": not failures,
         "semantic_failures": failures,

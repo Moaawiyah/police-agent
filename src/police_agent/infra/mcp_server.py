@@ -27,7 +27,16 @@ from police_agent.exceptions import ConfigError
 from police_agent.infra.mcp_guard import InboundDosGuard
 from police_agent.shared.rate_limit import DosDetector
 
-DEFAULT_DOS_LIMIT_PER_MINUTE = 30.0  # Appendix Vav table 19's requests_per_minute floor
+# ch. 9.3.1's Gatekeeper/DOS-detector narrative (Figure 13, item 29's own sanction
+# text) is about protecting the OUTBOUND Gmail-reporting pipeline from a 429 --
+# `gatekeeper.requests_per_minute` (Table 19 item 1, min 30) is that budget, not
+# this one. A real turn round-trip has no such cadence and no pacing anywhere in
+# the loop, so borrowing that floor here would let a fast, fully legal match trip
+# its own inbound guard. Derived from queue_depth instead (Table 19 item 5, min
+# 100), same reasoning the old report-only line used: "fill the whole queue in
+# one second" is already two orders of magnitude above anything a real turn
+# could produce, so this can only ever catch an actual flood or a buggy loop.
+DEFAULT_DOS_LIMIT_PER_MINUTE = 6000.0
 
 
 def _ensure_port_free(host: str, port: int) -> None:
@@ -62,6 +71,7 @@ class PeerInboxes:
     """
 
     def __init__(self, dos_limit_per_minute: float = DEFAULT_DOS_LIMIT_PER_MINUTE) -> None:
+        """Four empty mailboxes and an inbound DoS detector tuned to `dos_limit_per_minute`."""
         self.agreements: queue.Queue = queue.Queue()
         self.turns: queue.Queue = queue.Queue()
         self.audits: queue.Queue = queue.Queue()

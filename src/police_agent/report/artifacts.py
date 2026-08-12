@@ -96,6 +96,11 @@ def build_log(facts, summary: dict) -> dict:
         "duration_seconds": summary.get("duration_seconds", 0),
         "result": summary.get("result", ""),
         "winner": summary.get("winner"),
+        # None on any ordinary result; set only when the loop watchdog (ch.
+        # 8.4.2) itself stopped this sub-game -- the only place that reason
+        # survives the process, since it is peer-local and never crosses the
+        # wire to the opponent.
+        "abort_reason": summary.get("abort_reason"),
         "steps": summary.get("steps", 0),
         # The declaration is carried whole rather than as its payload: a verifier
         # needs the nonce and the commit to redo the seal the opponent was handed

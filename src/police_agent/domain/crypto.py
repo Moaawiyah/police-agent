@@ -48,6 +48,7 @@ class CommitReveal:
 
     @staticmethod
     def commit_of(payload: dict[str, Any], nonce: str) -> str:
+        """SHA-256 of the canonical payload joined with its nonce."""
         return hashlib.sha256(f"{canonical_json(payload)}|{nonce}".encode()).hexdigest()
 
     @classmethod

@@ -55,6 +55,7 @@ class BluffAnalyst:
     """Reads the thief's hints, checks them against the scent, keeps score."""
 
     def __init__(self, ask=None, gain: float = DEFAULT_GAIN) -> None:
+        """Track this peer's reliability score, starting from an unproven half."""
         self._ask = ask
         self._gain = gain
         self.corroborated = 0

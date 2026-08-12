@@ -41,6 +41,7 @@ class HintWriter:
         every_n_steps: int = 1,
         rng: random.Random | None = None,
     ) -> None:
+        """Hold the model hook (or None for fallback-only) and this peer's banter tuning."""
         self._ask = ask  # ask(prompt, system) -> str; None means fallback only
         self._setting = setting or "an unnamed city"
         self._max_words = max(1, int(max_words))

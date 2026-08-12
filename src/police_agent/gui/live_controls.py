@@ -20,6 +20,7 @@ class LiveControls:
     """Owns the control-bar widgets and the enable/disable states between them."""
 
     def __init__(self, root, app) -> None:
+        """Lay out the control bar and wire each button to `app`'s matching method."""
         bar = tk.Frame(root)
         bar.pack(pady=(0, 6))
         self.start = tk.Button(bar, text="Start", command=app.start)

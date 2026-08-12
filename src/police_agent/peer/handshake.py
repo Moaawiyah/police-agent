@@ -25,6 +25,7 @@ class Negotiation:
     """One peer's side of the agreement exchange."""
 
     def __init__(self, terms: dict, identity: dict | None = None) -> None:
+        """One peer's side of the exchange, holding `terms`, `identity` and a fresh nonce."""
         self.terms = terms
         self.identity = identity or {}
         self.peer_identity: dict = {}

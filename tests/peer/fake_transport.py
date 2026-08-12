@@ -20,7 +20,7 @@ class FakeTransport:
         agreement=None,
         audit=None,
         incoming_controls=None,
-        dos_limit_per_minute: float = 30.0,
+        dos_limit_per_minute: float = 6000.0,
     ) -> None:
         self.incoming = list(incoming or [])
         self._agreement = agreement

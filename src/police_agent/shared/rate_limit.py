@@ -28,6 +28,7 @@ class TokenBucket:
     """
 
     def __init__(self, capacity: float, refill_rate: float, clock=time.monotonic) -> None:
+        """A bucket holding `capacity` tokens, refilling at `refill_rate` per second."""
         self.capacity = float(capacity)
         self.refill_rate = float(refill_rate)
         self.tokens = float(capacity)  # start full, as the spec's sketch does
@@ -85,6 +86,7 @@ class DosDetector:
     def __init__(
         self, limit_per_minute: float, window_seconds: float = 60.0, clock=time.monotonic
     ) -> None:
+        """Watch for a rate over `limit_per_minute`, measured over a sliding `window_seconds`."""
         self.limit_per_minute = float(limit_per_minute)
         self.window_seconds = float(window_seconds)
         self.tripped = False

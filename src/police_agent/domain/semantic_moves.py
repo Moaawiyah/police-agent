@@ -5,6 +5,7 @@ from police_agent.domain.semantic_records import cell
 
 
 def thief_move(step, payload, origin, position, barriers, board, failures):
+    """Check one revealed thief step against the board rules, appending to `failures` on mismatch."""
     move = payload.get("move")
     if move == "HOLD:-":
         if position != origin:
@@ -18,6 +19,11 @@ def thief_move(step, payload, origin, position, barriers, board, failures):
 
 
 def police_turn(step, payload, logged, origin, barriers, board, failures):
+    """Check one revealed police step against the local log and board rules.
+
+    Returns the position and any barrier this step actually placed, for the
+    caller to fold into the next step's `origin`/`barriers`.
+    """
     position = cell(payload.get("position"))
     if position is None or not board.in_bounds(position):
         failures.append(f"local turn {step} has an out-of-bounds position")
@@ -41,6 +47,7 @@ def police_turn(step, payload, logged, origin, barriers, board, failures):
 
 
 def claim_response(step, message, local_by_step, positions, failures):
+    """Check a capture-claim response against the claim it answers and the true positions."""
     response = message.get("claim_response")
     if response is None:
         return

@@ -1,6 +1,6 @@
 [project]
 name = "police-agent"
-version = "0.1.0"
+version = "1.00"
 description = "Police agent for the distributed Police-vs-Thief P2P game (FastMCP, Dec-POMDP, commit-reveal)"
 readme = "README.md"
 authors = [

@@ -111,3 +111,14 @@ def test_from_config_reads_the_dedicated_key():
     watchdog = Watchdog.from_config(config, controls)
 
     assert watchdog.timeout_sec == 42.0
+
+
+def test_from_config_falls_back_to_the_agreed_network_watchdog_value():
+    """No private override: the shared, agreed Table 19 item 7 value (60s in
+    the shipped game.json) drives the loop watchdog, not the 180s example
+    from ch. 8.4.2's illustrative snippet."""
+    controls = GameControls()
+
+    watchdog = Watchdog.from_config(config_with(), controls)
+
+    assert watchdog.timeout_sec == 60.0

@@ -1,19 +1,40 @@
-"""Reading a saved match log back: normalisation, re-verification, labels.
+"""SDK facade for the replay/export path: reading a saved match log back,
+re-verifying it, and reconstructing the belief map it implies.
 
-Pure functions over plain dicts, with no Tk anywhere, because this is the half
-of the replay player that can actually be tested -- and the half that has to be
-right. A player that drew the wrong board would be obvious; one that reported
-`verified OK` over a tampered record would not.
-
-Two log shapes are accepted. Ours writes the summary at the top level; the
-course reference nests it under `"summary"`. Reading both is not politeness: the
-league (ch. 9.4) has us replay another group's log, and a player that could only
-open its own would be evidence of nothing.
+Front ends (`gui/replay.py`, `gui/export.py`, `gui/export_frames.py`) call in
+here rather than importing `domain.crypto`, `peer.step_zero` or
+`strategy.belief` themselves -- the same "reach no further than the SDK" rule
+`sdk/__init__.py` states for the live-match path applies to replay too.
 """
 
 from police_agent.domain.crypto import CommitReveal
 from police_agent.exceptions import CryptoError
 from police_agent.peer.step_zero import step_zero_of, turn_records
+from police_agent.strategy.belief import (
+    DEFAULT_LEAK,
+    DEFAULT_SMELL_POWER,
+    DEFAULT_SMELL_TRUST,
+    DEFAULT_STALE_DECAY,
+    DEFAULT_STALE_SUPPORT,
+    BeliefGrid,
+)
+
+__all__ = [
+    "DEFAULT_LEAK",
+    "DEFAULT_SMELL_POWER",
+    "DEFAULT_SMELL_TRUST",
+    "DEFAULT_STALE_DECAY",
+    "DEFAULT_STALE_SUPPORT",
+    "TAMPERED",
+    "UNKNOWN",
+    "VERIFIED",
+    "BeliefGrid",
+    "frozen_message",
+    "move_labels",
+    "normalize_log",
+    "opponent_positions",
+    "verify_record",
+]
 
 VERIFIED = "verified OK"
 TAMPERED = "TAMPERED"
@@ -21,11 +42,15 @@ UNKNOWN = "-"
 
 
 def normalize_log(log_data: dict) -> dict:
-    """One uniform view of a match log, whichever of the two shapes it arrived in.
+    """One uniform view of a match log, whichever of two shapes it arrived in.
 
     Every field has a fallback. A log missing its smell `history` replays with a
     flat belief map rather than refusing to open: the commit re-verification is
-    the part that carries weight, and it does not need the scent to run.
+    the part that carries weight, and it does not need the scent to run. Two log
+    shapes are accepted -- ours writes the summary at the top level, the course
+    reference nests it under `"summary"` -- because the league (ch. 9.4) has us
+    replay another group's log, and a reader that could only open its own would
+    be evidence of nothing.
     """
     body = log_data.get("summary") if isinstance(log_data.get("summary"), dict) else log_data
     records = body.get("records") or log_data.get("records") or []

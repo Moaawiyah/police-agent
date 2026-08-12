@@ -11,13 +11,15 @@ still advanced every step regardless, so a log with only a partial
 `belief_log` never desyncs mid-replay.
 """
 
-from police_agent.gui.replay_data import frozen_message, normalize_log, opponent_positions
-from police_agent.strategy.belief import (
+from police_agent.sdk.replay import (
     DEFAULT_LEAK,
     DEFAULT_SMELL_POWER,
     DEFAULT_STALE_DECAY,
     DEFAULT_STALE_SUPPORT,
     BeliefGrid,
+    frozen_message,
+    normalize_log,
+    opponent_positions,
 )
 
 __all__ = ["build_views"]
@@ -33,6 +35,7 @@ def build_views(
     stale_decay: float = DEFAULT_STALE_DECAY,
     stale_support: float = DEFAULT_STALE_SUPPORT,
 ) -> list[dict]:
+    """Rebuild the sequence of per-step view dicts a saved log implies."""
     view = normalize_log(log_data)
     my_log, history = view["my_log"], view["history"]
     opponent = opponent_positions(opponent_log)

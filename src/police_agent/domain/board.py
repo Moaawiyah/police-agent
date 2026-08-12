@@ -13,11 +13,13 @@ class Board:
     """An N x N grid with single-step orthogonal movement."""
 
     def __init__(self, size: int) -> None:
+        """A `size` x `size` grid; raises if `size` is not positive."""
         if size < 1:
             raise ValueError(f"Board size must be positive, got {size}")
         self.size = size
 
     def in_bounds(self, cell: Cell) -> bool:
+        """Whether `cell` sits on this board at all."""
         row, col = cell
         return 0 <= row < self.size and 0 <= col < self.size
 

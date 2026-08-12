@@ -62,10 +62,12 @@ class TurnMessage:
     win_claim: dict | None = None  # thief's end-of-game {"type": "survival"}
 
     def to_dict(self) -> dict:
+        """This message as a plain dict, ready for the wire."""
         return asdict(self)
 
     @classmethod
     def from_dict(cls, data: object) -> "TurnMessage":
+        """Parse a `TurnMessage` from an untrusted wire payload."""
         return _decode(cls, data)
 
 
@@ -83,10 +85,12 @@ class AuditPayload:
     result_claim: str  # "capture" | "survival" | "timeout" -- to be verified, not trusted
 
     def to_dict(self) -> dict:
+        """This payload as a plain dict, ready for the wire."""
         return asdict(self)
 
     @classmethod
     def from_dict(cls, data: object) -> "AuditPayload":
+        """Parse an `AuditPayload` from an untrusted wire payload."""
         return _decode(cls, data)
 
 
@@ -107,8 +111,10 @@ class ControlMessage:
     payload: dict | None = None
 
     def to_dict(self) -> dict:
+        """This message as a plain dict, ready for the wire."""
         return asdict(self)
 
     @classmethod
     def from_dict(cls, data: object) -> "ControlMessage":
+        """Parse a `ControlMessage` from an untrusted wire payload."""
         return _decode(cls, data)

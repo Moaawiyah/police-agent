@@ -43,6 +43,7 @@ class TurnHandler:
         rules: GameRules,
         analyst=None,
     ) -> None:
+        """Track `state`/`threat`/`rules` and, if given, an `analyst` for the thief's hints."""
         self.state = state
         self.threat = threat
         self.rules = rules
@@ -52,6 +53,7 @@ class TurnHandler:
         self._seen: set[str] = set()  # turn identities already spent
 
     def process(self, message: TurnMessage) -> IncomingOutcome:
+        """Fold one incoming message into the game, deduping replays first."""
         fingerprint = self._fingerprint(message)
         if fingerprint in self._seen:
             # Dropped before anything is touched. Folding a turn in twice would

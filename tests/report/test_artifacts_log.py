@@ -74,6 +74,17 @@ class TestTheSubGameLogArtifact:
         assert artifact["tokens"]["tokens_total"] == 120
         assert artifact["gatekeeper"]["sent"] == 3
 
+    def test_an_ordinary_result_carries_no_abort_reason(self):
+        assert _log()["abort_reason"] is None
+
+    def test_a_watchdog_abort_carries_its_reason_into_the_log(self):
+        """The only artifact a watchdog trip's diagnosis survives into -- it
+        is peer-local and never crosses the wire, so it cannot appear in the
+        symmetric result artifact (report/result.py)."""
+        summary = {**_summary(), "result": "aborted", "abort_reason": "watchdog: unresponsive 200s"}
+
+        assert build_log(facts_from(summary), summary)["abort_reason"] == summary["abort_reason"]
+
     def test_a_summary_missing_its_optional_blocks_still_builds(self):
         """The report of a match that failed early is the one the grader needs."""
         artifact = build_log(facts_from({}), {})

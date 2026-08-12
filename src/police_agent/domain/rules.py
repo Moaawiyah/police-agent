@@ -43,6 +43,7 @@ class GameRules:
     """
 
     def __init__(self, max_steps: int, survival_threshold: int) -> None:
+        """The agreed step ceiling and survival threshold for one sub-game."""
         self.max_steps = max_steps
         self.survival_threshold = survival_threshold
 

@@ -12,6 +12,7 @@ WINDOWS_QUERY = (
 
 
 def darwin(spec, run, field, number, gigabytes, bytes_per_gb, slow_timeout) -> None:
+    """Fill `spec` from macOS `sysctl`/`system_profiler` output."""
     spec["cpu_type"] = run(["sysctl", "-n", "machdep.cpu.brand_string"]) or spec["cpu_type"]
     spec["cpu_cores"] = number(run(["sysctl", "-n", "hw.physicalcpu"])) or spec["cpu_cores"]
     spec["ram_gb"] = gigabytes(number(run(["sysctl", "-n", "hw.memsize"])), bytes_per_gb)
@@ -24,6 +25,7 @@ def darwin(spec, run, field, number, gigabytes, bytes_per_gb, slow_timeout) -> N
 
 
 def windows(spec, run, number, gigabytes, bytes_per_gb) -> None:
+    """Fill `spec` from a single PowerShell CIM query."""
     try:
         found = json.loads(run(["powershell", "-NoProfile", "-Command", WINDOWS_QUERY]) or "{}")
     except ValueError:
@@ -37,6 +39,7 @@ def windows(spec, run, number, gigabytes, bytes_per_gb) -> None:
 
 
 def nvidia(spec, run, number, gigabytes, mib_per_gb) -> None:
+    """Fill `spec`'s GPU fields from `nvidia-smi`, if present."""
     reply = run(["nvidia-smi", "--query-gpu=name,memory.total", "--format=csv,noheader"])
     if not reply:
         return

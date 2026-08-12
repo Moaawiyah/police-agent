@@ -15,13 +15,14 @@ This layer holds no game rules of its own. It decides *which* objects get built
 and with what settings; how the game is played stays in `domain/` and `peer/`.
 """
 
-from police_agent.sdk.agent import DEFAULT_REPORT_DIR, PoliceAgentSDK
+from police_agent.sdk.agent import DEFAULT_REPORT_DIR, GameControls, PoliceAgentSDK
 from police_agent.sdk.options import DEFAULT_CONFIG_DIR, DEFAULT_HOST, MatchOptions
 
 __all__ = [
     "DEFAULT_CONFIG_DIR",
     "DEFAULT_HOST",
     "DEFAULT_REPORT_DIR",
+    "GameControls",
     "MatchOptions",
     "PoliceAgentSDK",
 ]

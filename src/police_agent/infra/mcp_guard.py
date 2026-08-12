@@ -19,6 +19,7 @@ class InboundDosError(McpError):
     McpTransport as a clean typed error, not a hang or a generic 500."""
 
     def __init__(self, message: str) -> None:
+        """Wrap `message` as the fastmcp error code this rejection reports."""
         super().__init__(ErrorData(code=-32000, message=message))
 
 
@@ -32,9 +33,11 @@ class InboundDosGuard(Middleware):
     """
 
     def __init__(self, detector: DosDetector) -> None:
+        """Guard tool calls using the shared inbound `detector`."""
         self._detector = detector
 
     async def on_call_tool(self, context, call_next):
+        """Reject the call if the shared detector has tripped, else pass it through."""
         if not self._detector.record():
             raise InboundDosError(
                 f"inbound rate exceeded {self._detector.limit_per_minute:.0f}/min "
