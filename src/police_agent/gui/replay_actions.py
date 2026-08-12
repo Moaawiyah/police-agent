@@ -63,7 +63,7 @@ def render(app, index: int, total: int) -> None:
         }
     )
     both = "both agents shown" if app._opponent else "opponent log not supplied"
-    verification = "Verified OK" if app._audit.get("passed") else "Verification FAILED"
+    verification = "Verified OK" if app._verified else "Verification FAILED"
     app._window.set_label("status", f"step {index + 1}/{total} | {verification} | {both}")
 
 

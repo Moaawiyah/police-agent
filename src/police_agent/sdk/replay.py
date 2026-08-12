@@ -55,6 +55,9 @@ def normalize_log(log_data: dict) -> dict:
     body = log_data.get("summary") if isinstance(log_data.get("summary"), dict) else log_data
     records = body.get("records") or log_data.get("records") or []
     step_zero = step_zero_of(records)
+    role = body.get("role", "police")
+    roles = body.get("roles") or {}
+    my_log = body.get("my_log") or _moves_from_records(records)
     return {
         # Turns only. The player walks `records` alongside `my_log`, and the
         # step-zero declaration at the head is not a move -- leaving it in would
@@ -62,18 +65,34 @@ def normalize_log(log_data: dict) -> dict:
         # the payload, so an opponent's log with a declaration is handled too.
         "records": turn_records(records),
         "step_zero": step_zero,
-        "history": body.get("history", []),
-        "my_log": body.get("my_log", []),
+        "history": body.get("history") or body.get("opponent_messages") or [],
+        "my_log": my_log,
         "belief_log": body.get("belief_log", []),
-        "role": body.get("role", "police"),
+        "role": role,
         "result": body.get("result", UNKNOWN),
-        "winner": body.get("winner") or "nobody",
-        "group": body.get("group_name") or body.get("group_id", "unnamed"),
+        "winner": body.get("winner") or body.get("winner_role") or "nobody",
+        "group": body.get("group_name") or body.get("group_id") or roles.get(role, "unnamed"),
         "sub_game_number": body.get("sub_game_number") or step_zero.get("sub_game_number", 1),
         "duration_seconds": body.get("duration_seconds", 0),
         "audit": body.get("audit") or {"passed": True, "verified_steps": 0},
         "reliability": body.get("opponent_reliability"),
     }
+
+
+def _moves_from_records(records: list) -> list[dict]:
+    """Recover the movement track from report artifacts that only retain sealed records."""
+    moves = []
+    for record in turn_records(records):
+        payload = record.get("payload") or {}
+        if isinstance(payload.get("position"), list):
+            moves.append(
+                {
+                    "step": payload.get("step"),
+                    "position": payload["position"],
+                    "barrier": payload.get("barrier") or payload.get("barrier_placed"),
+                }
+            )
+    return moves
 
 
 def verify_record(records: list, index: int) -> str:

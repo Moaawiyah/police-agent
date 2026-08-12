@@ -9,9 +9,11 @@ from police_agent.sdk.replay import (
     DEFAULT_SMELL_TRUST,
     DEFAULT_STALE_DECAY,
     DEFAULT_STALE_SUPPORT,
+    VERIFIED,
     BeliefGrid,
     normalize_log,
     opponent_positions,
+    verify_record,
 )
 
 DEFAULT_STEP_SECONDS = 0.5
@@ -33,7 +35,20 @@ class ReplayApp:
         self._my_log, self._role = view["my_log"], view["role"]
         self._result, self._winner = view["result"], view["winner"]
         self._audit = view["audit"]
+        self._verified = bool(self._records) and bool(self._audit.get("passed"))
+        self._verified = self._verified and all(
+            verify_record(self._records, index) == VERIFIED for index in range(len(self._records))
+        )
         self._opponent = opponent_positions(opponent_log)
+        if opponent_log:
+            opponent_view = normalize_log(opponent_log)
+            opponent_records = opponent_view["records"]
+            self._verified = self._verified and bool(opponent_records)
+            self._verified = self._verified and bool(opponent_view["audit"].get("passed"))
+            self._verified = self._verified and all(
+                verify_record(opponent_records, index) == VERIFIED
+                for index in range(len(opponent_records))
+            )
         self._playing = False
         self._reset_state()
         self._window = window or self._open_window(config, view)

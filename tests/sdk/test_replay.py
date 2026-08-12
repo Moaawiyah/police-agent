@@ -71,6 +71,39 @@ def test_records_at_the_top_level_are_found_even_when_the_summary_omits_them():
     assert len(view["records"]) == 1
 
 
+def test_production_police_artifact_recovers_moves_and_messages():
+    artifact = {
+        "artifact_type": "sub_game_log",
+        "roles": {"police": "police-team", "thief": "thief-team"},
+        "records": [sealed(1)],
+        "opponent_messages": [{"step": 1, "hint": "north"}],
+    }
+
+    view = normalize_log(artifact)
+
+    assert view["group"] == "police-team"
+    assert view["my_log"] == [{"step": 1, "position": [1, 0], "barrier": None}]
+    assert view["history"] == [{"step": 1, "hint": "north"}]
+
+
+def test_production_thief_artifact_recovers_moves_and_winner_role():
+    artifact = {
+        "summary": {
+            "role": "thief",
+            "group_id": "thief-team",
+            "winner_role": "police",
+            "audit": {"passed": True},
+        },
+        "records": [sealed(1)],
+    }
+
+    view = normalize_log(artifact)
+
+    assert view["group"] == "thief-team"
+    assert view["winner"] == "police"
+    assert view["my_log"][0]["position"] == [1, 0]
+
+
 def test_an_empty_log_opens_instead_of_refusing():
     """A log without a smell history replays with a flat belief; the commit
     re-verification is the part that carries weight and it still runs."""

@@ -98,6 +98,7 @@ def test_a_rewritten_log_is_caught_as_it_is_drawn():
     app.advance()
 
     assert "TAMPERED" in window.labels["commit"]
+    assert "Verification FAILED" in window.labels["status"]
 
 
 def test_a_barrier_in_the_log_stays_on_the_board():
@@ -123,7 +124,11 @@ def test_a_barrier_the_thief_declared_is_drawn_too():
 
 
 def test_the_opponent_is_drawn_only_when_its_revealed_log_was_supplied():
-    theirs = {"my_log": [{"position": [3, 3]}, {"position": [3, 4]}]}
+    theirs = {
+        "records": [sealed(1), sealed(2)],
+        "my_log": [{"position": [3, 3]}, {"position": [3, 4]}],
+        "audit": {"passed": True},
+    }
     app, window = player(log_of(2), opponent=theirs)
 
     app.advance()
@@ -149,6 +154,21 @@ def test_failed_audit_is_never_labelled_verified():
     app.advance()
 
     assert window.labels["status"].startswith("step 1/1 | Verification FAILED")
+
+
+def test_a_tampered_opponent_log_fails_cross_log_verification():
+    their_record = sealed(1)
+    their_record["payload"]["position"] = [6, 6]
+    theirs = {
+        "records": [their_record],
+        "my_log": [{"position": [6, 6]}],
+        "audit": {"passed": True},
+    }
+    app, window = player(log_of(1), opponent=theirs)
+
+    app.advance()
+
+    assert "Verification FAILED" in window.labels["status"]
 
 
 def test_playback_runs_to_the_longer_track_and_freezes_the_shorter():
