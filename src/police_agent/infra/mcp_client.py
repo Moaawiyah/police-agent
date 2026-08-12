@@ -49,6 +49,11 @@ class McpTransport:
         self._call_timeout = call_timeout
         self._control_send_timeout = control_send_timeout
 
+    @property
+    def inbound_dos(self):
+        """The detector watching THIS peer's own inbound mailbox for a flood."""
+        return self._inboxes.inbound_dos
+
     def _call(self, tool: str, arguments: dict, timeout: float | None = None) -> None:
         """One MCP call: connect, invoke, disconnect.
 

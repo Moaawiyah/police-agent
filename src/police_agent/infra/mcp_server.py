@@ -24,6 +24,10 @@ from fastmcp import FastMCP
 
 from police_agent.constants import Role
 from police_agent.exceptions import ConfigError
+from police_agent.infra.mcp_guard import InboundDosGuard
+from police_agent.shared.rate_limit import DosDetector
+
+DEFAULT_DOS_LIMIT_PER_MINUTE = 30.0  # Appendix Vav table 19's requests_per_minute floor
 
 
 def _ensure_port_free(host: str, port: int) -> None:
@@ -57,11 +61,15 @@ class PeerInboxes:
     the turn the loop is currently waiting on.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, dos_limit_per_minute: float = DEFAULT_DOS_LIMIT_PER_MINUTE) -> None:
         self.agreements: queue.Queue = queue.Queue()
         self.turns: queue.Queue = queue.Queue()
         self.audits: queue.Queue = queue.Queue()
         self.controls: queue.Queue = queue.Queue()
+        # Real enforcement runs in mcp_guard.InboundDosGuard, on the server's own
+        # daemon thread; this same instance is also read from the game-loop
+        # thread for the end-of-match report (peer/summary.py).
+        self.inbound_dos = DosDetector(dos_limit_per_minute)
 
 
 def build_peer_server(role: Role, inboxes: PeerInboxes) -> FastMCP:
@@ -71,6 +79,7 @@ def build_peer_server(role: Role, inboxes: PeerInboxes) -> FastMCP:
     without binding a socket.
     """
     mcp = FastMCP(name=f"police-thief-{role.value}")
+    mcp.add_middleware(InboundDosGuard(inboxes.inbound_dos))
 
     @mcp.tool
     def negotiate(message: dict) -> dict:
@@ -99,7 +108,9 @@ def build_peer_server(role: Role, inboxes: PeerInboxes) -> FastMCP:
     return mcp
 
 
-def start_peer_server(role: Role, host: str, port: int) -> PeerInboxes:
+def start_peer_server(
+    role: Role, host: str, port: int, dos_limit_per_minute: float = DEFAULT_DOS_LIMIT_PER_MINUTE
+) -> PeerInboxes:
     """Serve this peer's mailbox on its own port and hand back the inboxes.
 
     The server runs in a daemon thread so the process still exits when the game
@@ -108,7 +119,7 @@ def start_peer_server(role: Role, host: str, port: int) -> PeerInboxes:
     never needs to talk to the server -- only to read what arrived.
     """
     _ensure_port_free(host, port)
-    inboxes = PeerInboxes()
+    inboxes = PeerInboxes(dos_limit_per_minute)
     server = build_peer_server(role, inboxes)
     thread = threading.Thread(
         target=lambda: server.run(

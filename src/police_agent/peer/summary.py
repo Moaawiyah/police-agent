@@ -87,6 +87,10 @@ def build_summary(runtime, result: str, winner: str | None, audit: dict) -> dict
     return {
         "result": result,
         "winner": winner,
+        # None on any ordinary result; set only when the watchdog (spec ch.
+        # 8.4) itself stopped the loop, so ABORTED reads distinguishably
+        # from an operator-initiated Stop rather than looking identical.
+        "abort_reason": runtime.abort_reason,
         "role": "police",
         "steps": runtime.state.step_number,
         "unique_cells": runtime.state.unique_cells,

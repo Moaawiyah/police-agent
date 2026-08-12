@@ -39,6 +39,9 @@ class TestInboxes:
         assert inboxes.audits.empty()
         assert inboxes.controls.empty()
 
+    def test_the_inbound_dos_limit_defaults_to_the_agreed_gatekeeper_floor(self):
+        assert PeerInboxes().inbound_dos.limit_per_minute == 30.0
+
 
 class TestReceiveTools:
     def test_server_exposes_exactly_the_four_receive_tools(self, peer):

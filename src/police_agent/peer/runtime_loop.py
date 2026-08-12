@@ -32,8 +32,8 @@ def turn_loop(runtime) -> None:
         if incoming is None:
             runtime._result = (TECHNICAL_LOSS, "police")
             return
-        runtime.inbound_dos.record()
         apply_incoming(runtime, TurnMessage.from_dict(incoming))
+        runtime.watchdog.beat()
 
 
 def apply_incoming(runtime, message: TurnMessage) -> None:

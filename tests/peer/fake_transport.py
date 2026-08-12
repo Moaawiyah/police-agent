@@ -8,12 +8,20 @@ in-process object at runtime, and this must never become shipped agent code.
 """
 
 from police_agent.peer.sealing import now_iso
+from police_agent.shared.rate_limit import DosDetector
 
 
 class FakeTransport:
     """Replays a fixed script of thief turns and records everything sent."""
 
-    def __init__(self, incoming=None, agreement=None, audit=None, incoming_controls=None) -> None:
+    def __init__(
+        self,
+        incoming=None,
+        agreement=None,
+        audit=None,
+        incoming_controls=None,
+        dos_limit_per_minute: float = 30.0,
+    ) -> None:
         self.incoming = list(incoming or [])
         self._agreement = agreement
         self._audit = audit
@@ -22,6 +30,10 @@ class FakeTransport:
         self.sent_audits: list[dict] = []
         self.sent_controls: list[dict] = []
         self.agreement_sent: dict | None = None
+        # No real FastMCP server sits in front of a FakeTransport, so nothing
+        # ever records against this -- it exists only so PeerRuntime's
+        # unconditional `transport.inbound_dos` read has something to find.
+        self.inbound_dos = DosDetector(dos_limit_per_minute)
 
     def exchange_agreement(self, signed: dict) -> dict:
         """Echo the police's own agreement back by default: an opponent that

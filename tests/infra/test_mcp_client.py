@@ -33,6 +33,14 @@ class Recorder:
             raise OSError("connection refused")
 
 
+class TestInboundDos:
+    def test_the_property_delegates_to_the_shared_inboxes_instance(self):
+        inboxes = PeerInboxes()
+        link = McpTransport(UNREACHABLE, inboxes)
+
+        assert link.inbound_dos is inboxes.inbound_dos
+
+
 class TestRetryPolicy:
     def test_a_late_starting_opponent_is_retried_not_failed(self):
         # Two processes never start at the same instant; early refusals are normal.
