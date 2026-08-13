@@ -81,3 +81,20 @@ def test_no_listener_is_a_quiet_series():
     summaries = agent.play_series()
 
     assert len(summaries) == 2
+
+
+def test_team_sync_enabled_delegates_to_the_scheduler_instead(monkeypatch):
+    """`team_sync.enabled` must route through the scheduler, not the normal
+    single-process loop -- the two must never both run for one series."""
+    import police_agent.team_sync.scheduler as scheduler_module
+
+    calls: list = []
+    monkeypatch.setattr(
+        scheduler_module, "run_team_series", lambda agent: calls.append(agent) or []
+    )
+    agent = agent_with(team_sync__enabled=True, transport=FakeTransport(incoming=[]))
+
+    result = agent.play_series()
+
+    assert calls == [agent]
+    assert result == []

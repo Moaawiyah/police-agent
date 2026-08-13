@@ -27,7 +27,7 @@ def test_an_illegal_action_from_the_strategy_becomes_a_hold():
 
     assert summary["my_log"][0]["position"] == [0, 0]  # it did not move
     assert "illegal action" in turn_records(summary["records"])[0]["payload"]["rationale"]
-    assert turn_records(summary["records"])[0]["payload"]["move"] == "HOLD:-"
+    assert turn_records(summary["records"])[0]["payload"]["move"] == "STAY"
 
 
 def test_a_held_turn_is_still_sealed_and_still_sent():

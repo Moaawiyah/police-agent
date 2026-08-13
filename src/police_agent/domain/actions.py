@@ -29,7 +29,14 @@ class Action:
             raise ValueError("HOLD must not carry a direction")
 
     def __str__(self) -> str:
-        """The wire form other peers and the game log read, e.g. `"MOVE:N"`."""
+        """The wire form other peers and the game log read, e.g. `"MOVE:N"`, `"STAY"`.
+
+        HOLD carries no direction and renders bare (`"STAY"`), matching the book
+        reference's wire vector rather than the `"STAY:-"` the general form
+        would otherwise produce.
+        """
+        if self.move_type is MoveType.HOLD:
+            return self.move_type.value
         return f"{self.move_type.value}:{self.direction.value if self.direction else '-'}"
 
 
