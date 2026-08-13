@@ -79,7 +79,19 @@ def _finish_series(agent, args, summaries: list[dict]) -> int:
     if args.summary:
         agent.save_summary(summaries[-1], args.summary)
     if args.report:
-        _report_series(agent, summaries, args.report_dir)
+        if agent.config.get("team_sync.enabled"):
+            # team_sync's own coordinator (team_sync/scheduler.py) already wrote every
+            # sub-game's artifacts and mailed the binding report exactly once, gated by
+            # TeamSyncStore.email_sent, as each sub-game settled. Calling report_series
+            # here too would re-send the same email unconditionally -- it has no
+            # idempotency check of its own -- so under team_sync this is a no-op.
+            print(
+                "--report is a no-op under team_sync: the coordinator already wrote "
+                "every sub-game's artifacts and mailed the binding report once.",
+                file=sys.stderr,
+            )
+        else:
+            _report_series(agent, summaries, args.report_dir)
     return 0
 
 

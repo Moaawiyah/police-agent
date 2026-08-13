@@ -3,7 +3,6 @@
 from police_agent.constants import Direction
 from police_agent.domain.semantic_records import cell
 
-
 HOLD_SPELLINGS = ("HOLD:-", "STAY")
 # Two conformant spellings for a stay move: our own team's "HOLD:-", and the
 # book reference's bare "STAY" (docs/EVIDENCE.md; also the literal token in
