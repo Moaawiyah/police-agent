@@ -18,6 +18,7 @@ from police_agent.team_sync import config as ts_config
 from police_agent.team_sync import coordinator as ts_coordinator
 from police_agent.team_sync import import_adapter
 from police_agent.team_sync.messages import new_message_id
+from police_agent.team_sync.resume import backfill_missing_summaries
 from police_agent.team_sync.scheduler_fail import fail
 from police_agent.team_sync.scheduler_wait import wait_for_thief_result
 from police_agent.team_sync.security import secret_from_env
@@ -51,6 +52,8 @@ def run_team_series(agent, base: str = "logs") -> list[dict]:
 
     total = series_count(agent.config)
     summaries: list[dict] = [{}] * total
+    if status.sub_game_number > 1:
+        backfill_missing_summaries(agent, base, _group_id(agent.config), summaries)
     if status.sub_game_number <= 1:
         first_sibling_subgame = _first_role_subgame(total, THIEF)
         if first_sibling_subgame:

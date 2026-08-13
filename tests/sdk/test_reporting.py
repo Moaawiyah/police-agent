@@ -150,6 +150,20 @@ class TestTheGuiReportsTheWholeSeries:
         assert agent.reported == []
         assert "no match played" in capsys.readouterr().out
 
+    def test_report_is_a_noop_under_team_sync(self, monkeypatch, capsys):
+        """team_sync's own coordinator already wrote artifacts and mailed once as
+        each sub-game settled (team_sync/scheduler.py); `_report_series` has no
+        idempotency check of its own, so calling it here too would re-send the
+        same email. `--report` must become a no-op rather than double-mail."""
+        agent = _StubAgent(team_sync_enabled=True)
+        monkeypatch.setattr(cli, "PoliceAgentSDK", lambda options: agent)
+        monkeypatch.setattr(cli, "_play_series_headless", lambda _agent: _two_sub_games())
+
+        cli.main(["--series", "--report"])
+
+        assert agent.reported == []
+        assert "no-op under team_sync" in capsys.readouterr().err
+
 
 def _two_sub_games() -> list[dict]:
     return [
@@ -158,14 +172,27 @@ def _two_sub_games() -> list[dict]:
     ]
 
 
+class _StubConfig:
+    """Just enough of the real config surface for `_finish_series`'s team_sync check."""
+
+    def __init__(self, team_sync_enabled: bool = False) -> None:
+        self._team_sync_enabled = team_sync_enabled
+
+    def get(self, key, default=None):
+        if key == "team_sync.enabled":
+            return self._team_sync_enabled
+        return default
+
+
 class _StubAgent:
     """The SDK's reporting surface only, so the CLI test opens no socket."""
 
     host, port, opponent_url, public_url = "127.0.0.1", 8801, "http://elsewhere/mcp", None
 
-    def __init__(self, mailed: str | None = None) -> None:
+    def __init__(self, mailed: str | None = None, team_sync_enabled: bool = False) -> None:
         self.reported: list[str] = []
         self.mailed = mailed
+        self.config = _StubConfig(team_sync_enabled)
 
     def connect(self) -> None:
         return None
