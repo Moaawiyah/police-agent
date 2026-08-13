@@ -4,10 +4,17 @@ from police_agent.constants import Direction
 from police_agent.domain.semantic_records import cell
 
 
+HOLD_SPELLINGS = ("HOLD:-", "STAY")
+# Two conformant spellings for a stay move: our own team's "HOLD:-", and the
+# book reference's bare "STAY" (docs/EVIDENCE.md; also the literal token in
+# game.json's move_set). A checker that only accepts one flags an honest
+# opponent's hold as illegal and forfeits a game nobody tampered with.
+
+
 def thief_move(step, payload, origin, position, barriers, board, failures):
     """Check one revealed thief step against the board rules, appending to `failures` on mismatch."""
     move = payload.get("move")
-    if move == "HOLD:-":
+    if move in HOLD_SPELLINGS:
         if position != origin:
             failures.append(f"turn {step} hold changes position")
         return
@@ -31,7 +38,7 @@ def police_turn(step, payload, logged, origin, barriers, board, failures):
     _match_local_log(step, payload, logged, failures)
     move = payload.get("move")
     placed = cell(payload.get("barrier")) if payload.get("barrier") is not None else None
-    if move == "HOLD:-":
+    if move in HOLD_SPELLINGS:
         if position != origin or placed is not None:
             failures.append(f"local turn {step} has an illegal hold")
     elif isinstance(move, str) and move.startswith("MOVE:"):

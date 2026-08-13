@@ -35,4 +35,4 @@ class TestConstructors:
     def test_string_form_is_loggable(self):
         assert str(move(Direction.S)) == "MOVE:S"
         assert str(barrier()) == "BARRIER:-"
-        assert str(hold()) == "HOLD:-"
+        assert str(hold()) == "STAY"

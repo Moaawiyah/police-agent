@@ -77,10 +77,17 @@ def is_step_zero(record: dict) -> bool:
     """Whether a revealed record is a declaration rather than a turn.
 
     Reads the payload rather than trusting the position, because this is also
-    applied to the *opponent's* revealed log, where we control neither.
+    applied to the *opponent's* revealed log, where we control neither. Two
+    spellings are conformant (book Sec. 5.5): our own slim `record_type:
+    "step_zero"`, and the reference's inline-hardware `type: "system_spec"` --
+    both must be accepted or a real opponent using the other spelling shifts
+    every later step by one and fails the audit for a declaration that was
+    never tampered with.
     """
     payload = record.get("payload") if isinstance(record, dict) else None
-    return isinstance(payload, dict) and payload.get("record_type") == RECORD_TYPE
+    if not isinstance(payload, dict) or payload.get("step") != STEP_ZERO:
+        return False
+    return payload.get("record_type") == RECORD_TYPE or payload.get("type") == "system_spec"
 
 
 def turn_records(records: list) -> list:

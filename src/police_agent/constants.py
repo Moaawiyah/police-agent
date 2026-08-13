@@ -25,7 +25,7 @@ class MoveType(StrEnum):
 
     MOVE = "MOVE"  # step one cell orthogonally
     BARRIER = "BARRIER"  # police only: forgo the step and wall a cell instead
-    HOLD = "HOLD"  # stay put
+    HOLD = "STAY"  # stay put; wire value matches the book reference ("STAY", bare)
 
 
 class Direction(StrEnum):
