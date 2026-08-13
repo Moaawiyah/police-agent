@@ -16,7 +16,18 @@ def play_series(agent) -> list[dict]:
     match is finished" (see `gui/player.py::_drain`), and only the series as
     a whole is that. A real `game_over` is raised once more, here, after the
     last sub-game actually ends.
+
+    When `team_sync.enabled` is set, this delegates to the team_sync
+    scheduler instead: only Police's own sub-games are played here, the
+    sibling Thief process's are imported over the local coordination link.
+    Imported lazily so the two modules can import each other's small,
+    reused helpers (`series_listener` below) without a circular import at
+    module load time -- this branch is the only place that matters.
     """
+    if agent.config.get("team_sync.enabled"):
+        from police_agent.team_sync.scheduler import run_team_series
+
+        return run_team_series(agent)
     summaries = run_series(
         agent.config,
         agent.connect(),

@@ -99,8 +99,8 @@ class PoliceRuntime:
             # whole series.
             self.watchdog.stop()
         result, winner = self._result
-        result, winner, audit = exchange_and_audit(self, result, winner)
-        summary = build_summary(self, result, winner, audit)
+        result, winner, audit, opponent_records = exchange_and_audit(self, result, winner)
+        summary = build_summary(self, result, winner, audit, opponent_records)
         self.notify({"type": "game_over", "summary": summary})
         return summary
 

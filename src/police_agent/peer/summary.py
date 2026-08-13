@@ -20,6 +20,7 @@ from police_agent.peer.handshake import identity_from_config
 from police_agent.peer.protocol import AuditPayload
 from police_agent.peer.sealing import now_iso
 from police_agent.peer.step_zero import step_zero_of
+from police_agent.peer.summary_tokens import tokens_of
 
 SKIPPED_AUDIT = {
     "passed": False,
@@ -37,21 +38,30 @@ SKIPPED_AUDIT = {
 NO_AUDIT_RESULTS = (TECHNICAL_LOSS, ABORTED)
 
 
-def exchange_and_audit(runtime, result: str, winner: str | None) -> tuple[str, str | None, dict]:
-    """Trade sealed logs with the opponent and re-verify theirs."""
+def exchange_and_audit(
+    runtime, result: str, winner: str | None
+) -> tuple[str, str | None, dict, list]:
+    """Trade sealed logs with the opponent and re-verify theirs.
+
+    The 4th element is the opponent's own revealed records, exactly as it sent
+    them -- kept (not just checked and discarded) so `build_summary` can file
+    them alongside ours. A team_sync import of the *other* role's settled
+    result depends on this surviving into the report: see `opponent_records`
+    below.
+    """
     if result in NO_AUDIT_RESULTS:
-        return result, winner, SKIPPED_AUDIT
+        return result, winner, SKIPPED_AUDIT, []
 
     mine = AuditPayload(sender="police", records=runtime.records, result_claim=result)
     theirs = runtime.transport.exchange_audit(mine.to_dict())
     if theirs is None:
         audit = {**SKIPPED_AUDIT, "semantic_failures": ["opponent did not reveal its audit"]}
-        return TECHNICAL_LOSS, "police", audit
+        return TECHNICAL_LOSS, "police", audit, []
     try:
         revealed = AuditPayload.from_dict(theirs)
     except (ProtocolError, TypeError, ValueError, KeyError):
         audit = {**SKIPPED_AUDIT, "skipped": False, "semantic_failures": ["malformed audit reveal"]}
-        return TAMPER_FORFEIT, "police", audit
+        return TAMPER_FORFEIT, "police", audit, []
     audit = audit_records(revealed.records)
     audit.update(
         audit_semantics(
@@ -67,18 +77,20 @@ def exchange_and_audit(runtime, result: str, winner: str | None) -> tuple[str, s
         )
     )
     if not audit["passed"] or not audit["semantic_passed"]:
-        return TAMPER_FORFEIT, "police", audit
+        return TAMPER_FORFEIT, "police", audit, revealed.records
     terminal = audit.get("terminal")
     if (
         terminal
         and terminal["result"] == CAPTURE
         and terminal["reason"] in {"barrier", "confinement"}
     ):
-        return CAPTURE, "police", audit
-    return result, winner, audit
+        return CAPTURE, "police", audit, revealed.records
+    return result, winner, audit, revealed.records
 
 
-def build_summary(runtime, result: str, winner: str | None, audit: dict) -> dict:
+def build_summary(
+    runtime, result: str, winner: str | None, audit: dict, opponent_records: list | None = None
+) -> dict:
     """The match record: the result, the evidence for it, and the logs behind it.
 
     Both peers' logs are included so the replay and the report can be rebuilt
@@ -110,7 +122,7 @@ def build_summary(runtime, result: str, winner: str | None, audit: dict) -> dict
         # How far the thief's words survived contact with its own scent trail.
         # Below 0.5 is a peer that talked its way into being disbelieved.
         "opponent_reliability": round(runtime.analyst.reliability, 3),
-        "tokens": _tokens(runtime, audit),
+        "tokens": tokens_of(runtime, audit),
         # Evidence that the rate limiter was in the path, not merely present:
         # the counters say how many outbound calls it admitted, queued, retried
         # and refused, and `inbound_dos` reports how hard the opponent pushed.
@@ -119,31 +131,15 @@ def build_summary(runtime, result: str, winner: str | None, audit: dict) -> dict
         "hint_readings": runtime.handler.readings,
         "disputes": runtime.disputes,
         "records": runtime.records,
+        # The opponent's own sealed records, revealed and tamper-checked at the
+        # audit above -- preserved post-audit rather than discarded, since a
+        # team_sync import of the sibling role's settled result needs both
+        # sides' logs to file a report exactly like a normal sub-game does.
+        "opponent_records": opponent_records or [],
         "history": runtime.handler.history,
         "my_log": runtime.state.log,
         # Per-step scent grid + Bayesian posterior (police-only): what the
         # belief filter saw and concluded at each update, for analysis and for
         # a faithful (rather than merely re-derived) replay.
         "belief_log": runtime.belief_log,
-    }
-
-
-def _tokens(runtime, audit: dict) -> dict:
-    """What this sub-game consumed, against the series budget (Appendix He 54).
-
-    The series total is deliberately absent rather than guessed: a sub-game runs
-    in its own process and cannot see its siblings' spend. It is the sum of
-    `tokens_total` across the series' summaries, which is a figure the report can
-    add up from files it has -- unlike one this peer would have to invent.
-
-    `peer_tokens_total` is the opponent's own figure: `audit_records()` sums it
-    from the peer's revealed, tamper-checked payloads, so it is 0 whenever the
-    peer's schema omits `tokens` or the audit did not pass -- an unverified
-    reveal proves nothing about spend.
-    """
-    trusted = audit.get("passed")
-    return {
-        **runtime.tokens.snapshot(),
-        "budget_per_series": runtime.config.get("game.token_budget_per_series"),
-        "peer_tokens_total": int(audit.get("peer_tokens_total") or 0) if trusted else 0,
     }

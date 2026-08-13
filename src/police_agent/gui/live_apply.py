@@ -11,6 +11,7 @@ runtime a safe change rather than a crash in a thread nobody is watching.
 """
 
 from police_agent.gui.game_mode import NO_MODEL
+from police_agent.gui.live_apply_team_sync import apply_team_sync_event
 
 BANNER_ERROR = "ERROR - see status"
 
@@ -36,6 +37,8 @@ def apply_event(window, event: dict) -> None:
         _apply_sub_game_over(window, event)
     elif kind == "game_over":
         _apply_game_over(window, event)
+    elif kind == "team_sync":
+        apply_team_sync_event(window, event)
 
 
 def _apply_negotiated(window, event: dict) -> None:

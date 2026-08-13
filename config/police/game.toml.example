@@ -101,3 +101,25 @@ credentials_file = "credentials.json"  # downloaded per Appendix Alef; gitignore
 token_file = "token.json"              # written by the one-time consent flow; gitignored
 daily_limit = 20                       # ch. 9.3.1's first gate, ahead of the token bucket
 quota_file = "logs/.mail_quota.json"   # where that daily count is remembered across runs
+
+# [team_sync] -- local coordination with the SEPARATE thief_agent process on this
+# SAME machine (ch. 2.4.2: two independent processes, no shared memory -- this is
+# still just a second FastMCP link, bound to 127.0.0.1 only, never the ngrok
+# tunnel). Lets one press of THIS agent's GUI "Start" button alternate through
+# every agreed sub-game automatically: Police plays the odd sub-games itself and
+# imports the even ones from the sibling thief_agent, then -- and only this
+# agent -- emails the lecturer once every sub-game is settled. Off by default so
+# a normal single-process match (today's behaviour) is unaffected.
+# [team_sync]
+# enabled      = false
+# host         = "127.0.0.1"           # never a public interface
+# port         = 8811                  # THIS agent's own coordinator port
+# sibling_url  = "http://127.0.0.1:8812/mcp"  # the sibling thief_agent's coordinator
+# role         = "police"              # fixed: this repo is Police-only (CLAUDE.md)
+# series_owner = true                  # this agent mints the series id and starts it
+# report_owner = true                  # only this agent ever emails the lecturer
+#
+# The shared HMAC-SHA256 secret is NOT set here and must never be: export the
+# SAME value in TEAM_SYNC_SECRET on both sibling processes' environments before
+# a real run. Unset on both sides, coordination still works (auth disabled) --
+# fine for local dev, not for a graded match.
