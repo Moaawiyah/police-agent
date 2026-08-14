@@ -16,17 +16,15 @@ without quite reaching it -- the long historical tail the chapter wants, still
 legible twenty turns on. The course reference subtracts a flat 0.10 instead and
 erases a trail in nine; it departs from the book in three places and this module
 follows the book on all three (docs/TODO.md).
+
+The merge/decay/wire-format side (`absorb`, `decay_all`, `snapshot`, key
+parsing) lives in `scent_ops.py`, split out to keep this file -- laying and
+reading a trail -- under the project's line budget.
 """
 
 from police_agent.constants import Cell
+from police_agent.domain import scent_ops as ops
 from police_agent.domain.scent_kernel import emission_kernel
-
-# Intensities cross the wire rounded to three decimals so both peers hold them
-# identically. That rounding has a floor: multiply anything at or under 0.005 by
-# 0.9 and it rounds back to itself, staining the board forever. Dropping below a
-# hundredth clears the sticky region and still outlasts the agreed 35-move
-# ceiling -- a full-strength trail only gets there after some forty turns.
-_TRACE_FLOOR = 0.01
 
 
 class ScentField:
@@ -95,32 +93,12 @@ class ScentField:
             self._values[cell] = max(self._values.get(cell, 0.0), value)
 
     def absorb(self, cells: dict | None) -> None:
-        """Merge a received `{"r,c": intensity}` grid into this field, max wins.
-
-        Malformed entries are skipped, not raised on: the grid comes from
-        another team's implementation, and forfeiting a match over one
-        unparseable key would throw away a game still perfectly playable.
-        Values are clamped to `[0, 1]` too -- a stray negative or oversized number
-        should not be able to poison this peer's own view."""
-        for key, value in (cells or {}).items():
-            cell = self._parse(key)
-            if cell is not None and isinstance(value, int | float):
-                intensity = min(1.0, max(0.0, float(value)))
-                self._values[cell] = max(self._values.get(cell, 0.0), intensity)
+        """Merge a received `{"r,c": intensity}` grid into this field, max wins."""
+        ops.absorb(self, cells)
 
     def decay_all(self) -> None:
-        """One full turn of fading: every trail keeps `1 - rho` of its strength.
-
-        A cell loses a tenth of what it has, so it thins fast while strong and
-        lingers once faint -- the historical shoulder the chapter asks for. Worn
-        past the trace floor it is dropped rather than left as a stain.
-        """
-        for cell in list(self._values):
-            faded = round(self._values[cell] * (1.0 - self._decay), 3)
-            if faded >= _TRACE_FLOOR:
-                self._values[cell] = faded
-            else:
-                del self._values[cell]
+        """One full turn of fading; see `scent_ops.py` for the update law."""
+        ops.decay_all(self)
 
     def intensity_at(self, cell: Cell) -> float:
         """This cell's current trail strength, or 0.0 if it has none."""
@@ -128,7 +106,7 @@ class ScentField:
 
     def snapshot(self) -> dict[str, float]:
         """The wire form: `{"r,c": intensity}` for every cell that still smells."""
-        return {f"{row},{col}": value for (row, col), value in self._values.items() if value > 0.0}
+        return ops.snapshot(self)
 
     def _radial(self, center: Cell, intensity: float) -> dict[Cell, float]:
         """One emission landed on the board: the kernel translated and clipped."""
@@ -143,10 +121,4 @@ class ScentField:
         return 0 <= cell[0] < self._board_size and 0 <= cell[1] < self._board_size
 
     def _parse(self, key: str) -> Cell | None:
-        """Turn a `"row,col"` wire key into an on-board cell, or None."""
-        try:
-            row_text, col_text = str(key).split(",")
-            cell = (int(row_text), int(col_text))
-        except ValueError:
-            return None
-        return cell if self._in_bounds(cell) else None
+        return ops.parse(self, key)

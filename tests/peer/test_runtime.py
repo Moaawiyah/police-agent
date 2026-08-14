@@ -1,20 +1,15 @@
-"""The turn loop end to end, driven by a scripted thief."""
+"""The turn loop end to end, driven by a scripted thief.
 
-import pytest
+Tamper/forfeit detection and record sealing live in `test_runtime_audit.py`;
+progress events, config validation and the belief log in
+`test_runtime_belief.py` -- split out to keep each file under the project's
+line budget, sharing `runtime_helpers.py`'s `run_against`.
+"""
 
-from police_agent.domain.rules import SURVIVAL, TAMPER_FORFEIT, TECHNICAL_LOSS
-from police_agent.peer.protocol import AuditPayload, TurnMessage
-from police_agent.peer.runtime import PoliceRuntime
-from police_agent.peer.step_zero import turn_records
-from tests.conftest import config_with
-from tests.peer.fake_transport import FakeTransport, thief_turn, thief_turns
-
-
-def run_against(incoming, audit=None, **overrides):
-    """Play one sub-game against a scripted thief and return (summary, transport)."""
-    transport = FakeTransport(incoming=incoming, audit=audit)
-    summary = PoliceRuntime(config_with(**overrides), transport).run()
-    return summary, transport
+from police_agent.domain.rules import SURVIVAL, TECHNICAL_LOSS
+from police_agent.peer.protocol import TurnMessage
+from tests.peer.fake_transport import thief_turn, thief_turns
+from tests.peer.runtime_helpers import run_against
 
 
 def test_the_police_waits_before_it_moves():
@@ -101,94 +96,3 @@ def test_a_timeout_without_a_reveal_becomes_a_technical_win():
     summary, _ = run_against(thief_turns(4), rules__max_steps=2, rules__survival_threshold=99)
 
     assert (summary["result"], summary["winner"]) == (TECHNICAL_LOSS, "police")
-
-
-def test_a_forged_opponent_log_forfeits_the_game():
-    """A capture the police won is overridden when the thief's reveal will not hash."""
-    forged = AuditPayload(
-        sender="thief",
-        records=[{"payload": {"step": 1}, "nonce": "n", "commit": "not-the-real-digest"}],
-        result_claim="capture",
-    ).to_dict()
-
-    summary, _ = run_against(
-        [thief_turn(1), thief_turn(2, claim_response={"caught": True})], audit=forged
-    )
-
-    assert (summary["result"], summary["winner"]) == (TAMPER_FORFEIT, "police")
-    assert summary["audit"]["passed"] is False
-
-
-def test_a_malformed_opponent_audit_forfeits_the_game():
-    summary, _ = run_against(
-        [thief_turn(1), thief_turn(2, claim_response={"caught": True})],
-        audit={"sender": "thief"},
-    )
-
-    assert (summary["result"], summary["winner"]) == (TAMPER_FORFEIT, "police")
-    assert summary["audit"]["semantic_failures"] == ["malformed audit reveal"]
-
-
-def test_the_police_seals_one_record_per_turn_it_played():
-    """Plus the step-zero declaration, which heads the log without being a turn."""
-    summary, transport = run_against([thief_turn(1), thief_turn(2)])
-
-    assert len(turn_records(summary["records"])) == len(transport.sent_turns) == 2
-    assert all(record["commit"] for record in summary["records"])
-
-
-def test_every_sealed_record_verifies_against_its_own_commit():
-    """The audit this peer would face: its own log must survive it."""
-    from police_agent.domain.crypto import audit_records
-
-    summary, _ = run_against(thief_turns(3))
-
-    assert audit_records(summary["records"])["passed"] is True
-
-
-def test_the_commit_on_the_wire_is_the_commit_of_the_record():
-    summary, transport = run_against([thief_turn(1)])
-
-    assert transport.sent_turns[0]["commit"] == turn_records(summary["records"])[0]["commit"]
-
-
-def test_the_true_position_never_crosses_the_wire():
-    _, transport = run_against(thief_turns(3))
-
-    for message in transport.sent_turns:
-        assert "position" not in message
-        assert "nonce" not in message
-
-
-def test_progress_events_reach_a_listener():
-    events = []
-    transport = FakeTransport(incoming=[thief_turn(1)])
-    PoliceRuntime(config_with(), transport, listener=events.append).run()
-
-    assert [event["type"] for event in events][:2] == ["negotiated", "incoming"]
-    assert events[-1]["type"] == "game_over"
-
-
-def test_a_missing_agreed_term_is_refused_before_any_play():
-    from police_agent.exceptions import ConfigError
-
-    with pytest.raises(ConfigError, match="board_size"):
-        PoliceRuntime(config_with(board__size=None), FakeTransport())
-
-
-def test_the_belief_log_records_one_bayes_update_per_incoming_turn():
-    """Scent grid plus the posterior it produced, one entry per thief turn --
-    not per step of the game, since a replayed/duplicate turn folds nothing in."""
-    summary, _ = run_against([thief_turn(1, smell_grid={"3,3": 0.9}), thief_turn(2)])
-
-    assert [entry["step"] for entry in summary["belief_log"]] == [1, 2]
-    assert summary["belief_log"][0]["smell_grid"] == {"3,3": 0.9}
-    matrix = summary["belief_log"][0]["belief"]
-    assert len(matrix) == len(matrix[0]) == config_with().require("board.size")
-    assert abs(sum(sum(row) for row in matrix) - 1.0) < 1e-9  # still a distribution
-
-
-def test_a_replayed_turn_does_not_add_a_second_belief_log_entry():
-    summary, _ = run_against([thief_turn(1), thief_turn(1)])  # same step twice
-
-    assert len(summary["belief_log"]) == 1

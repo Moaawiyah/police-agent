@@ -40,9 +40,11 @@ def record_wiring(monkeypatch) -> tuple[list, list]:
         dialled.append((url, inboxes, FakeTransport(), timeouts))
         return dialled[-1][2]
 
-    monkeypatch.setattr("police_agent.sdk.agent.start_peer_server", start)
-    monkeypatch.setattr("police_agent.sdk.agent.McpTransport", transport)
+    monkeypatch.setattr("police_agent.sdk.agent_connection.start_peer_server", start)
+    monkeypatch.setattr("police_agent.sdk.agent_connection.McpTransport", transport)
     # Tunnelling is opt-in, so every test using this helper also proves that a
     # default run starts no child process and publishes nothing to the internet.
-    monkeypatch.setattr("police_agent.sdk.agent.open_tunnel", _forbidden("started ngrok"))
+    monkeypatch.setattr(
+        "police_agent.sdk.agent_connection.open_tunnel", _forbidden("started ngrok")
+    )
     return opened, dialled

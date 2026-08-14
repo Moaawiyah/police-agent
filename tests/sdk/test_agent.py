@@ -57,7 +57,7 @@ def test_the_config_is_loaded_from_the_options_directory_when_none_is_given():
 def test_an_injected_transport_is_never_replaced_by_a_socket(monkeypatch):
     """The seam that keeps the whole loop testable: if `connect` could reach past
     an injected double, every SDK test would need a live port."""
-    monkeypatch.setattr("police_agent.sdk.agent.start_peer_server", _forbidden("started a server"))
+    monkeypatch.setattr("police_agent.sdk.agent_connection.start_peer_server", _forbidden("started a server"))
     double = FakeTransport()
 
     agent = agent_with(transport=double)
@@ -120,7 +120,7 @@ def test_the_tunnel_publishes_my_port_on_my_reserved_domain(monkeypatch):
         asked.append((port, domain))
         return NgrokTunnel(f"https://{domain}")
 
-    monkeypatch.setattr("police_agent.sdk.agent.open_tunnel", open_tunnel)
+    monkeypatch.setattr("police_agent.sdk.agent_connection.open_tunnel", open_tunnel)
     options = MatchOptions(tunnel=True)
     agent = agent_with(transport=None, options=options, network__tunnel_domain="cops.ngrok.app")
 

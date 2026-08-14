@@ -59,7 +59,7 @@ def test_league_mode_rejects_a_private_turn_timeout():
 def test_league_mode_uses_the_reserved_https_tunnel_and_watchdog(monkeypatch):
     opened, _ = record_wiring(monkeypatch)
     monkeypatch.setattr(
-        "police_agent.sdk.agent.open_tunnel",
+        "police_agent.sdk.agent_connection.open_tunnel",
         lambda port, domain: NgrokTunnel(f"https://{domain}"),
     )
     agent = agent_with(
@@ -80,7 +80,7 @@ def test_league_mode_uses_the_reserved_https_tunnel_and_watchdog(monkeypatch):
 def test_league_mode_rejects_an_unreserved_tunnel_endpoint(monkeypatch):
     record_wiring(monkeypatch)
     monkeypatch.setattr(
-        "police_agent.sdk.agent.open_tunnel",
+        "police_agent.sdk.agent_connection.open_tunnel",
         lambda port, domain: NgrokTunnel("https://other.ngrok.app"),
     )
     agent = agent_with(
