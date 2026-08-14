@@ -12,6 +12,7 @@ import hashlib
 from police_agent.domain.crypto import canonical_json
 from police_agent.exceptions import CryptoError, ProtocolError
 from police_agent.team_sync.messages import SUBGAME_RESULT
+from police_agent.team_sync.state import role_for_subgame
 
 # Keys the hash excludes (must match the sibling Thief repo's independently
 # implemented `export_adapter.py` byte for byte). `message_id` is excluded
@@ -64,3 +65,17 @@ def validate_settled_result(payload: dict) -> None:
     recomputed = compute_result_hash(payload)
     if payload.get("result_hash") != recomputed:
         raise CryptoError("SettledSubgameResult.result_hash does not match its own content")
+    if payload.get("sender_role") != "thief" or payload.get("status") != "settled":
+        raise ProtocolError("only settled Thief results may enter Police's series ledger")
+    if "start_role" in payload:
+        number = payload.get("sub_game_number")
+        if not isinstance(number, int) or isinstance(number, bool):
+            raise ProtocolError("settled result sub_game_number must be an integer")
+        if payload.get("start_role") not in ("police", "thief"):
+            raise ProtocolError("settled result start_role is invalid")
+        if payload.get("completed_subgame") != number:
+            raise ProtocolError("settled result completed_subgame does not match sub_game_number")
+        if payload.get("next_subgame") != number + 1:
+            raise ProtocolError("settled result next_subgame is not the following sub-game")
+        if payload.get("next_role") != role_for_subgame(number + 1, payload["start_role"]):
+            raise ProtocolError("settled result next_role does not match the series schedule")

@@ -56,6 +56,15 @@ class TeamSyncStore:
         if path.exists():
             path.unlink()
 
+    def reset_series(self) -> None:
+        """Clear only the active attempt bookkeeping; never delete artifacts."""
+        for path in (
+            self._directory / STATE_FILE,
+            self._directory / SEEN_FILE,
+            self._directory / EMAIL_FILE,
+        ):
+            path.unlink(missing_ok=True)
+
     def seen(self, key: str) -> bool:
         """Whether `key` (an idempotency key) has already been recorded."""
         return key in _read_json(self._directory / SEEN_FILE, [])

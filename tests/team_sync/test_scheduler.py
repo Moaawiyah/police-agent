@@ -42,7 +42,7 @@ def test_the_series_start_and_handoff_are_sent_to_the_sibling(tmp_path, monkeypa
 
     kinds = [call[0] for call in FakeSiblingClient.instances[-1].calls]
     assert kinds == ["series_start", "handoff"]
-    assert FakeSiblingClient.instances[-1].calls[0][-1] == 2  # first sibling subgame
+    assert FakeSiblingClient.instances[-1].calls[0][-1] == 1  # sibling also joins G1
 
 
 def test_a_message_for_the_wrong_series_id_is_rejected(tmp_path, monkeypatch):

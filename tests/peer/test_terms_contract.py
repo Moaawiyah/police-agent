@@ -61,7 +61,7 @@ def test_the_shipped_config_produces_the_values_the_opponent_expects(config):
         "axis_start_index": 0,
         "thief_start": [3, 3],
         "cop_start": [0, 0],
-        "num_games": 2,
+        "num_games": 6,
     }
 
 

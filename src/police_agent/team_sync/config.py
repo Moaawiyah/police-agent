@@ -16,6 +16,7 @@ DEFAULTS = {
     "port": DEFAULT_PORT,
     "sibling_url": "http://127.0.0.1:8812/mcp",
     "role": "police",
+    "start_role": "police",
     "series_owner": True,
     "report_owner": True,
 }
