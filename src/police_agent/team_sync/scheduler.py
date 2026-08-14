@@ -1,8 +1,13 @@
 """team_sync's orchestration loop for two fixed-role peer processes.
 
-Both processes participate in every MCP sub-game.  `role_for_subgame` only
-decides which process owns the READY/handoff and settled-result ledger for
-that sub-game; it never removes the other role from the live game flow.
+`role_for_subgame` decides which of the two sibling processes owns each
+sub-game: the owner plays it against the opponent and files the settled
+result, and the other process waits for that result over the team_sync link.
+
+Only the owner plays. The peer-facing wire is role-split (the opponent's own
+`docs/LEAGUE-OPS.md` §4), so a Police runtime opened for a sub-game Thief
+owns would meet the opponent's Police in that window and collide on role --
+the handshake refusal that ends a series at its second sub-game.
 
 `wait_for_thief_result` stays called directly here rather than in
 `scheduler_helpers.py` (everything else this loop does besides play/settle a
@@ -70,9 +75,9 @@ def run_team_series(agent, base: str = "logs") -> list[dict]:
         helpers.notify_status(agent, "PLAYING" if police_turn else "WAITING", n)
         store.save_status(status)
 
-        # The fixed Police runtime must be present for every sub-game, even
-        # when Thief owns the series handoff/result for this number.
-        local_summary = agent.build_runtime(n, controls=controls).run()
+        # A sub-game Thief owns is played by the sibling process against the
+        # opponent's Police service; this one stays off that wire entirely.
+        local_summary = agent.build_runtime(n, controls=controls).run() if police_turn else None
         status = status.advance(SeriesSyncState.AUDITING, n)
         helpers.notify_status(agent, "AUDITING", n)
 
