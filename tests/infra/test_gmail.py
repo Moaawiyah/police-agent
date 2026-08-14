@@ -54,8 +54,7 @@ class TestTheFormRuleThirtyFourFixes:
         assert attached.get_filename() == report.name
 
     def test_a_default_body_still_points_at_the_attachment(self, report):
-        """`build_message` is the low-level primitive: given no summary, it
-        falls back to a one-line pointer rather than an empty body."""
+        """No summary given: falls back to a one-line pointer, not an empty body."""
         body = build_message("them@example.test", "subject", report).get_body().get_content()
 
         assert "attached" in body.lower()
@@ -101,11 +100,8 @@ class TestOffAndInertByDefault:
         assert draft_path(report) == report.with_name(f"draft_{report.stem}.eml")
 
     def test_it_builds_its_own_gate_when_the_caller_supplies_none(self, report, tmp_path):
-        """Rule 28 wants the gate in the path whether or not anyone passed one.
-
-        Its own `Gatekeeper` rather than the runtime's: figure 13's gates protect
-        a provider's allowance, and Ollama's rate window is not Google's.
-        """
+        """Rule 28: its own `Gatekeeper` rather than the runtime's -- figure 13's
+        gates protect a provider's allowance, and Ollama's rate window is not Google's."""
         reporter = gmail_reporter(_enabled(email__quota_file=str(tmp_path / "quota.json")))
 
         assert reporter(report)  # the draft path calls nobody, and still built one
@@ -131,7 +127,10 @@ class TestReadingTheEmailBlock:
 
 
 def _enabled(**overrides):
-    return config_with(**{"email__enabled": True, **overrides})
+    # Non-lecturer default: an uncounted send now refuses that address (WARNINGS §3).
+    overrides.setdefault("email__recipient", "them@example.test")
+    overrides.setdefault("email__enabled", True)
+    return config_with(**overrides)
 
 
 def _forbidden_gate():

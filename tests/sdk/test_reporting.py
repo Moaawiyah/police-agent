@@ -12,9 +12,11 @@ project's line budget.
 """
 
 import json
+from email import message_from_bytes
 
-from police_agent.infra.gmail import draft_path
+from police_agent.infra.gmail import DEFAULTS, draft_path
 from police_agent.sdk import DEFAULT_REPORT_DIR, PoliceAgentSDK
+from police_agent.sdk.options import MatchOptions
 from tests.conftest import config_with
 from tests.peer.fake_transport import FakeTransport, thief_turn
 
@@ -72,7 +74,11 @@ class TestTheSdkMailsTheReport:
 
     def test_the_result_is_the_artifact_that_gets_sent(self, tmp_path):
         """Picked here so no caller can mail the wrong one of the four."""
-        agent = _agent(email__enabled=True, email__quota_file=str(tmp_path / "quota.json"))
+        agent = _agent(
+            email__enabled=True,
+            email__recipient="them@example.test",
+            email__quota_file=str(tmp_path / "quota.json"),
+        )
         paths = agent.write_artifacts(agent.play(), tmp_path)
 
         note = agent.email_report(paths)
@@ -83,8 +89,27 @@ class TestTheSdkMailsTheReport:
     def test_nothing_is_mailed_when_no_report_was_written(self):
         assert _agent().email_report({}) is None
 
+    def test_the_count_flag_reaches_the_mail_call(self, tmp_path):
+        """`--count` -> `MatchOptions.counted` -> `agent.email_report`, with no
+        wiring left for a caller to forget between the CLI and the send."""
+        agent = _agent(
+            email__enabled=True,
+            email__recipient="us@example.test",
+            email__quota_file=str(tmp_path / "quota.json"),
+            options=MatchOptions(counted=True),
+        )
+        paths = agent.write_artifacts(agent.play(), tmp_path)
 
-def _agent(**overrides) -> PoliceAgentSDK:
+        agent.email_report(paths)
+
+        drafted = message_from_bytes(draft_path(paths["result"]).read_bytes())
+        assert drafted["To"] == DEFAULTS["recipient"]
+        assert drafted["Cc"] == "us@example.test"
+
+
+def _agent(options: MatchOptions | None = None, **overrides) -> PoliceAgentSDK:
     return PoliceAgentSDK(
-        config=config_with(**overrides), transport=FakeTransport(incoming=[thief_turn(1)])
+        options=options,
+        config=config_with(**overrides),
+        transport=FakeTransport(incoming=[thief_turn(1)]),
     )

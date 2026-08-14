@@ -14,6 +14,10 @@ peer play on a port its own config file does not name.
 mandatory for league play (Appendix He rule 10). The default here is the
 development case -- both peers on one machine, ch. 2.4.2 -- and a tunnel opened
 without being asked for would publish a practice match to the internet.
+
+`counted` defaults to off for the same reason: an uncounted run's report mails
+only `email.recipient` (normally the team itself), never the lecturer -- see
+`infra/gmail_counted.py`. Only `--count` arms the real, counted send.
 """
 
 from dataclasses import dataclass
@@ -33,3 +37,4 @@ class MatchOptions:
     opponent_url: str | None = None
     tunnel: bool = False
     league: bool = False
+    counted: bool = False

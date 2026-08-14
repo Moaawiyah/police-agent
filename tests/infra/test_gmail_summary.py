@@ -13,7 +13,10 @@ from tests.conftest import config_with
 
 
 def _enabled(**overrides):
-    return config_with(**{"email__enabled": True, **overrides})
+    # Non-lecturer default: an uncounted send now refuses that address (WARNINGS §3).
+    overrides.setdefault("email__recipient", "them@example.test")
+    overrides.setdefault("email__enabled", True)
+    return config_with(**overrides)
 
 
 def _forbidden_gate():
@@ -80,7 +83,7 @@ def test_the_body_carries_this_group_s_own_repository(tmp_path):
 
 def test_a_missing_group_id_degrades_to_the_same_placeholder_email_summary_uses(tmp_path):
     report = _rich_report(tmp_path)
-    config = config_with(email__enabled=True)  # no game.group_id override
+    config = _enabled()  # no game.group_id override
 
     gmail_reporter(config, gate=_forbidden_gate())(report)
 

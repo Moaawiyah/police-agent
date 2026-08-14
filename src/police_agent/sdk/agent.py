@@ -83,5 +83,6 @@ class PoliceAgentSDK(_ConnectionMixin):
         return write_artifacts(summary, base, self.config)
 
     def email_report(self, paths: dict) -> str | None:
-        """Mail (or draft) the report at `paths`, per this peer's `[email]` config."""
-        return email_report(paths, self.config)
+        """Mail (or draft) the report at `paths`, per this peer's `[email]`
+        config and the `--count` flag (`self.options.counted`)."""
+        return email_report(paths, self.config, counted=self.options.counted)

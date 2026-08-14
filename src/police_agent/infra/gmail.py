@@ -34,6 +34,7 @@ from pathlib import Path
 
 from police_agent.exceptions import ConfigError
 from police_agent.infra.gmail_client import SCOPE, send_raw
+from police_agent.infra.gmail_counted import recipients_for
 from police_agent.report.email_summary import build_body, build_subject
 from police_agent.shared.gatekeeper import Gatekeeper
 from police_agent.shared.quota import DailyQuota
@@ -53,10 +54,14 @@ DEFAULTS = {
 }
 
 
-def build_message(recipient: str, subject: str, attachment: Path, body: str = "") -> EmailMessage:
+def build_message(
+    recipient: str, subject: str, attachment: Path, body: str = "", cc: list[str] | None = None
+) -> EmailMessage:
     """The report as mail: a summary body, and the JSON itself as an attachment."""
     message = EmailMessage()
     message["To"] = recipient
+    if cc:
+        message["Cc"] = ", ".join(cc)
     message["Subject"] = subject
     message.set_content(body or "Attached is this peer's independently generated match report.")
     message.add_attachment(
@@ -91,13 +96,15 @@ def settings(config=None) -> dict:
     return {key: _or_default(read(f"email.{key}"), value) for key, value in DEFAULTS.items()}
 
 
-def gmail_reporter(config=None, gate: Gatekeeper | None = None):
+def gmail_reporter(config=None, gate: Gatekeeper | None = None, counted: bool = False):
     """A bound `report(path) -> str | None`, which is the shape the SDK holds.
 
     `None` means reporting is switched off, which is the shipped state and not an
     error: a practice match should not mail the lecturer. Anything else is a
     sentence saying what happened, because the one failure mode rule 35 punishes
     is a report nobody noticed was never sent.
+
+    `counted` is the `--count` CLI flag: see `gmail_counted.recipients_for`.
     """
     options = settings(config)
     gate = gate or _mail_gate(options)
@@ -108,6 +115,7 @@ def gmail_reporter(config=None, gate: Gatekeeper | None = None):
             return None
         # `config` is never None here: `enabled` only turns True through a real
         # config, since `settings(None)` always resolves it to the DEFAULTS false.
+        to, cc = recipients_for(options["recipient"], DEFAULTS["recipient"], counted)
         result_json = json.loads(Path(attachment).read_text(encoding="utf-8"))
         own = {
             "group_id": config.get("game.group_id", "unknown-group"),
@@ -115,7 +123,7 @@ def gmail_reporter(config=None, gate: Gatekeeper | None = None):
         }
         subject = build_subject(result_json, own)
         body = build_body(result_json, own)
-        message = build_message(options["recipient"], subject, Path(attachment), body)
+        message = build_message(to, subject, Path(attachment), body, cc=cc)
         if options["mode"] == DRAFT:
             return f"draft written to {write_draft(message, draft_path(attachment))}"
         if options["mode"] != SEND:
@@ -123,7 +131,10 @@ def gmail_reporter(config=None, gate: Gatekeeper | None = None):
         identifier = gate.submit(
             lambda: send_raw(api_body(message), options["credentials_file"], options["token_file"])
         )
-        return f"sent to {options['recipient']} as message {identifier}"
+        note = f"sent to {to}"
+        if cc:
+            note += f", cc {', '.join(cc)}"
+        return f"{note} as message {identifier}"
 
     return report
 

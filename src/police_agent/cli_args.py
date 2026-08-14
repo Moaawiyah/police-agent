@@ -44,6 +44,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="enforce the public-tunnel league profile (requires --tunnel)",
     )
+    parser.add_argument(
+        "--count",
+        action="store_true",
+        help="counted run: mail the report to the lecturer (cc email.recipient) instead of "
+        "email.recipient only",
+    )
     return parser.parse_args(argv)
 
 
@@ -56,4 +62,5 @@ def options_from(args: argparse.Namespace) -> MatchOptions:
         opponent_url=args.opponent,
         tunnel=args.tunnel,
         league=args.league,
+        counted=args.count,
     )
