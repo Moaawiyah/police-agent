@@ -1,147 +1,110 @@
-"""team_sync's orchestration loop: play only Police's own sub-games, import
-the sibling Thief process's, alternating strictly by `role_for_subgame`.
+"""team_sync's orchestration loop for two fixed-role peer processes.
 
-Only entered when config `team_sync.enabled` is true (see `sdk/series.py`);
-the single-process `peer/series.py::run_series` path is untouched.
+Both processes participate in every MCP sub-game.  `role_for_subgame` only
+decides which process owns the READY/handoff and settled-result ledger for
+that sub-game; it never removes the other role from the live game flow.
+
+`wait_for_thief_result` stays called directly here rather than in
+`scheduler_helpers.py` (everything else this loop does besides play/settle a
+sub-game): the test suite monkeypatches it by name on this module.
 """
 
+import contextlib
+
 from police_agent.exceptions import TransportError
-from police_agent.peer.controls import GameControls
-from police_agent.peer.runtime import PoliceRuntime
 from police_agent.peer.series import series_count
-from police_agent.report.result import scoring_from
-from police_agent.report.result_parts import series_totals
 from police_agent.report.writer import report_dir
-from police_agent.sdk.series import series_listener
+from police_agent.sdk import GameControls
 from police_agent.team_sync import client as ts_client
 from police_agent.team_sync import config as ts_config
 from police_agent.team_sync import coordinator as ts_coordinator
 from police_agent.team_sync import import_adapter
-from police_agent.team_sync.messages import new_message_id
+from police_agent.team_sync import scheduler_helpers as helpers
 from police_agent.team_sync.resume import backfill_missing_summaries
 from police_agent.team_sync.scheduler_fail import fail
-from police_agent.team_sync.scheduler_wait import wait_for_thief_result
+from police_agent.team_sync.scheduler_wait import wait_for_handoff, wait_for_thief_result
 from police_agent.team_sync.security import secret_from_env
-from police_agent.team_sync.state import (
-    POLICE,
-    THIEF,
-    SeriesSyncState,
-    SeriesSyncStatus,
-    role_for_subgame,
-)
+from police_agent.team_sync.state import POLICE, SeriesSyncState, role_for_subgame
 from police_agent.team_sync.store import TeamSyncStore
+
+__all__ = ["run_team_series"]
 
 
 def run_team_series(agent, base: str = "logs") -> list[dict]:
-    """Play the agreed series, alternating Police's own sub-games with the
-    sibling Thief process's, and return every sub-game's summary in order."""
+    """Run all six live sub-games, importing Thief-owned settled results."""
     settings = ts_config.settings(agent.config)
+    start_role = helpers.start_role(agent.config, settings)
     secret = secret_from_env()
-    store = TeamSyncStore(report_dir(base, _group_id(agent.config)) / "team_sync")
-    status = _resume_or_start(store)
-    inboxes, _thread = ts_coordinator.start_coordinator(
-        settings["host"], settings["port"], secret, status.to_dict
-    )
+    store = TeamSyncStore(report_dir(base, helpers.group_id(agent.config)) / "team_sync")
+    fresh_start = agent._team_sync_fresh_start
+    if fresh_start:
+        store.reset_series()
+        agent._team_sync_fresh_start = False
+    status = helpers.resume_or_start(store, start_role)
+    coordinator = agent._team_sync_coordinator
+    if coordinator is None or coordinator[1] is None or not coordinator[1].is_alive():
+        coordinator = ts_coordinator.start_coordinator(
+            settings["host"], settings["port"], secret, status.to_dict
+        )
+        agent._team_sync_coordinator = coordinator
+    inboxes, _thread = coordinator
+    if fresh_start:
+        inboxes.clear()
     sibling = ts_client.TeamSyncClient(settings["sibling_url"], secret)
-    transport = agent.connect()
-    police_kwargs = {
-        "listener": series_listener(agent),
-        "controls": agent.controls or GameControls(),
-        "league": agent.options.league,
-    }
+    agent.connect()
+    controls = agent.controls or GameControls()
 
     total = series_count(agent.config)
     summaries: list[dict] = [{}] * total
     if status.sub_game_number > 1:
-        backfill_missing_summaries(agent, base, _group_id(agent.config), summaries)
-    if status.sub_game_number <= 1:
-        first_sibling_subgame = _first_role_subgame(total, THIEF)
-        if first_sibling_subgame:
-            try:
-                sibling.send_series_start(
-                    status.series_id, _group_id(agent.config), total, first_sibling_subgame
-                )
-            except TransportError as exc:
-                fail(agent, store, status, f"could not announce the series to Thief: {exc}")
+        backfill_missing_summaries(agent, base, helpers.group_id(agent.config), summaries)
+    status = helpers.announce_opening(agent, store, status, start_role, sibling, inboxes, total)
 
     for n in range(max(status.sub_game_number, 1), total + 1):
-        police_turn = role_for_subgame(n) == POLICE
-        status = status.advance(
-            SeriesSyncState.PLAYING if police_turn else SeriesSyncState.WAITING_FOR_SIBLING
-        )
+        police_turn = role_for_subgame(n, start_role) == POLICE
+        if status.state in (SeriesSyncState.WAITING, SeriesSyncState.WAITING_FOR_SIBLING,
+                            SeriesSyncState.SETTLED):
+            status = status.advance(SeriesSyncState.READY, n)
+        helpers.notify_status(agent, "READY" if police_turn else "WAITING", n)
+        status = status.advance(SeriesSyncState.PLAYING, n)
+        helpers.notify_status(agent, "PLAYING" if police_turn else "WAITING", n)
         store.save_status(status)
+
+        # The fixed Police runtime must be present for every sub-game, even
+        # when Thief owns the series handoff/result for this number.
+        local_summary = agent.build_runtime(n, controls=controls).run()
+        status = status.advance(SeriesSyncState.AUDITING, n)
+        helpers.notify_status(agent, "AUDITING", n)
+
         if police_turn:
-            runtime = PoliceRuntime(agent.config, transport, sub_game_number=n, **police_kwargs)
-            summary = runtime.run()
+            summary = local_summary
             paths = agent.write_artifacts(summary, base)
             import_adapter.maybe_email_final_report(agent, paths, summary, store)
-            try:
-                sibling.send_handoff(status.series_id, n, n + 1)
-            except TransportError as exc:
-                fail(agent, store, status, f"sub-game {n} settled, but handoff to Thief failed: {exc}")
         else:
-            _notify_status(agent, "waiting_for_sibling", n)
             try:
                 message = wait_for_thief_result(inboxes, status.series_id, n)
             except TransportError as exc:
                 fail(agent, store, status, str(exc))
-            # No separate ack round-trip: the sibling's `subgame_result` tool
-            # call already gets `{"ok": True}` back synchronously (Thief has
-            # no `ack` tool to receive one, and never waits for it either).
+            # Thief's complete settled payload is the ledger copy for its
+            # owned sub-game; local Police runtime state is never exchanged.
             summary = import_adapter.import_and_persist(message, agent, base, store)
-            _notify_status(agent, "subgame_settled", n)
+            if n < total and hasattr(inboxes, "handoff"):
+                handoff = wait_for_handoff(inboxes, status.series_id, n + 1)
+                if handoff.get("message_id") and hasattr(sibling, "send_ack"):
+                    sibling.send_ack(status.series_id, handoff["message_id"], n + 1)
+
+        status = status.advance(SeriesSyncState.SETTLED, n)
+        helpers.notify_status(agent, "SETTLED", n)
         summaries[n - 1] = summary
-        status = status.advance(SeriesSyncState.SETTLED)
-        target = SeriesSyncState.SERIES_COMPLETE if n == total else SeriesSyncState.READY
-        status = status.advance(target, sub_game_number=n + 1)
-        store.save_status(status)
+        status = helpers.advance_to_next(
+            agent, store, sibling, inboxes, status, start_role, n, total, police_turn
+        )
 
-    _notify_game_over(agent, summaries)
+    helpers.notify_status(agent, "SERIES_COMPLETE", total)
+    helpers.notify_game_over(agent, summaries)
+    if hasattr(sibling, "send_series_complete"):
+        # The final report is already persisted and email-gated locally; a
+        # notification failure must not create a second report.
+        with contextlib.suppress(TransportError):
+            sibling.send_series_complete(status.series_id)
     return summaries
-
-
-def _resume_or_start(store: TeamSyncStore) -> SeriesSyncStatus:
-    """The persisted position, normalized back to READY (a resumed status
-    cannot be trusted mid-flight) -- or a fresh series."""
-    persisted = store.load_status()
-    if persisted is None:
-        return SeriesSyncStatus(series_id=new_message_id()).advance(SeriesSyncState.READY)
-    return SeriesSyncStatus(
-        series_id=persisted.series_id,
-        sub_game_number=persisted.sub_game_number,
-        state=SeriesSyncState.READY,
-        updated_at=persisted.updated_at,
-    )
-
-
-def _notify_game_over(agent, summaries: list[dict]) -> None:
-    """The same final `game_over` event the single-process path emits."""
-    if agent.listener is None:
-        return
-    totals = series_totals(summaries, scoring_from(agent.config))
-    agent.listener(
-        {
-            "type": "game_over",
-            "summary": summaries[-1] if summaries else {},
-            "summaries": summaries,
-            "sub_game_number": len(summaries),
-            "totals": totals,
-        }
-    )
-
-
-def _group_id(config) -> str:
-    return str(config.get("game.group_id", "unknown-group"))
-
-
-def _first_role_subgame(total: int, role: str) -> int:
-    """The lowest sub-game number `role` owns, or 0 if it owns none at all
-    (only possible for a very short series -- normally this is 2)."""
-    return next((n for n in range(1, total + 1) if role_for_subgame(n) == role), 0)
-
-
-def _notify_status(agent, status: str, sub_game_number: int) -> None:
-    """A team_sync-kind event for statuses no `PoliceRuntime` event covers --
-    chiefly the even sub-games, which this process never plays itself."""
-    if agent.listener is not None:
-        agent.listener({"type": "team_sync", "status": status, "sub_game_number": sub_game_number})

@@ -30,7 +30,10 @@ def write_artifacts(summary: dict, base: str | Path, config) -> dict:
     return write_report_artifacts(summary, base, config)
 
 
-def email_report(paths: dict, config) -> str | None:
-    """Mail (or draft) the report at `paths`, per this peer's `[email]` config."""
+def email_report(paths: dict, config, counted: bool = False) -> str | None:
+    """Mail (or draft) the report at `paths`, per this peer's `[email]` config.
+
+    `counted` is the `--count` CLI flag: see `infra/gmail_counted.py`.
+    """
     report = paths.get("result")
-    return gmail_reporter(config)(report) if report else None
+    return gmail_reporter(config, counted=counted)(report) if report else None

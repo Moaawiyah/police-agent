@@ -27,6 +27,7 @@ STATUS_REQUEST = "status_request"
 STATUS_RESPONSE = "status_response"
 ACK = "ack"
 SUBGAME_RESULT = "subgame_result"
+SERIES_COMPLETE = "series_complete"
 
 
 def new_message_id() -> str:
@@ -56,6 +57,9 @@ class SeriesStart(_Envelope):
     num_sub_games: int
     sub_game_number: int
     sender_role: str
+    start_role: str = "police"
+    next_role: str = "thief"
+    status: str = "settled"
     message_id: str = field(default_factory=new_message_id)
     schema_version: int = SCHEMA_VERSION
     type: str = SERIES_START
@@ -77,6 +81,9 @@ class SubgameHandoff(_Envelope):
     next_subgame: int
     sub_game_number: int
     sender_role: str
+    start_role: str = "police"
+    next_role: str = "thief"
+    status: str = "settled"
     message_id: str = field(default_factory=new_message_id)
     schema_version: int = SCHEMA_VERSION
     type: str = HANDOFF

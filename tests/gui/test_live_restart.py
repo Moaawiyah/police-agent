@@ -27,6 +27,10 @@ class FakeVar:
 class FakeBar:
     def __init__(self, bidi: bool = False) -> None:
         self.bidi_var = FakeVar(bidi)
+        self.ready = False
+
+    def mark_ready(self) -> None:
+        self.ready = True
 
 
 class FakeApp:
@@ -62,7 +66,9 @@ class TestRestart:
         live_restart.restart(app)
 
         assert app._agent.restart_calls == 1
-        assert app.start_calls == 1
+        assert app.start_calls == 0
+        assert app._bar.ready
+        assert app._window.banner == (False, "READY - press Start")
 
 
 class TestToggleBidirectional:
@@ -88,11 +94,12 @@ class TestRebuildAndStart:
         assert app._controls is not old_controls
         assert app._agent.controls is app._controls
 
-    def test_calls_agent_restart_and_then_start(self):
+    def test_calls_agent_restart_and_waits_for_start_click(self):
         app = FakeApp()
         live_restart.rebuild_and_start(app)
         assert app._agent.restart_calls == 1
-        assert app.start_calls == 1
+        assert app.start_calls == 0
+        assert app._bar.ready
 
     def test_carries_a_checked_bidirectional_box_into_the_fresh_controls(self):
         """Without this, restarting would silently uncheck the box's real

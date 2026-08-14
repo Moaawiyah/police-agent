@@ -39,3 +39,63 @@ def _is_expected(message: object, series_id: str, sub_game_number: int) -> bool:
         and message.get("sender_role") == "thief"
         and message.get("sub_game_number") == sub_game_number
     )
+
+
+def wait_for_series_start(inboxes, start_role: str, expected_sub_game: int = 1,
+                          expected_role: str = "thief",
+                          sender_role: str = "thief") -> dict:
+    """Wait for the opening announcement for the expected sub-game."""
+    deadline = time.monotonic() + WAIT_FOR_SIBLING_SECONDS
+    inbox = getattr(inboxes, "series_start", None)
+    if inbox is None:
+        raise TransportError("team_sync coordinator has no series_start inbox")
+    while time.monotonic() < deadline:
+        try:
+            message = inbox.get(timeout=INBOX_POLL_SECONDS)
+        except queue.Empty:
+            continue
+        if (
+            isinstance(message, dict)
+            and message.get("sender_role") == sender_role
+            and message.get("start_role") == start_role
+            and message.get("sub_game_number") == expected_sub_game
+            and message.get("next_role") == expected_role
+        ):
+            return message
+        print(f"team_sync: rejected series_start: {message!r}", file=sys.stderr)
+    raise TransportError(f"No series_start within {WAIT_FOR_SIBLING_SECONDS}s")
+
+
+def wait_for_ack(inboxes, series_id: str, message_id: str, sub_game_number: int) -> None:
+    """Wait for the sibling to consume one unlock, rejecting stale ACKs."""
+    deadline = time.monotonic() + WAIT_FOR_SIBLING_SECONDS
+    while time.monotonic() < deadline:
+        try:
+            message = inboxes.acks.get(timeout=INBOX_POLL_SECONDS)
+        except queue.Empty:
+            continue
+        if (isinstance(message, dict) and message.get("series_id") == series_id
+                and message.get("sub_game_number") == sub_game_number
+                and message.get("ack_for_message_id", message.get("in_reply_to")) == message_id):
+            return
+        print(f"team_sync: rejected stale ACK: {message!r}", file=sys.stderr)
+    raise TransportError(f"No ACK for sub-game {sub_game_number} within {WAIT_FOR_SIBLING_SECONDS}s")
+
+
+def wait_for_handoff(inboxes, series_id: str, next_subgame: int) -> dict:
+    """Consume the Thief-owned handoff that unlocks Police's next game."""
+    deadline = time.monotonic() + WAIT_FOR_SIBLING_SECONDS
+    inbox = getattr(inboxes, "handoff", None)
+    if inbox is None:
+        raise TransportError("team_sync coordinator has no handoff inbox")
+    while time.monotonic() < deadline:
+        try:
+            message = inbox.get(timeout=INBOX_POLL_SECONDS)
+        except queue.Empty:
+            continue
+        if (isinstance(message, dict) and message.get("series_id") == series_id
+                and message.get("sender_role") == "thief"
+                and message.get("next_subgame", message.get("sub_game_number")) == next_subgame):
+            return message
+        print(f"team_sync: rejected out-of-order handoff: {message!r}", file=sys.stderr)
+    raise TransportError(f"No handoff for sub-game {next_subgame} within {WAIT_FOR_SIBLING_SECONDS}s")

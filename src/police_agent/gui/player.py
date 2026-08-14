@@ -13,10 +13,8 @@ import queue
 import threading
 import time
 
-from police_agent.exceptions import RestartRequested
-from police_agent.gui import live_restart
+from police_agent.gui import live_events, live_restart
 from police_agent.gui.game_mode import mode_and_model
-from police_agent.gui.live_apply import apply_event
 from police_agent.gui.live_controls import LiveControls
 from police_agent.gui.window import PeerWindow
 from police_agent.sdk import GameControls
@@ -74,7 +72,10 @@ class LivePeerApp:
         self._window.set_label("game", f"1 / {total}")
         self._window.set_turn(False, "STARTING - negotiating terms...")
         threading.Thread(target=self._worker, daemon=True, name="police-runtime").start()
-        self._window.root.after(CLOCK_INTERVAL_MS, self._tick_clock)
+        self._window.root.after(
+            CLOCK_INTERVAL_MS,
+            lambda: live_events.tick_clock(self, self._title, CLOCK_INTERVAL_MS),
+        )
 
     def pause(self) -> None:
         """Hold this peer. The thief's watchdog keeps running -- see peer/controls."""
@@ -106,50 +107,19 @@ class LivePeerApp:
         live_restart.toggle_bidirectional(self)
 
     def _worker(self) -> None:
-        try:
-            self._summaries = self._agent.play_series()
-        except RestartRequested:
-            # agent.play() has already unwound on this thread -- never two
-            # runtimes racing. Dispatched via `after`: Tk is not thread-safe.
-            self._window.root.after(0, lambda: live_restart.rebuild_and_start(self))
-        except Exception as exc:  # noqa: BLE001 - a dead thread would show nothing
-            # The window is the only place a background failure can surface. A
-            # traceback into a daemon thread's stderr is invisible to whoever is
-            # watching the board, and they are the one who has to react to it.
-            self._events.put({"type": "error", "message": f"{type(exc).__name__}: {exc}"})
+        live_events.worker(self)
 
     def _on_event(self, event: dict) -> None:
-        """Called on the game thread: hand the event over, then pace the match.
-
-        The sleep is here rather than in the drain loop because it must slow the
-        *game*, not the drawing -- a delay applied on the Tk side would let the
-        runtime race ahead and the board would jump.
-        """
-        self._events.put(event)
-        if event["type"] == "moved":
-            time.sleep(max(0.0, self._window.speed.get()))
-
-    def _drain(self) -> None:
-        while not self._events.empty():
-            event = self._events.get_nowait()
-            apply_event(self._window, event)
-            if event["type"] in ("game_over", "error"):
-                self._started_at = None  # the clock stops with the game
-                self._in_progress = False
-                self._bar.mark_finished()
-        self._window.root.after(DRAIN_INTERVAL_MS, self._drain)
-
-    def _tick_clock(self) -> None:
-        if self._started_at is not None:
-            elapsed = int(time.monotonic() - self._started_at)
-            self._window.root.title(f"{self._title} | {elapsed // 60:02d}:{elapsed % 60:02d}")
-        self._window.root.after(CLOCK_INTERVAL_MS, self._tick_clock)
+        """Called on the game thread; see `live_events.on_event` for the pipeline."""
+        live_events.on_event(self, event)
 
     def run(self) -> list[dict]:
         """Show the window and block until it closes; return every sub-game
         played, in order -- the whole series, not just the last one, so a
         caller can report it exactly the way the headless series path does."""
         self._window.set_turn(False, "READY - press Start")
-        self._window.root.after(DRAIN_INTERVAL_MS, self._drain)
+        self._window.root.after(
+            DRAIN_INTERVAL_MS, lambda: live_events.drain(self, DRAIN_INTERVAL_MS)
+        )
         self._window.root.mainloop()
         return self._summaries

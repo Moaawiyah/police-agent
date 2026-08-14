@@ -35,13 +35,25 @@ def toggle_bidirectional(app) -> None:
 
 
 def rebuild_and_start(app) -> None:
-    """A new handshake and a new runtime, never a re-armed one -- see
-    `sdk/agent.py::restart` for why `agent.play()` never reuses state."""
+    """Reset the whole attempt and wait for the next Start click.
+
+    A restart is a fresh six-subgame attempt, not an automatic continuation.
+    The worker/coordinator is only recreated when the user presses Start.
+    """
     app._in_progress = False
+    app._started_at = None
     app._agent.restart()
+    app._agent._team_sync_fresh_start = True
     app._controls = GameControls()
     if app._bar.bidi_var.get():
         app._controls.request_enable()
     app._agent.controls = app._controls
     app._summaries = []
-    app.start()
+    events = getattr(app, "_events", None)
+    if events is not None:
+        while not events.empty():
+            events.get_nowait()
+    if hasattr(app._bar, "mark_ready"):
+        app._bar.mark_ready()
+    app._window.set_turn(False, "READY - press Start")
+    app._window.set_label("status", "SERIES RESET - press Start")

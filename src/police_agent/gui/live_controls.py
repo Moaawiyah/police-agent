@@ -60,3 +60,9 @@ class LiveControls:
         """The game is over: nothing is left to steer but Restart and Quit."""
         for button in (self.pause, self.play, self.stop):
             button.config(state="disabled")
+
+    def mark_ready(self) -> None:
+        """Return to the pre-start state after a whole-series reset."""
+        self.start.config(state="normal")
+        for button in (self.pause, self.play, self.stop):
+            button.config(state="disabled")

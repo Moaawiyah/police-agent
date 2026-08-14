@@ -88,6 +88,22 @@ def test_reset_clears_the_persisted_status(tmp_path):
     assert store.load_status() is None
 
 
+def test_reset_series_clears_attempt_bookkeeping_but_keeps_artifacts(tmp_path):
+    store = TeamSyncStore(tmp_path)
+    store.save_status(SeriesSyncStatus(series_id="s1"))
+    store.mark_seen("s1|1|thief|m1")
+    store.mark_email_sent("g1", "hash")
+    artifact = tmp_path / "log_g1_g01.json"
+    artifact.write_text("{}")
+
+    store.reset_series()
+
+    assert store.load_status() is None
+    assert not (tmp_path / "team_sync_seen.json").exists()
+    assert not (tmp_path / "team_sync_email.json").exists()
+    assert artifact.exists()
+
+
 def test_no_tmp_file_is_left_behind_after_a_save(tmp_path):
     store = TeamSyncStore(tmp_path)
     store.save_status(SeriesSyncStatus(series_id="s1"))

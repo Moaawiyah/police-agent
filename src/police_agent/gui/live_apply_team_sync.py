@@ -14,6 +14,13 @@ unchanged by `scheduler.py` for Police's own sub-games.
 """
 
 _LABELS = {
+    "WAITING": "WAITING FOR SUBGAME {n}",
+    "READY": "READY FOR SUBGAME {n}",
+    "PLAYING": "PLAYING SUBGAME {n}",
+    "AUDITING": "AUDITING SUBGAME {n}",
+    "SETTLED": "SUBGAME {n} SETTLED",
+    "SERIES_COMPLETE": "SERIES COMPLETE",
+    "SYNC_ERROR": "SYNC ERROR",
     "waiting_for_sibling": "WAITING FOR THIEF SUBGAME {n}",
     "ready_for_subgame": "READY FOR SUBGAME {n}",
     "subgame_settled": "SUBGAME {n} RECEIVED AND SETTLED",
@@ -25,7 +32,7 @@ _LABELS = {
 
 def apply_team_sync_event(window, event: dict) -> None:
     """Render one `{"type": "team_sync", ...}` status event."""
-    status = event.get("status", "")
+    status = event.get("state") or event.get("status", "")
     text = _LABELS.get(status, status.upper()).format(n=event.get("sub_game_number", "?"))
     window.set_turn(False, text)
     window.set_label("status", text)

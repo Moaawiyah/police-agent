@@ -37,6 +37,7 @@ class TeamSyncClient:
     def _call(self, tool: str, message: dict) -> dict:
         """One MCP call: connect, invoke, disconnect -- a fresh session each time."""
         signed = security.sign_message(message, self._secret)
+        self.last_message_id = message.get("message_id", "")
 
         async def invoke() -> dict:
             async with Client(
@@ -71,7 +72,8 @@ class TeamSyncClient:
             return response
 
     def send_series_start(
-        self, series_id: str, game_id: str, num_sub_games: int, first_sibling_subgame: int
+        self, series_id: str, game_id: str, num_sub_games: int, first_sibling_subgame: int,
+        start_role: str = "police", next_role: str = "thief",
     ) -> dict:
         """Announce a new series to the sibling Thief process.
 
@@ -85,10 +87,15 @@ class TeamSyncClient:
             num_sub_games=num_sub_games,
             sub_game_number=first_sibling_subgame,
             sender_role="police",
+            start_role=start_role,
+            next_role=next_role,
         ).to_dict()
         return self._send_with_retry(messages.SERIES_START, message)
 
-    def send_handoff(self, series_id: str, completed_subgame: int, next_subgame: int) -> dict:
+    def send_handoff(
+        self, series_id: str, completed_subgame: int, next_subgame: int,
+        start_role: str = "police", next_role: str = "thief",
+    ) -> dict:
         """Tell the sibling one sub-game settled and the next one is unlocked."""
         message = messages.SubgameHandoff(
             series_id=series_id,
@@ -96,6 +103,8 @@ class TeamSyncClient:
             next_subgame=next_subgame,
             sub_game_number=next_subgame,
             sender_role="police",
+            start_role=start_role,
+            next_role=next_role,
         ).to_dict()
         return self._send_with_retry(messages.HANDOFF, message)
 
@@ -113,3 +122,16 @@ class TeamSyncClient:
             sender_role="police",
         ).to_dict()
         return self._send_with_retry(messages.ACK, message)
+
+    def send_series_complete(self, series_id: str, result: dict | None = None) -> dict:
+        """Notify the sibling that Police filed the final series report."""
+        message = {
+            "schema_version": messages.SCHEMA_VERSION,
+            "type": messages.SERIES_COMPLETE,
+            "series_id": series_id,
+            "message_id": messages.new_message_id(),
+            "sender_role": "police",
+            "status": "settled",
+            "result": result or {},
+        }
+        return self._send_with_retry("series_complete", message)

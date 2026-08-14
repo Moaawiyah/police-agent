@@ -1,10 +1,12 @@
-"""The daily allowance, and the gate that spends it before anything else runs.
+"""The daily allowance itself: booking calls, rolling over, surviving a restart.
 
 Two things are being defended. The first is that the count survives a restart:
 a sub-game is its own process, so a counter that lived in memory would report a
 series of twenty sends as one and the provider would disagree at the worst
 possible moment. The second is ordering -- the quota is the *first* gate, so a
-day that is already spent costs no queueing, no token and no socket.
+day that is already spent costs no queueing, no token and no socket (see
+`test_quota_gate.py`, split out to keep both files under the line budget, for
+the Gatekeeper side of that).
 
 The clock is injected rather than mocked at the module, so "tomorrow" is a value
 a test passes in and no test waits for midnight.
@@ -15,7 +17,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from police_agent.shared.gatekeeper import Gatekeeper, GateLimits, QuotaExceededError
+from police_agent.shared.gatekeeper import QuotaExceededError
 from police_agent.shared.quota import DailyQuota
 
 TODAY, TOMORROW = "2026-08-05", "2026-08-06"
@@ -125,66 +127,3 @@ class TestSurvivingARestart:
         blocked.mkdir()  # a directory where the ledger wants to be
 
         quota(path=blocked).spend()  # must not raise
-
-
-class TestTheGatekeepersFirstGate:
-    def test_a_gate_with_no_quota_is_unaffected(self):
-        """Ollama has no daily allowance to protect, and passes nothing."""
-        gate = Gatekeeper(_immediate())
-
-        assert gate.submit(lambda: "sent") == "sent"
-        assert gate.snapshot()["quota"] is None
-
-    def test_the_allowance_is_spent_by_passing_through(self):
-        allowance = quota()
-        gate = Gatekeeper(_immediate(), quota=allowance)
-
-        gate.submit(lambda: "sent")
-
-        assert allowance.remaining == 2
-
-    def test_a_spent_day_is_refused_before_any_call_is_made(self):
-        """The cheapest question, asked first: no queue, no token, no socket."""
-        gate = Gatekeeper(_immediate(), quota=quota(limit=0))
-
-        with pytest.raises(QuotaExceededError):
-            gate.submit(_forbidden)
-
-    def test_a_refusal_is_counted_as_one(self):
-        gate = Gatekeeper(_immediate(), quota=quota(limit=0))
-
-        with pytest.raises(QuotaExceededError):
-            gate.submit(lambda: "sent")
-
-        assert gate.snapshot()["rejected"] == 1
-
-    def test_the_snapshot_reports_the_day_the_report_ran_against(self):
-        gate = Gatekeeper(_immediate(), quota=quota())
-        gate.submit(lambda: "sent")
-
-        assert gate.snapshot()["quota"] == {"date": TODAY, "spent": 1, "limit": 3}
-
-    def test_retrying_a_failed_call_does_not_re_spend_the_allowance(self):
-        """The allowance counts reports; a retry of one report is the same report,
-        and `max_retries` is what bounds the calls a submission may make."""
-        allowance = quota()
-        gate = Gatekeeper(_immediate(), sleep=lambda _seconds: None, quota=allowance)
-        attempts: list[int] = []
-
-        def flaky():
-            attempts.append(1)
-            if len(attempts) < 3:
-                raise RuntimeError("not yet")
-            return "sent"
-
-        assert gate.submit(flaky) == "sent"
-        assert (len(attempts), allowance.remaining) == (3, 2)
-
-
-def _immediate() -> GateLimits:
-    """Limits generous enough that only the quota can turn a call away."""
-    return GateLimits(requests_per_minute=600, retry_backoff_seconds=0.0)
-
-
-def _forbidden():
-    raise AssertionError("the call was made past a spent quota")

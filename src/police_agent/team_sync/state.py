@@ -27,17 +27,20 @@ class SeriesSyncState(StrEnum):
     SETTLED = "settled"
     WAITING_FOR_SIBLING = "waiting_for_sibling"
     SERIES_COMPLETE = "series_complete"
+    SYNC_ERROR = "sync_error"
     ERROR = "error"
 
 
-def role_for_subgame(sub_game_number: int) -> str:
+def role_for_subgame(n: int, start_role: str = POLICE) -> str:
     """ "police" for an odd sub-game, "thief" for an even one.
 
     Sub-game 1 = our Police vs. the opponent's Thief, sub-game 2 = our Thief
     vs. the opponent's Police, and so on -- the alternation the six-sub-game
     match is built on.
     """
-    return POLICE if sub_game_number % 2 == 1 else THIEF
+    if n % 2 == 1:
+        return start_role
+    return THIEF if start_role == POLICE else POLICE
 
 
 # Legal forward transitions: every value in the set is a state `advance` may
@@ -50,26 +53,36 @@ _TRANSITIONS: dict[SeriesSyncState, frozenset[SeriesSyncState]] = {
             SeriesSyncState.NEGOTIATING,
             SeriesSyncState.WAITING_FOR_SIBLING,
             SeriesSyncState.PLAYING,
+            SeriesSyncState.SYNC_ERROR,
             SeriesSyncState.ERROR,
         }
     ),
-    SeriesSyncState.WAITING: frozenset({SeriesSyncState.READY, SeriesSyncState.NEGOTIATING}),
-    SeriesSyncState.NEGOTIATING: frozenset({SeriesSyncState.PLAYING, SeriesSyncState.ERROR}),
+    SeriesSyncState.WAITING: frozenset({SeriesSyncState.READY, SeriesSyncState.WAITING_FOR_SIBLING,
+                                        SeriesSyncState.NEGOTIATING, SeriesSyncState.SYNC_ERROR,
+                                        SeriesSyncState.ERROR}),
+    SeriesSyncState.NEGOTIATING: frozenset({SeriesSyncState.PLAYING, SeriesSyncState.SYNC_ERROR,
+                                            SeriesSyncState.ERROR}),
     SeriesSyncState.PLAYING: frozenset(
-        {SeriesSyncState.AUDITING, SeriesSyncState.SETTLED, SeriesSyncState.ERROR}
+        {SeriesSyncState.AUDITING, SeriesSyncState.SETTLED, SeriesSyncState.SYNC_ERROR,
+         SeriesSyncState.ERROR}
     ),
-    SeriesSyncState.AUDITING: frozenset({SeriesSyncState.SETTLED, SeriesSyncState.ERROR}),
+    SeriesSyncState.AUDITING: frozenset({SeriesSyncState.SETTLED, SeriesSyncState.SYNC_ERROR,
+                                         SeriesSyncState.ERROR}),
     SeriesSyncState.SETTLED: frozenset(
         {
             SeriesSyncState.WAITING_FOR_SIBLING,
             SeriesSyncState.READY,
             SeriesSyncState.SERIES_COMPLETE,
+            SeriesSyncState.SYNC_ERROR,
+            SeriesSyncState.ERROR,
         }
     ),
     SeriesSyncState.WAITING_FOR_SIBLING: frozenset(
-        {SeriesSyncState.READY, SeriesSyncState.SETTLED, SeriesSyncState.ERROR}
+        {SeriesSyncState.READY, SeriesSyncState.SETTLED, SeriesSyncState.SYNC_ERROR,
+         SeriesSyncState.ERROR}
     ),
     SeriesSyncState.SERIES_COMPLETE: frozenset(),
+    SeriesSyncState.SYNC_ERROR: frozenset(),
     SeriesSyncState.ERROR: frozenset(),
 }
 
@@ -87,6 +100,7 @@ class SeriesSyncStatus:
     sub_game_number: int = 1
     state: SeriesSyncState = SeriesSyncState.IDLE
     updated_at: str = ""
+    start_role: str = POLICE
 
     def advance(
         self, target: SeriesSyncState, sub_game_number: int | None = None
@@ -99,6 +113,7 @@ class SeriesSyncStatus:
             sub_game_number=self.sub_game_number if sub_game_number is None else sub_game_number,
             state=target,
             updated_at=now_iso(),
+            start_role=self.start_role,
         )
 
     def to_dict(self) -> dict:
@@ -108,6 +123,7 @@ class SeriesSyncStatus:
             "sub_game_number": self.sub_game_number,
             "state": str(self.state),
             "updated_at": self.updated_at,
+            "start_role": self.start_role,
         }
 
     @classmethod
@@ -118,4 +134,5 @@ class SeriesSyncStatus:
             sub_game_number=int(data.get("sub_game_number", 1)),
             state=SeriesSyncState(data.get("state", SeriesSyncState.IDLE)),
             updated_at=str(data.get("updated_at", "")),
+            start_role=str(data.get("start_role", POLICE)),
         )
