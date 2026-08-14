@@ -75,7 +75,11 @@ def check_local_coverage(local, log_by_step, failures):
 
 def cell(value):
     """Parse a `[row, col]` wire value into a `(row, col)` tuple, or None."""
-    if not isinstance(value, (list, tuple)) or len(value) != 2 or not all(isinstance(item, int) for item in value):
+    if (
+        not isinstance(value, (list, tuple))
+        or len(value) != 2
+        or not all(isinstance(item, int) for item in value)
+    ):
         return None
     return tuple(value)
 

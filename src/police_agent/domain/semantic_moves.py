@@ -41,11 +41,18 @@ def police_turn(step, payload, logged, origin, barriers, board, failures):
         if position != origin or placed is not None:
             failures.append(f"local turn {step} has an illegal hold")
     elif isinstance(move, str) and move.startswith("MOVE:"):
-        if _move_target(board, origin, move.removeprefix("MOVE:"), barriers) != position or placed is not None:
+        if (
+            _move_target(board, origin, move.removeprefix("MOVE:"), barriers) != position
+            or placed is not None
+        ):
             failures.append(f"local turn {step} has an illegal move")
     elif isinstance(move, str) and move.startswith("BARRIER:"):
         target = origin if move == "BARRIER:-" else _move_target(board, origin, move[8:], barriers)
-        if position != origin or placed != target or target not in board.barrier_targets(origin, barriers):
+        if (
+            position != origin
+            or placed != target
+            or target not in board.barrier_targets(origin, barriers)
+        ):
             failures.append(f"local turn {step} has an illegal barrier")
     else:
         failures.append(f"local turn {step} has an unknown action")

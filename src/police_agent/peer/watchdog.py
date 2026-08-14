@@ -119,8 +119,7 @@ class Watchdog:
     def _trip(self, elapsed: float) -> None:
         self.tripped = True
         reason = (
-            f"watchdog: main loop unresponsive for {elapsed:.0f}s "
-            f"(limit {self._timeout_sec:.0f}s)"
+            f"watchdog: main loop unresponsive for {elapsed:.0f}s (limit {self._timeout_sec:.0f}s)"
         )
         if self._on_trip is not None:
             self._on_trip(reason)

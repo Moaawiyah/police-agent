@@ -18,7 +18,9 @@ def validate_league(agent, default_connect_timeout: float) -> None:
     private_timeout = agent.config.get("network.turn_timeout_seconds")
     watchdog = agent.config.get("network.watchdog_timeout_seconds") or default_connect_timeout
     if private_timeout is not None and float(private_timeout) != float(watchdog):
-        raise ConfigError("league mode requires turn_timeout_seconds to equal watchdog_timeout_seconds")
+        raise ConfigError(
+            "league mode requires turn_timeout_seconds to equal watchdog_timeout_seconds"
+        )
 
 
 def validate_public_opponent(url: str) -> None:

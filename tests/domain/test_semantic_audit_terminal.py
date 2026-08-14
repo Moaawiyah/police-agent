@@ -44,7 +44,12 @@ def test_a_trailing_capture_confirmation_passes_the_audit():
 
     assert audit_records([remote])["passed"] is True
     assert result["semantic_passed"] is True
-    assert result["terminal"] == {"result": CAPTURE, "winner": "police", "step": 1, "reason": "claim"}
+    assert result["terminal"] == {
+        "result": CAPTURE,
+        "winner": "police",
+        "step": 1,
+        "reason": "claim",
+    }
 
 
 def test_the_terminal_message_needs_no_commit_of_its_own():

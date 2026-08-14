@@ -105,9 +105,7 @@ def commits_of(summary: dict) -> dict:
     """Return each declared commit keyed by group id."""
     both = (summary.get("identity") or {}, summary.get("peer_identity") or {})
     return {
-        side["group_id"]: side.get("github_commit", "")
-        for side in both
-        if side.get("group_id")
+        side["group_id"]: side.get("github_commit", "") for side in both if side.get("group_id")
     }
 
 

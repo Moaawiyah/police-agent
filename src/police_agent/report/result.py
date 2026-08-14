@@ -66,6 +66,7 @@ RESULT_NOTE = (
     "-- never timestamps, file paths or token spend, which legitimately differ."
 )
 
+
 def scoring_from(config=None) -> dict:
     """The signed scoring table, over Appendix Vav's mandatory example values."""
     table = config.get("scoring") if config is not None else None

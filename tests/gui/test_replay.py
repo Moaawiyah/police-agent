@@ -67,6 +67,21 @@ def test_each_step_re_verifies_its_own_commit():
 def test_a_rewritten_log_is_caught_as_it_is_drawn():
     log = log_of(2)
     log["records"][0]["payload"]["position"] = [6, 6]
+def test_a_barrier_in_the_log_stays_on_the_board():
+    log = log_of(2)
+    log["my_log"][0]["barrier"] = [1, 1]
+    app, window = player(log)
+
+    app.advance()
+    app.advance()
+
+    assert (1, 1) in window.views[-1]["barriers"]
+
+
+def test_a_barrier_the_thief_declared_is_drawn_too():
+    """A barrier is impassable for both peers, so both sides' walls are real."""
+    log = log_of(2)
+    log["history"][0]["barrier_placed"] = [4, 4]
     app, window = player(log)
 
     app.advance()

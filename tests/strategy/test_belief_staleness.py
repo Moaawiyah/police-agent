@@ -48,13 +48,18 @@ class TestReinforcedBeatsAbandoned:
             reinforced.observe_smell({f"{TARGET[0]},{TARGET[1]}": 0.9})
         abandoned = _run(stale_decay=0.85)
 
-        assert reinforced.as_matrix()[TARGET[0]][TARGET[1]] > abandoned.as_matrix()[TARGET[0]][TARGET[1]]
+        assert (
+            reinforced.as_matrix()[TARGET[0]][TARGET[1]]
+            > abandoned.as_matrix()[TARGET[0]][TARGET[1]]
+        )
 
     def test_the_abandoned_cell_ends_up_lower_than_with_staleness_disabled(self):
         disabled = _run(stale_decay=1.0)
         default = _run(stale_decay=0.85)
 
-        assert default.as_matrix()[TARGET[0]][TARGET[1]] < disabled.as_matrix()[TARGET[0]][TARGET[1]]
+        assert (
+            default.as_matrix()[TARGET[0]][TARGET[1]] < disabled.as_matrix()[TARGET[0]][TARGET[1]]
+        )
 
 
 class TestStrengthensMonotonically:

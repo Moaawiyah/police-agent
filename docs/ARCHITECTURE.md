@@ -67,3 +67,9 @@ stricter bar than the course reference uses, for the reason documented there.
 
 See `README.md`'s own "Layout" section for the directory tree; this document
 is about *flow*, not file placement.
+
+For the feature-by-feature implementation map, see
+[`FEATURES.md`](FEATURES.md). The protocol and integrity details are in
+[`P2P_PROTOCOL.md`](P2P_PROTOCOL.md) and
+[`SECURITY_AND_AUDIT.md`](SECURITY_AND_AUDIT.md); the remaining strategy,
+front-end, and reporting flows are linked from that index.
