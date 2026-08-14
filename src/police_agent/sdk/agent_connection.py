@@ -101,3 +101,21 @@ class _ConnectionMixin:
                 league=self.options.league,
             )
         return self._runtime
+
+    def build_runtime(self, sub_game_number: int, controls=None) -> PoliceRuntime:
+        """A fresh, uncached `PoliceRuntime` for one sub-game of a multi-game
+        series -- what team_sync needs (a new one per sub-game number),
+        distinct from the single `runtime` this class caches for `play()`.
+        Wraps the listener the same way `sdk/series.py::play_series` does,
+        so each sub-game's own `game_over` still arrives `sub_game_over`.
+        """
+        from police_agent.sdk.series import series_listener
+
+        return PoliceRuntime(
+            self.config,
+            self.connect(),
+            sub_game_number=sub_game_number,
+            listener=series_listener(self),
+            controls=controls if controls is not None else self.controls,
+            league=self.options.league,
+        )

@@ -49,6 +49,12 @@ class PoliceAgentSDK(_ConnectionMixin):
         self._tunnel = None
         self.listener = listener
         self.controls = controls
+        # team_sync's own state, owned here rather than bolted onto the
+        # instance ad hoc: whether the next play_series() should discard any
+        # resumed series state, and the (inboxes, thread) pair from this
+        # peer's local coordinator, kept alive across restarts within one run.
+        self._team_sync_fresh_start = False
+        self._team_sync_coordinator = None
 
     def play(self) -> dict:
         """Play one sub-game to a result."""
