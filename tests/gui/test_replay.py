@@ -67,6 +67,13 @@ def test_each_step_re_verifies_its_own_commit():
 def test_a_rewritten_log_is_caught_as_it_is_drawn():
     log = log_of(2)
     log["records"][0]["payload"]["position"] = [6, 6]
+    app, window = player(log)
+
+    app.advance()
+
+    assert "TAMPERED" in window.labels["commit"]
+
+
 def test_a_barrier_in_the_log_stays_on_the_board():
     log = log_of(2)
     log["my_log"][0]["barrier"] = [1, 1]
@@ -86,4 +93,4 @@ def test_a_barrier_the_thief_declared_is_drawn_too():
 
     app.advance()
 
-    assert "TAMPERED" in window.labels["commit"]
+    assert (4, 4) in window.views[-1]["barriers"]
