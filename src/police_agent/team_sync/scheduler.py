@@ -77,21 +77,25 @@ def run_team_series(agent, base: str = "logs") -> list[dict]:
 
         # A sub-game Thief owns is played by the sibling process against the
         # opponent's Police service; this one stays off that wire entirely.
-        local_summary = agent.build_runtime(n, controls=controls).run() if police_turn else None
-        status = status.advance(SeriesSyncState.AUDITING, n)
-        helpers.notify_status(agent, "AUDITING", n)
-
         if police_turn:
-            summary = local_summary
+            summary = agent.build_runtime(n, controls=controls).run()
+            status = status.advance(SeriesSyncState.AUDITING, n)
+            helpers.notify_status(agent, "AUDITING", n)
             paths = agent.write_artifacts(summary, base)
             import_adapter.maybe_email_final_report(agent, paths, summary, store)
         else:
+            # AUDITING is announced *after* the result lands, not before: the
+            # wait can last a whole sub-game, and labelling it as this
+            # process's own audit is the one thing the window must not say.
+            helpers.notify_status(agent, "waiting_for_sibling", n)
             try:
                 message = wait_for_thief_result(inboxes, status.series_id, n)
             except TransportError as exc:
                 fail(agent, store, status, str(exc))
             # Thief's complete settled payload is the ledger copy for its
             # owned sub-game; local Police runtime state is never exchanged.
+            status = status.advance(SeriesSyncState.AUDITING, n)
+            helpers.notify_status(agent, "AUDITING", n)
             summary = import_adapter.import_and_persist(message, agent, base, store)
             if n < total and hasattr(inboxes, "handoff"):
                 handoff = wait_for_handoff(inboxes, status.series_id, n + 1)
