@@ -32,6 +32,7 @@ Contrast the log artifact, whose `mutual_agreement` is asymmetric on purpose --
 see `report/artifacts.py`.
 """
 
+from police_agent.domain.rules import ZEROED_RESULTS
 from police_agent.domain.scoring import aggregate
 from police_agent.report.ids import SCHEMA_VERSION, consensus_signature, interop_sha256
 from police_agent.report.result_parts import (
@@ -84,7 +85,12 @@ def build_result(facts, summaries: list, scoring: dict | None = None) -> dict:
         {**subgame_block(summary, table), "log_files": log_files_of(summary, facts.game_id)}
         for summary in summaries
     ]
-    totals = aggregate([block["score"] for block in sub_games], int(table.get("tie_score", 0)))
+    # A zeroed/sanctioned sub-game's score is withheld from `aggregate` entirely
+    # (which already skips an empty row) rather than passed as {a: 0, b: 0} --
+    # `aggregate` has no result-type context of its own, so a real 0-0 would
+    # otherwise be indistinguishable from a genuine tie and miscounted as one.
+    scores = [{} if b["result"] in ZEROED_RESULTS else b["score"] for b in sub_games]
+    totals = aggregate(scores, int(table.get("tie_score", 0)))
     core = agreement_core(facts.game_id, sub_games, totals)
     final_result = {**totals, "tokens_total_series": tokens_total_series(sub_games)}
     return {

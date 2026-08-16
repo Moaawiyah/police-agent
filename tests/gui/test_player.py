@@ -13,7 +13,11 @@ from tests.conftest import config_with
 
 
 def _title(config, port: int = 8801) -> str:
-    agent = type("FakeAgent", (), {"config": config, "port": port, "listener": None})()
+    agent = type(
+        "FakeAgent",
+        (),
+        {"config": config, "port": port, "listener": None, "connect": lambda self: None},
+    )()
     with (
         patch("police_agent.gui.player.PeerWindow"),
         patch.object(LivePeerApp, "_describe_verbal_layer"),

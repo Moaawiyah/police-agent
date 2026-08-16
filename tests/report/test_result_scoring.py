@@ -3,7 +3,8 @@ files under the project's 150-line rule; fixtures are defined there and
 imported here.
 """
 
-from police_agent.report.result import DEFAULT_SCORING, scoring_from, subgame_block
+from police_agent.report.facts import facts_from
+from police_agent.report.result import DEFAULT_SCORING, build_result, scoring_from, subgame_block
 from tests.conftest import config_with
 from tests.report.test_result import POLICE, THIEF, _capture, _result
 
@@ -36,6 +37,34 @@ class TestScoringTheSeries:
 
         assert block["score"] == {POLICE: 0, THIEF: 0}
         assert block["winner_group"] is None
+        assert block["tie"] is False
+
+    def test_a_tamper_forfeit_is_zeroed_not_credited_to_the_catcher(self):
+        """The interop kit's binding table: tamper forfeit zeroes both sides,
+        the same as timeout/technical_loss -- it is a sanction, not a win, even
+        though the runtime's own `summary["winner"]` names the honest peer."""
+        summary = {**_capture(), "result": "tamper_forfeit", "winner": "police"}
+
+        block = subgame_block(summary, DEFAULT_SCORING)
+
+        assert block["score"] == {POLICE: 0, THIEF: 0}
+        assert block["winner_group"] is None
+        assert block["tie"] is False
+
+    def test_a_tamper_forfeit_counts_toward_neither_sub_games_won_nor_ties(self):
+        """A zeroed sub-game is credited to nobody: sub_games_won[a] +
+        sub_games_won[b] + ties + zeroed == num_sub_games (the count of
+        zeroed sub-games isn't a tracked field, so it must show up as neither
+        of the other two). A real capture sits alongside it so the series
+        isn't degenerately all-zeroed."""
+        forfeited = {**_capture(), "result": "tamper_forfeit", "winner": "police",
+                     "step_zero": {"sub_game_number": 2}}
+        summaries = [_capture(), forfeited]
+
+        artifact = build_result(facts_from(summaries[0]), summaries)
+
+        assert artifact["final_result"]["sub_games_won"] == {POLICE: 1, THIEF: 0}
+        assert artifact["final_result"]["ties"] == 0
 
     def test_the_signed_table_is_used_when_one_was_loaded(self):
         assert scoring_from(config_with()) == config_with().get("scoring")

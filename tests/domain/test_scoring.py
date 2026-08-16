@@ -33,6 +33,12 @@ class TestScoreSubgame:
         scoring = {**SCORING, "technical_loss": -1}
         assert score_subgame("timeout", ROLES, scoring) == {"g1": -1, "g2": -1}
 
+    def test_tamper_forfeit_zeroes_both_sides_like_a_technical_loss(self):
+        """The interop kit's binding table: tamper forfeit is a sanction, not
+        a consolation prize for the honest side -- it scores like timeout or
+        technical_loss, not like a capture."""
+        assert score_subgame("tamper_forfeit", ROLES, SCORING) == {"g1": 0, "g2": 0}
+
 
 class TestAggregate:
     def test_single_subgame(self):

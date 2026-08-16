@@ -1,5 +1,6 @@
 """Small projections used by the binding series result artifact."""
 
+from police_agent.domain.rules import ZEROED_RESULTS
 from police_agent.domain.scoring import aggregate, score_subgame
 from police_agent.report.artifacts import roles_of
 from police_agent.report.ids import log_filename
@@ -25,7 +26,12 @@ def subgame_block(summary: dict, scoring: dict) -> dict:
     roles = roles_of(summary)
     played = {group: role for role, group in roles.items() if group}
     result = summary.get("result", "")
-    winner_group = roles.get(str(summary.get("winner") or "")) or None
+    zeroed = result in ZEROED_RESULTS
+    # A zeroed/sanctioned outcome (timeout, technical loss, tamper forfeit) is
+    # credited to nobody -- winner_group stays null and tie stays false -- even
+    # though the runtime's own `summary["winner"]` field may name a role, since
+    # that field serves live GUI/audit display, not the binding score.
+    winner_group = None if zeroed else roles.get(str(summary.get("winner") or "")) or None
     own_gid = (summary.get("identity") or {}).get("group_id", "")
     opp_gid = (summary.get("peer_identity") or {}).get("group_id", "")
     passed = bool((summary.get("audit") or {}).get("passed"))
@@ -39,7 +45,7 @@ def subgame_block(summary: dict, scoring: dict) -> dict:
         "ended_at": summary.get("ended_at", ""),
         "result": result,
         "winner_group": winner_group,
-        "tie": winner_group is None,
+        "tie": (not zeroed) and winner_group is None,
         "github_commit": commits_of(summary),
         "tokens": {own_gid: spent, opp_gid: peer_spent},
         "score": score_subgame(result, played, scoring),
@@ -61,9 +67,14 @@ def series_totals(summaries: list, scoring: dict) -> dict:
     """Aggregate every sub-game summary into one series-level result.
 
     Shared by the binding report (`report/result.py`) and the live GUI, so a
-    series winner means the same thing wherever it is shown.
+    series winner means the same thing wherever it is shown. A zeroed/
+    sanctioned sub-game's score is withheld from `aggregate` entirely (which
+    already skips an empty row) rather than passed through as `{a: 0, b: 0}`
+    -- `aggregate` has no result-type context of its own, so a real 0-0 would
+    otherwise be indistinguishable from a genuine tie and miscounted as one.
     """
-    scores = [subgame_block(summary, scoring)["score"] for summary in summaries]
+    blocks = [subgame_block(summary, scoring) for summary in summaries]
+    scores = [{} if block["result"] in ZEROED_RESULTS else block["score"] for block in blocks]
     return aggregate(scores, int(scoring.get("tie_score", 0)))
 
 

@@ -20,9 +20,10 @@ def score_subgame(result: str, roles: dict[str, str], scoring: dict) -> dict[str
     """Points each group earns from one sub-game.
 
     `roles` maps group id -> the role that group played this sub-game. Any
-    outcome that is neither a capture nor a survival is a technical loss and
-    scores the same for both sides, so no peer profits from stalling, crashing
-    or forfeiting.
+    outcome that is neither a capture nor a survival -- including a
+    tamper-forfeit -- zeroes both sides (the interop kit's binding scoring
+    table), so no peer profits from stalling, crashing or forfeiting, and a
+    tamper-forfeit is not a consolation prize for the honest side either.
     """
     if result not in _POINT_KEYS:
         return dict.fromkeys(roles, scoring.get("technical_loss", 0))

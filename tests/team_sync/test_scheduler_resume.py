@@ -32,4 +32,9 @@ def test_a_resumed_run_backfills_earlier_summaries_from_disk(tmp_path, monkeypat
     assert [s["role"] for s in summaries] == ["police", "thief", "police", "thief"]
 
     game_overs = [event for event in events if event["type"] == "game_over"]
-    assert game_overs[0]["totals"]["sub_games_won"]["OURTEAM"] >= 1
+    # Sub-game 1's real "survival" score (5) must be in the total -- a failed
+    # backfill would leave it as a skipped {} placeholder and understate this
+    # to 10. (Not asserting on sub_games_won: sub-game 3 ends in a zeroed
+    # technical_loss here, credited to nobody, so it contributes to neither
+    # side's win count.)
+    assert game_overs[0]["totals"]["total_score"]["OURTEAM"] == 15

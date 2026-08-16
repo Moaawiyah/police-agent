@@ -30,11 +30,14 @@ class LivePeerApp:
     """Runs the police agent in a thread and shows what it is doing."""
 
     def __init__(self, agent, controls=None) -> None:
-        """Build the window for `agent`; nothing touches the network until Start."""
+        """Build the window for `agent` and open its server/tunnel immediately,
+        so the opponent can reach us as soon as the window is up. Start still
+        gates the actual handshake/play -- only the listening moves earlier."""
         self._agent = agent
         self._controls = controls or GameControls()
         agent.listener = self._on_event  # read when the runtime is built, on Start
         agent.controls = self._controls
+        agent.connect()
         self._events: queue.Queue = queue.Queue()
         self._summaries: list[dict] = []
         self._started_at: float | None = None
@@ -64,7 +67,8 @@ class LivePeerApp:
         self._window.set_label("model", model)
 
     def start(self) -> None:
-        """Open the link and play. Nothing has touched the network before this."""
+        """Begin the handshake and play. The server/tunnel are already open;
+        this is what starts actually talking to the opponent."""
         self._bar.mark_started()
         self._in_progress = True
         self._started_at = time.monotonic()

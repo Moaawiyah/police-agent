@@ -27,11 +27,18 @@ TECHNICAL_LOSS = "technical_loss"
 # audit still describe what happened, rather than a match simply going missing.
 ABORTED = "aborted"
 
-# A revealed log that does not hash to the commitments published during play.
-# Kept distinct from a technical loss because it is not a crash or a forfeit: it
-# is evidence the opponent rewrote its history, and the honest peer wins on it
-# regardless of what happened on the board.
+# A revealed log that does not hash to the commitments published during play:
+# evidence the opponent rewrote its history.
 TAMPER_FORFEIT = "tamper_forfeit"
+
+# Outcomes that zero BOTH sides (the interop kit's binding scoring table:
+# capture=(20,5), survival=(5,10), everything else=(0,0)). A zeroed sub-game
+# is a sanction, not a tie -- credited to nobody, `winner_group: null`,
+# `tie: false` -- so it must not fold into the tie count either. The book's
+# stated reason: protocol correctness is worth more to each side than a win
+# on a technicality, and an honest peer CAN be zeroed by its opponent's own
+# failure (a tamper-forfeit is not a consolation prize for the honest side).
+ZEROED_RESULTS = frozenset({TIMEOUT, TECHNICAL_LOSS, TAMPER_FORFEIT})
 
 
 class GameRules:
