@@ -7,7 +7,7 @@ than being hardcoded here, because the two peers negotiate that table.
 """
 
 from police_agent.constants import Role
-from police_agent.domain.rules import CAPTURE, SURVIVAL, TAMPER_FORFEIT
+from police_agent.domain.rules import CAPTURE, SURVIVAL
 
 # outcome -> (key for whoever played police, key for whoever played thief)
 _POINT_KEYS = {
@@ -16,31 +16,15 @@ _POINT_KEYS = {
 }
 
 
-def score_subgame(
-    result: str, roles: dict[str, str], scoring: dict, winner: str | None = None
-) -> dict[str, int]:
+def score_subgame(result: str, roles: dict[str, str], scoring: dict) -> dict[str, int]:
     """Points each group earns from one sub-game.
 
     `roles` maps group id -> the role that group played this sub-game. Any
-    outcome that is neither a capture, a survival, nor a resolved
-    tamper-forfeit is a technical loss and scores the same for both sides, so
-    no peer profits from stalling, crashing or forfeiting.
-
-    A tamper-forfeit is not a technical loss (`domain/rules.py`'s
-    `TAMPER_FORFEIT` docstring: the honest peer wins on it regardless of what
-    happened on the board), so it scores like a capture for whichever role
-    `winner` played -- reusing the existing capture point values rather than
-    adding a new signed term, since `scoring` isn't part of the handshake's
-    agreed key set. If `winner` cannot be resolved against `roles`, this
-    falls back to the technical-loss split rather than guessing.
+    outcome that is neither a capture nor a survival -- including a
+    tamper-forfeit -- zeroes both sides (the interop kit's binding scoring
+    table), so no peer profits from stalling, crashing or forfeiting, and a
+    tamper-forfeit is not a consolation prize for the honest side either.
     """
-    if result == TAMPER_FORFEIT and winner in roles:
-        cop_key, thief_key = _POINT_KEYS[CAPTURE]
-        winner_key = cop_key if roles[winner] == Role.POLICE else thief_key
-        return {
-            group: scoring[winner_key] if group == winner else scoring.get("technical_loss", 0)
-            for group in roles
-        }
     if result not in _POINT_KEYS:
         return dict.fromkeys(roles, scoring.get("technical_loss", 0))
     cop_key, thief_key = _POINT_KEYS[result]
