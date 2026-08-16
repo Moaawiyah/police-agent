@@ -33,6 +33,29 @@ class TestScoreSubgame:
         scoring = {**SCORING, "technical_loss": -1}
         assert score_subgame("timeout", ROLES, scoring) == {"g1": -1, "g2": -1}
 
+    def test_tamper_forfeit_scores_like_a_capture_for_the_winner(self):
+        assert score_subgame("tamper_forfeit", ROLES, SCORING, winner="g1") == {
+            "g1": 20,
+            "g2": 0,
+        }
+
+    def test_tamper_forfeit_follows_the_winners_role_not_a_fixed_side(self):
+        swapped = {"g1": "thief", "g2": "police"}
+        assert score_subgame("tamper_forfeit", swapped, SCORING, winner="g1") == {
+            "g1": 5,
+            "g2": 0,
+        }
+
+    def test_tamper_forfeit_with_no_resolvable_winner_falls_back_to_technical_loss(self):
+        assert score_subgame("tamper_forfeit", ROLES, SCORING, winner=None) == {
+            "g1": 0,
+            "g2": 0,
+        }
+        assert score_subgame("tamper_forfeit", ROLES, SCORING, winner="ghost") == {
+            "g1": 0,
+            "g2": 0,
+        }
+
 
 class TestAggregate:
     def test_single_subgame(self):

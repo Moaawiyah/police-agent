@@ -42,7 +42,7 @@ def subgame_block(summary: dict, scoring: dict) -> dict:
         "tie": winner_group is None,
         "github_commit": commits_of(summary),
         "tokens": {own_gid: spent, opp_gid: peer_spent},
-        "score": score_subgame(result, played, scoring),
+        "score": score_subgame(result, played, scoring, winner_group),
         "audit": {"log_verified": passed, "tampered": not passed},
         "steps": summary.get("steps", 0),
     }
