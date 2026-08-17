@@ -64,8 +64,8 @@ class TestRematchesAgainstTheSameOpponent:
         assert [record["steps"] for record in series] == [3]
 
     def test_the_rematch_is_reflected_in_the_series_count(self, tmp_path):
-        write_artifacts(_summary(sub_game=1), tmp_path)
-        write_artifacts(_summary(sub_game=2), tmp_path)
+        write_artifacts(_summary(sub_game=1), tmp_path, counted=True)
+        write_artifacts(_summary(sub_game=2), tmp_path, counted=True)
 
         write_artifacts(_summary(sub_game=1, steps=3), tmp_path)
 

@@ -52,10 +52,8 @@ def archive_completed_series(directory: Path, facts, now=lambda: datetime.now(UT
     A no-op unless `directory` already holds a `result_<game_id>.json` whose
     own `num_sub_games` reached its own `num_sub_games_agreed` -- see the
     module docstring for why that is a safe test. Returns whether anything
-    moved. A destination that cannot be created is a worse archive, not a
-    reason to fail the report the caller is about to write, so it is caught
-    here rather than left to surface from `write_artifacts`.
-    """
+    moved; a destination that cannot be created is caught here rather than
+    left to surface from `write_artifacts`."""
     old = _read_json(directory / f"{RESULT_PREFIX}_{facts.game_id}.json")
     if not _is_complete(old):
         return False
@@ -72,13 +70,12 @@ def archive_completed_series(directory: Path, facts, now=lambda: datetime.now(UT
 
 
 def count_series(directory: Path, opponent_group_id: str | None = None) -> int:
-    """How many completed series are on record, optionally against one opponent.
-
-    The driftproof answer to "how many series against group X" -- read off the
-    ledger `archive_completed_series` maintains, not kept in anyone's head.
-    """
+    """How many *counted* (`--count`) series are on record, optionally against
+    one opponent -- a warm-up run is never included. Read off the ledger
+    `archive_completed_series` maintains, not kept in anyone's head."""
     entries = _read_json(directory / HISTORY_FILE)
     entries = entries if isinstance(entries, list) else []
+    entries = [entry for entry in entries if entry.get("counted") is True]
     if opponent_group_id is None:
         return len(entries)
     return sum(1 for entry in entries if entry.get("opponent_group_id") == opponent_group_id)
@@ -96,9 +93,8 @@ def _is_complete(old) -> bool:
 
 def _series_files(directory: Path, game_id: str) -> list[Path]:
     """Every file this series wrote; matched like `series_records`, never a substring."""
-    exact = [
-        directory / f"{prefix}_{game_id}.json" for prefix in (DECLARATION_PREFIX, RESULT_PREFIX)
-    ]
+    prefixes = (DECLARATION_PREFIX, RESULT_PREFIX)
+    exact = [directory / f"{prefix}_{game_id}.json" for prefix in prefixes]
     found = [path for path in exact if path.is_file()]
     for prefix in (CONFIG_PREFIX, LOG_PREFIX, RECORD_PREFIX):
         found.extend(sorted(directory.glob(f"{prefix}_{game_id}_*.json")))
@@ -106,8 +102,11 @@ def _series_files(directory: Path, game_id: str) -> list[Path]:
 
 
 def _append_history(directory: Path, facts, old: dict, moment: datetime) -> None:
-    """Log the archived series. Timing/outcome come from `old`, the series being
-    filed away, never from `facts`, which describes the new call overwriting it."""
+    """Log the archived series. Timing/outcome/`counted` all come from `old`,
+    the series being filed away, never from `facts`, which describes the new
+    call overwriting it. `old["counted"]` is `build_result`'s own record of
+    whether that run was `--count`; absent or False never inflates
+    `count_series`."""
     entries = _read_json(directory / HISTORY_FILE)
     entries = entries if isinstance(entries, list) else []
     entries.append(
@@ -121,6 +120,7 @@ def _append_history(directory: Path, facts, old: dict, moment: datetime) -> None
             "started_at": old.get("game_started_at"),
             "ended_at": old.get("game_ended_at"),
             "archived_at": moment.isoformat(),
+            "counted": old.get("counted", False),
         }
     )
     _write_json(directory / HISTORY_FILE, entries)

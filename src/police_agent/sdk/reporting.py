@@ -25,9 +25,9 @@ def save_summary(summary: dict, path: str | Path) -> Path:
     return destination
 
 
-def write_artifacts(summary: dict, base: str | Path, config) -> dict:
+def write_artifacts(summary: dict, base: str | Path, config, counted: bool = False) -> dict:
     """Write this match's mandatory report artifacts under `base`."""
-    return write_report_artifacts(summary, base, config)
+    return write_report_artifacts(summary, base, config, counted)
 
 
 def email_report(paths: dict, config, counted: bool = False) -> str | None:

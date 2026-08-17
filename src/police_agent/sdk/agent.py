@@ -86,7 +86,7 @@ class PoliceAgentSDK(_ConnectionMixin):
 
     def write_artifacts(self, summary: dict, base: str | Path = DEFAULT_REPORT_DIR) -> dict:
         """Write this match's mandatory report artifacts under `base`."""
-        return write_artifacts(summary, base, self.config)
+        return write_artifacts(summary, base, self.config, self.options.counted)
 
     def email_report(self, paths: dict) -> str | None:
         """Mail (or draft) the report at `paths`, per this peer's `[email]`

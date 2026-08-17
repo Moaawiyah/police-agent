@@ -79,6 +79,7 @@ class TestArchivingAFinishedSeries:
             game_started_at="2026-08-01T09:00:00+00:00",
             game_ended_at="2026-08-01T09:10:00+00:00",
             final_result={"winner_group": POLICE},
+            counted=True,
         )
 
         archive_completed_series(tmp_path, facts(), now=clock)
@@ -95,8 +96,19 @@ class TestArchivingAFinishedSeries:
                 "started_at": "2026-08-01T09:00:00+00:00",
                 "ended_at": "2026-08-01T09:10:00+00:00",
                 "archived_at": CLOCK.isoformat(),
+                "counted": True,
             }
         ]
+
+    def test_a_warm_up_is_archived_but_not_marked_counted(self, tmp_path):
+        """`--count` was never passed, so the ledger entry says so -- and
+        count_series must not fold it into the tally."""
+        write_result(tmp_path, num_sub_games=2, agreed=2)
+
+        archive_completed_series(tmp_path, facts(), now=clock)
+
+        entries = json.loads((tmp_path / "series_history.json").read_text())
+        assert entries[0]["counted"] is False
 
     def test_archiving_leaves_the_directory_clean_for_the_next_series(self, tmp_path):
         write_result(tmp_path, num_sub_games=2, agreed=2)

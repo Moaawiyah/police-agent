@@ -74,11 +74,28 @@ def scoring_from(config=None) -> dict:
     return {**DEFAULT_SCORING, **(table if isinstance(table, dict) else {})}
 
 
-def build_result(facts, summaries: list, scoring: dict | None = None) -> dict:
+def build_result(
+    facts,
+    summaries: list,
+    scoring: dict | None = None,
+    counted_games_played: int = 0,
+    counted: bool = False,
+) -> dict:
     """The series as one document: every sub-game, the totals, and the digest.
 
     Takes a *list* of match records because the artifact is match-level while a
     sub-game runs in its own process. One record is a legitimate series of one.
+
+    `counted_games_played` is how many prior *counted* series are on record
+    against this opponent; `games_played_including_this` adds the one this
+    result is for, but only if `counted` (a `--count` run) -- a warm-up never
+    inflates the tally. `counted` is also stored on the artifact itself, since
+    it is the only place that ever knows: `report/history.py::archive_completed_series`
+    reads it back from here the next time this opponent is played, to keep
+    `count_series` accurate without a second source of truth. Per-peer, not
+    part of the symmetric digest -- each side's own local history can
+    legitimately differ, same reasoning as why token spend sits outside
+    `mutual_agreement`.
     """
     table = scoring or DEFAULT_SCORING
     sub_games = [
@@ -111,6 +128,8 @@ def build_result(facts, summaries: list, scoring: dict | None = None) -> dict:
         "final_result": final_result,
         "max_tokens_per_game": facts.token_budget,
         "tokens_used": tokens_used(facts, summaries),
+        "counted": counted,
+        "games_played_including_this": counted_games_played + (1 if counted else 0),
         "mutual_agreement": {
             "sha256": consensus_signature(core),
             "confirmed": all(block["audit"]["log_verified"] for block in sub_games),

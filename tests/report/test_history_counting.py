@@ -14,16 +14,24 @@ class TestCountingSeries:
     def test_no_ledger_is_zero_series(self, tmp_path):
         assert count_series(tmp_path) == 0
 
-    def test_counts_every_archived_series(self, tmp_path):
-        write_result(tmp_path, num_sub_games=2, agreed=2)
+    def test_counts_every_counted_archived_series(self, tmp_path):
+        write_result(tmp_path, num_sub_games=2, agreed=2, counted=True)
         archive_completed_series(tmp_path, facts(), now=clock)
-        write_result(tmp_path, num_sub_games=1, agreed=1)
+        write_result(tmp_path, num_sub_games=1, agreed=1, counted=True)
         archive_completed_series(tmp_path, facts(), now=lambda: datetime(2026, 8, 13, tzinfo=UTC))
 
         assert count_series(tmp_path) == 2
 
-    def test_filters_by_opponent(self, tmp_path):
+    def test_a_warm_up_is_never_counted(self, tmp_path):
+        """No --count on the archived run -- count_series must not tally it,
+        even though archive_completed_series still filed it away."""
         write_result(tmp_path, num_sub_games=2, agreed=2)
+        archive_completed_series(tmp_path, facts(), now=clock)
+
+        assert count_series(tmp_path) == 0
+
+    def test_filters_by_opponent(self, tmp_path):
+        write_result(tmp_path, num_sub_games=2, agreed=2, counted=True)
         archive_completed_series(tmp_path, facts(), now=clock)
 
         assert count_series(tmp_path, opponent_group_id=THIEF) == 1
