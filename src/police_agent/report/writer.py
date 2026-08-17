@@ -39,32 +39,41 @@ from pathlib import Path
 from police_agent.report.artifacts import build_config, build_log
 from police_agent.report.declaration import build_declaration
 from police_agent.report.facts import facts_from
-from police_agent.report.history import archive_completed_series
+from police_agent.report.history import archive_completed_series, count_series
 from police_agent.report.ids import sub_game_tag
 from police_agent.report.result import build_result, scoring_from
 
 RECORD_PREFIX = "record"
 
 
-def write_artifacts(summary: dict, base: str | Path = "logs", config=None) -> dict:
+def write_artifacts(
+    summary: dict, base: str | Path = "logs", config=None, counted: bool = False
+) -> dict:
     """Write all four artifacts for this sub-game, and return where each landed.
 
     The result covers the whole series: this sub-game's record plus every sibling
     already filed under the same `game_id`. Sub-game 1 first archives a finished
     prior series against this opponent, if one is sitting in the way.
+
+    `counted` is the `--count` CLI flag: only a counted series is folded into
+    `count_series`' tally the next time this opponent is played (see
+    `report/result.py::build_result` for why the flag is stored on the result
+    artifact itself rather than threaded separately).
     """
     facts = facts_from(summary, config)
     directory = report_dir(base, facts.own_group_id)
     if facts.sub_game_number == 1:
         archive_completed_series(directory, facts)
     paths = artifact_paths(directory, facts)
+    prior_games = count_series(directory, facts.opponent_group_id)
 
     _write(paths["record"], summary)
-    _write(paths["declaration"], build_declaration(facts, summary))
+    _write(paths["declaration"], build_declaration(facts, summary, prior_games))
     _write(paths["config"], build_config(facts, summary, config))
     _write(paths["log"], build_log(facts, summary))
     series = series_records(directory, facts.game_id)
-    _write(paths["result"], build_result(facts, series, scoring_from(config)))
+    result = build_result(facts, series, scoring_from(config), prior_games, counted)
+    _write(paths["result"], result)
     return paths
 
 

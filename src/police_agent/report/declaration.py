@@ -52,8 +52,14 @@ _DECLARED_HARDWARE = (
 )
 
 
-def build_declaration(facts, summary: dict) -> dict:
-    """The declaration artifact, keys in the order the schema lists them."""
+def build_declaration(facts, summary: dict, counted_games_played: int = 0) -> dict:
+    """The declaration artifact, keys in the order the schema lists them.
+
+    `counted_games_played` is how many prior series are on record against this
+    same opponent -- exclusive of the one this declaration is for, since it is
+    filed before the sub-games are played. The result artifact's
+    `games_played_including_this` is the inclusive counterpart.
+    """
     identity = summary.get("identity") or {}
     peer = summary.get("peer_identity") or {}
     return {
@@ -68,6 +74,7 @@ def build_declaration(facts, summary: dict) -> dict:
         "game_ended_at": facts.ended_at,
         "num_sub_games": facts.num_sub_games,
         "max_tokens_per_game": facts.token_budget,
+        "counted_games_played": counted_games_played,
         "groups": {"group_1": group_block(identity), "group_2": group_block(peer)},
     }
 

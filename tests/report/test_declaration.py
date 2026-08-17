@@ -66,6 +66,20 @@ class TestWhatTheChapterPinsBeforeTheSeries:
         assert artifact["game_ended_at"] == "2026-08-05T09:02:00+00:00"
         assert artifact["timezone"]
 
+    def test_counted_games_played_defaults_to_zero(self):
+        artifact = _declaration()
+
+        assert artifact["counted_games_played"] == 0
+
+    def test_counted_games_played_is_exclusive_of_this_one(self):
+        """The declaration is filed before the sub-games are played, so it
+        reports how many prior series are on record -- not this one."""
+        facts = facts_from(_summary())
+
+        artifact = build_declaration(facts, _summary(), counted_games_played=3)
+
+        assert artifact["counted_games_played"] == 3
+
     def test_nothing_that_changes_between_sub_games_appears(self):
         """Roles alternate across the series, so either would be false by game 2.
 

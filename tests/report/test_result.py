@@ -51,6 +51,26 @@ class TestWhatTheLecturerIsSent:
         assert artifact["num_sub_games"] == 2
         assert artifact["num_sub_games_agreed"] == 2
 
+    def test_an_uncounted_run_never_inflates_the_tally(self):
+        """A warm-up (no --count) leaves games_played_including_this exactly
+        at the prior counted total -- it does not add itself."""
+        artifact = build_result(
+            facts_from(_capture()), _series(), config_with().get("scoring"),
+            counted_games_played=3, counted=False,
+        )
+
+        assert artifact["counted"] is False
+        assert artifact["games_played_including_this"] == 3
+
+    def test_a_counted_run_adds_one_to_the_prior_count(self):
+        artifact = build_result(
+            facts_from(_capture()), _series(), config_with().get("scoring"),
+            counted_games_played=3, counted=True,
+        )
+
+        assert artifact["counted"] is True
+        assert artifact["games_played_including_this"] == 4
+
 
 def digest(summaries: list) -> str:
     return build_result(facts_from(summaries[0]), summaries)["mutual_agreement"]["sha256"]
