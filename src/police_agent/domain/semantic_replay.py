@@ -51,7 +51,7 @@ def replay_audit(
     positions: dict[int, tuple[int, int]] = {}
     terminal = None
     for index, (step, payload, _) in enumerate(remote):
-        _after_terminal(step, terminal, failures)
+        _after_terminal(step, terminal, failures, corrections)
         position = cell(payload.get("position"))
         if position is None or not board.in_bounds(position):
             failures.append(f"turn {step} has an out-of-bounds position")
@@ -91,11 +91,17 @@ def replay_audit(
     return result(failures, corrections, expected)
 
 
-def _after_terminal(step, terminal, failures):
-    if terminal is not None:
-        ended_by = (
-            "survival" if terminal["reason"] == "survival" else f"{terminal['reason']} capture"
-        )
+def _after_terminal(step, terminal, failures, corrections):
+    """Flag a turn after the game ended -- unless it's one the thief could not
+    have known about (barrier/confinement, decided by police's own record),
+    which is a correction, not tampering. Every other check in the loop still
+    runs on the turn regardless; only this complaint is relaxed."""
+    if terminal is None:
+        return
+    ended_by = "survival" if terminal["reason"] == "survival" else f"{terminal['reason']} capture"
+    if terminal["reason"] in {"barrier", "confinement"}:
+        corrections.append(f"turn {step} after {ended_by}: peer not told yet")
+    else:
         failures.append(f"turn {step} occurs after {ended_by}")
 
 

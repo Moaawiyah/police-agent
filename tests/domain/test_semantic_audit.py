@@ -74,6 +74,31 @@ def test_semantic_audit_rejects_false_claims_and_illegal_moves(
     assert any(expected in failure for failure in result["semantic_failures"])
 
 
+@pytest.mark.parametrize("spelling", ["HOLD:-", "STAY", "MOVE:STAY", "MOVE:-", "hold"])
+def test_every_conformant_spelling_of_a_stay_is_accepted_from_either_side(spelling):
+    """move_set fixes the vocabulary, not the rendering: "STAY", "HOLD:-" and
+    "MOVE:STAY" are the same move. Reading only our own spelling forfeited three
+    honest sub-games of MOAAMOHA-vs-najamjad as tampering."""
+    remote = sealed(1, [3, 3], spelling)
+    local = sealed(1, [0, 0], spelling)
+
+    result = audit([remote], [message(remote)], [local], [local["payload"]])
+
+    assert result["semantic_passed"] is True
+    assert result["semantic_failures"] == []
+
+
+def test_a_stay_that_moves_the_piece_is_still_rejected():
+    """The spelling is read leniently; the effect is not."""
+    remote = sealed(1, [3, 4], "MOVE:STAY")
+    local = sealed(1, [1, 0], "MOVE:S")
+
+    result = audit([remote], [message(remote)], [local], [local["payload"]])
+
+    assert result["semantic_passed"] is False
+    assert any("hold changes position" in failure for failure in result["semantic_failures"])
+
+
 def test_semantic_audit_rejects_a_forged_capture_response():
     one = sealed(1, [3, 3], "HOLD:-")
     two = sealed(2, [3, 3], "HOLD:-")

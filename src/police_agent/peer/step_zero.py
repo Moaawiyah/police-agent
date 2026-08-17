@@ -99,6 +99,40 @@ def turn_records(records: list) -> list:
     return [record for record in records or [] if not is_step_zero(record)]
 
 
+def audit_declaration(audit: dict, records: list, peer_identity: dict) -> list[str]:
+    """Fold the declaration binding into `audit`, returning any dispute it raised.
+
+    `audit_records` proves the opponent's revealed declaration hashes to the
+    commit stored beside it, which a peer that rewrote both still passes. What
+    settles it is `step_zero_commit`: the digest the opponent published in its
+    handshake identity, before either side moved. Comparing the two is the only
+    check that the payload revealed here is not an invention of a peer that
+    already knows how the match went -- and it is the same proof this peer
+    offers about itself (`handshake.identity_from_config`).
+
+    A failure is folded in as step 0 -- the step the declaration occupies -- so
+    it reaches the report, the GUI and the forfeit through the same
+    `failed_steps` list as any other tampered record.
+
+    An opponent that published no digest raises nothing: a missing declaration
+    is that team's rule-24 problem, not a forgery this peer can prove, and
+    refusing the match over it would reject every peer predating the field.
+    """
+    declared = (peer_identity or {}).get("step_zero_commit", "")
+    if not declared:
+        return []
+    revealed = next((record for record in records or [] if is_step_zero(record)), {})
+    if not revealed:
+        reason = "opponent published a step-zero digest but revealed no declaration"
+    elif revealed.get("commit") != declared:
+        reason = f"opponent's declaration does not match the digest it published ({declared[:16]})"
+    else:
+        return []
+    audit["passed"] = False
+    audit["failed_steps"] = [*audit.get("failed_steps", []), STEP_ZERO]
+    return [reason]
+
+
 def step_zero_of(records: list) -> dict:
     """The declaration payload from a revealed log, or `{}` if it has none.
 

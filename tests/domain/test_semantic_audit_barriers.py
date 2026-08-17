@@ -25,7 +25,9 @@ def test_barrier_capture_overrides_an_incorrect_reported_survival():
     assert result["semantic_corrections"] == ["reported survival overridden by barrier capture"]
 
 
-def test_turns_after_a_barrier_capture_are_invalid():
+def test_a_harmless_turn_after_a_barrier_capture_is_a_correction_not_a_failure():
+    """The thief holds no barrier list, so it cannot know a barrier just ended
+    the sub-game and plays on. That is a peer not told yet, not tampering."""
     one = sealed(1, [0, 1], "HOLD:-")
     two = sealed(2, [0, 1], "HOLD:-")
     local = sealed(1, [0, 0], "BARRIER:E", barrier=[0, 1])
@@ -38,8 +40,47 @@ def test_turns_after_a_barrier_capture_are_invalid():
         thief_start=[0, 1],
     )
 
+    assert result["semantic_passed"] is True
+    assert result["semantic_failures"] == []
+    assert result["semantic_corrections"] == ["turn 2 after barrier capture: peer not told yet"]
+
+
+def test_an_actually_illegal_turn_after_a_barrier_capture_still_fails():
+    """The leniency is scoped to 'you didn't know it ended', not 'anything
+    goes' -- an out-of-bounds position in the same trailing turn must still
+    be caught, or the correction becomes a way to smuggle bad data past audit."""
+    one = sealed(1, [0, 1], "HOLD:-")
+    two = sealed(2, [99, 99], "HOLD:-")
+    local = sealed(1, [0, 0], "BARRIER:E", barrier=[0, 1])
+
+    result = audit(
+        [one, two],
+        [message(one), message(two)],
+        [local],
+        [local["payload"]],
+        thief_start=[0, 1],
+    )
+
     assert result["semantic_passed"] is False
-    assert any("after barrier capture" in failure for failure in result["semantic_failures"])
+    assert any("out-of-bounds position" in failure for failure in result["semantic_failures"])
+
+
+def test_turns_after_a_survival_or_claim_terminal_are_still_invalid():
+    """Leniency is scoped to terminals the thief cannot see. A survival or
+    claim terminal is one it raised itself, so playing past it stays tampering."""
+    remote = [sealed(step, [3, 3], "HOLD:-") for step in range(1, 6)]
+    local = [sealed(step, [0, 0], "HOLD:-") for step in range(1, 6)]
+    claims = [
+        message(
+            record, **({"win_claim": {"type": SURVIVAL}} if record["payload"]["step"] == 4 else {})
+        )
+        for record in remote
+    ]
+
+    result = audit(remote, claims, local, [record["payload"] for record in local])
+
+    assert result["semantic_passed"] is False
+    assert any("after survival" in failure for failure in result["semantic_failures"])
 
 
 def test_confinement_capture_overrides_an_incorrect_reported_survival():
