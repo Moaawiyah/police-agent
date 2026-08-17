@@ -30,13 +30,16 @@ class TestTheSubGameLogArtifact:
         assert artifact["duration_seconds"] == 4.2
 
     def test_it_says_which_group_played_which_side(self):
-        assert _log()["roles"] == {"police": POLICE, "thief": THIEF}
+        """Group-keyed, not role-keyed: matches the sibling thief repo's own
+        convention, so an independently written opponent's `roles` block
+        hashes the same way for `mutual_agreement.sha256`."""
+        assert _log()["roles"] == {POLICE: "police", THIEF: "thief"}
 
     def test_the_sides_are_read_from_the_record_because_roles_alternate(self):
         """This peer is only the police in the sub-games where it is."""
         swapped = roles_of({**_summary(), "role": "thief"})
 
-        assert swapped == {"thief": POLICE, "police": THIEF}
+        assert swapped == {POLICE: "thief", THIEF: "police"}
 
     def test_every_turn_is_carried_with_its_nonce_and_hash(self):
         """Without both, the replay simulator can re-read the log but not check it."""

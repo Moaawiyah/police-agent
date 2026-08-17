@@ -24,14 +24,14 @@ def subgame_block(summary: dict, scoring: dict) -> dict:
     value byte-for-byte.
     """
     roles = roles_of(summary)
-    played = {group: role for role, group in roles.items() if group}
     result = summary.get("result", "")
     zeroed = result in ZEROED_RESULTS
     # A zeroed/sanctioned outcome (timeout, technical loss, tamper forfeit) is
     # credited to nobody -- winner_group stays null and tie stays false -- even
     # though the runtime's own `summary["winner"]` field may name a role, since
     # that field serves live GUI/audit display, not the binding score.
-    winner_group = None if zeroed else roles.get(str(summary.get("winner") or "")) or None
+    winner_role = str(summary.get("winner") or "")
+    winner_group = None if zeroed else next((g for g, r in roles.items() if r == winner_role), None)
     own_gid = (summary.get("identity") or {}).get("group_id", "")
     opp_gid = (summary.get("peer_identity") or {}).get("group_id", "")
     passed = bool((summary.get("audit") or {}).get("passed"))
@@ -48,7 +48,7 @@ def subgame_block(summary: dict, scoring: dict) -> dict:
         "tie": (not zeroed) and winner_group is None,
         "github_commit": commits_of(summary),
         "tokens": {own_gid: spent, opp_gid: peer_spent},
-        "score": score_subgame(result, played, scoring),
+        "score": score_subgame(result, roles, scoring),
         "audit": {"log_verified": passed, "tampered": not passed},
         "steps": summary.get("steps", 0),
     }

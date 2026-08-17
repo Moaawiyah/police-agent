@@ -123,16 +123,17 @@ def build_log(facts, summary: dict) -> dict:
 
 
 def roles_of(summary: dict) -> dict:
-    """Which group played which side this sub-game.
-
-    Read from the record rather than assumed, because roles alternate across the
-    series (ch. 9.3.3) and this peer is only the police in the games where it is.
-    """
+    """Which group played which side this sub-game, keyed by group id --
+    matching the sibling thief repo's own convention, since a role-keyed
+    block hashes differently from a group-keyed one for `mutual_agreement`
+    even when every other field agrees. Read from the record rather than
+    assumed: roles alternate across the series (ch. 9.3.3)."""
     identity = summary.get("identity") or {}
     peer = summary.get("peer_identity") or {}
     mine = str(summary.get("role") or Role.POLICE)
-    theirs = Role.THIEF if mine == Role.POLICE else Role.POLICE
-    return {mine: identity.get("group_id", ""), str(theirs): peer.get("group_id", "")}
+    theirs = str(Role.THIEF if mine == Role.POLICE else Role.POLICE)
+    own_gid, opp_gid = identity.get("group_id", ""), peer.get("group_id", "")
+    return {gid: role for gid, role in ((own_gid, mine), (opp_gid, theirs)) if gid}
 
 
 def _agreed_terms(summary: dict, config) -> dict:
