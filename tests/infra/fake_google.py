@@ -19,6 +19,7 @@ MODULES = (
     "googleapiclient.discovery",
     "google",
     "google.auth",
+    "google.auth.exceptions",
     "google.auth.transport",
     "google.auth.transport.requests",
     "google.oauth2",
@@ -28,19 +29,33 @@ MODULES = (
 )
 
 
+class RefreshError(Exception):
+    """Stands in for `google.auth.exceptions.RefreshError`."""
+
+
 class FakeGmail:
     """The whole Google client stack, as much of it as `infra/gmail_client.py` uses."""
 
-    def __init__(self, monkeypatch, token: str = '{"token": "stored"}', valid: bool = True) -> None:
+    def __init__(
+        self,
+        monkeypatch,
+        token: str = '{"token": "stored"}',
+        valid: bool = True,
+        revoked: bool = False,
+    ) -> None:
         self.sent: list[dict] = []
         self.scopes: list[list[str]] = []
         self.consented = 0
         self.refreshed = 0
         self._token = token
         self._valid = valid
+        # A refresh Google itself refuses: the grant behind the stored token is
+        # gone (invalid_grant), which no retry and no re-read of the file fixes.
+        self._revoked = revoked
         for name in MODULES:
             monkeypatch.setitem(sys.modules, name, ModuleType(name))
         sys.modules["googleapiclient.discovery"].build = self._build
+        sys.modules["google.auth.exceptions"].RefreshError = RefreshError
         sys.modules["google.auth.transport.requests"].Request = lambda: "request"
         sys.modules["google.oauth2.credentials"].Credentials = self._credentials_class()
         sys.modules["google_auth_oauthlib.flow"].InstalledAppFlow = self._flow_class()
@@ -64,6 +79,8 @@ class FakeGmail:
 
             def refresh(self, request):
                 fake.refreshed += 1
+                if fake._revoked:
+                    raise RefreshError("invalid_grant: Token has been expired or revoked.")
                 self.valid = True
 
             def to_json(self):

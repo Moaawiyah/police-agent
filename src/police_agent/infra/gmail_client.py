@@ -45,6 +45,15 @@ _MISSING = (
 )
 
 
+_REVOKED = (
+    "The stored Gmail token can no longer be refreshed (invalid_grant: expired "
+    "or revoked). Google expires the refresh token after 7 days while the OAuth "
+    "consent screen is still in 'Testing' publishing status, which is the usual "
+    "cause. Delete {token} and run once with a human watching to consent again, "
+    "or publish the app in the Google Cloud console so the grant stops expiring."
+)
+
+
 def send_raw(body: dict, credentials_file, token_file) -> str:
     """Hand one already-encoded message to Gmail; return the id it was filed as."""
     service = _service(credentials_file, token_file)
@@ -69,6 +78,7 @@ def credentials(credentials_file, token_file):
     why the first send is something you do on purpose.
     """
     try:
+        from google.auth.exceptions import RefreshError
         from google.auth.transport.requests import Request
         from google.oauth2.credentials import Credentials
         from google_auth_oauthlib.flow import InstalledAppFlow
@@ -80,7 +90,10 @@ def credentials(credentials_file, token_file):
     if stored and stored.valid:
         return stored
     if stored and stored.expired and stored.refresh_token:
-        stored.refresh(Request())
+        try:
+            stored.refresh(Request())
+        except RefreshError as exc:
+            raise ConfigError(_REVOKED.format(token=token)) from exc
     else:
         stored = _consent(InstalledAppFlow, credentials_file)
     token.write_text(stored.to_json(), encoding="utf-8")

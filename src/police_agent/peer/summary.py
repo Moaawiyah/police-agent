@@ -19,7 +19,7 @@ from police_agent.exceptions import ProtocolError
 from police_agent.peer.handshake import identity_from_config
 from police_agent.peer.protocol import AuditPayload
 from police_agent.peer.sealing import now_iso
-from police_agent.peer.step_zero import step_zero_of
+from police_agent.peer.step_zero import audit_declaration, step_zero_of
 from police_agent.peer.summary_tokens import tokens_of
 
 SKIPPED_AUDIT = {
@@ -76,6 +76,7 @@ def exchange_and_audit(
             revealed.result_claim,
         )
     )
+    runtime.disputes.extend(audit_declaration(audit, revealed.records, runtime.peer_identity))
     if not audit["passed"] or not audit["semantic_passed"]:
         return TAMPER_FORFEIT, "police", audit, revealed.records
     terminal = audit.get("terminal")

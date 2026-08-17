@@ -17,7 +17,9 @@ def test_game_over_reports_the_result_and_what_the_audit_proved():
 def test_sub_game_over_reports_progress_rather_than_ending_the_session():
     """Distinct from `game_over`: more sub-games may still follow, so the
     wording must not read as the whole series being finished."""
-    window = apply({"type": "sub_game_over", "summary": SUMMARY, "sub_game_number": 2, "view": VIEW})
+    window = apply(
+        {"type": "sub_game_over", "summary": SUMMARY, "sub_game_number": 2, "view": VIEW}
+    )
 
     assert window.banner == (False, "SUB-GAME 2 DONE: capture - winner police")
     assert "next sub-game" in window.labels["status"]
@@ -49,6 +51,20 @@ def test_a_skipped_audit_is_not_reported_as_a_pass():
 
     assert "not exchanged" in window.labels["status"]
     assert "PASSED" not in window.labels["status"]
+
+
+def test_a_sibling_imported_audit_block_still_draws_the_final_banner():
+    """Under team_sync a series can end on a sub-game the sibling Thief process
+    settled, and that repo's audit block carries no `verified_steps`. Indexing it
+    killed the Tk callback drawing the banner, so a whole finished series ended
+    in a traceback instead of a result."""
+    imported = {"passed": True, "own": {}, "opponent": {}, "opponent_records": []}
+    summary = {**SUMMARY, "audit": imported}
+
+    window = apply({"type": "game_over", "summary": summary, "view": VIEW})
+
+    assert "Audit PASSED" in window.labels["status"]
+    assert "steps" in window.labels["status"]  # the summary's own step count still shows
 
 
 def test_a_thief_that_lied_its_way_through_is_reported_as_disbelieved():

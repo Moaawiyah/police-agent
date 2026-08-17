@@ -132,7 +132,13 @@ def _audit_line(audit: dict, summary: dict) -> str:
     if audit.get("skipped"):
         outcome = "not exchanged (opponent silent)"
     else:
-        outcome = f"{'PASSED' if audit['passed'] else 'FAILED'}, {audit['verified_steps']} steps"
+        # Read leniently: a team_sync series can end on a sub-game the sibling
+        # Thief settled, whose audit block is that repo's shape and carries no
+        # `verified_steps`. Indexing it killed the Tk callback drawing the final
+        # banner, so a finished series showed a traceback instead of a result.
+        outcome = "PASSED" if audit.get("passed") else "FAILED"
+        if (verified := audit.get("verified_steps")) is not None:
+            outcome += f", {verified} steps"
     return f"Audit {outcome} | {summary['steps']} steps | {summary['duration_seconds']}s"
 
 

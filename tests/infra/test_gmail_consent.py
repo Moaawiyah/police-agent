@@ -65,6 +65,18 @@ class TestTheConsentFlow:
 
         assert (google.refreshed, google.consented) == (1, 0)
 
+    def test_a_revoked_grant_is_named_with_its_fix_rather_than_a_raw_refresh_error(
+        self, monkeypatch, tmp_path
+    ):
+        """The 7-day expiry of a 'Testing' consent screen ends a series with an
+        opaque `RefreshError` banner after every sub-game has already been
+        played. What the operator needs is the one-line fix, not the traceback --
+        and re-consenting silently would open a browser mid-match."""
+        FakeGmail(monkeypatch, valid=False, revoked=True)
+
+        with pytest.raises(ConfigError, match="invalid_grant"):
+            credentials(tmp_path / "creds.json", _token(tmp_path))
+
     def test_the_first_run_consents_and_stores_the_token(self, monkeypatch, tmp_path):
         """Interactive, and deliberately not attempted mid-match: a run that needs
         it is a run a human is watching, which is why enabled defaults to false."""

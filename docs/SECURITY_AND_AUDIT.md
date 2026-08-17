@@ -28,6 +28,18 @@ Its digest is exchanged during negotiation and its nonce is revealed only in
 the audit. Unknown hardware values remain explicitly `"unknown"`; the probe
 does not invent measurements.
 
+The binding runs in both directions. Hash verification only proves a revealed
+declaration is internally consistent, which a peer that rewrote payload and
+commit together still satisfies; `audit_declaration` therefore compares the
+opponent's revealed declaration against the `step_zero_commit` it published in
+its handshake identity, before either side moved. A mismatch — or a published
+digest with no declaration behind it — fails that peer's audit as step 0 and
+forfeits on the same path as any other tampered record. An opponent that
+published no digest is not accused: a missing declaration is that team's
+rule-24 problem, and refusing the audit over it would reject every peer
+predating the field. Both record spellings are recognised, this repository's
+`record_type: "step_zero"` and the sibling thief's `type: "system_spec"`.
+
 Implementation: [`peer/step_zero.py`](../src/police_agent/peer/step_zero.py),
 [`infra/hardware.py`](../src/police_agent/infra/hardware.py), and
 [`infra/gitcommit.py`](../src/police_agent/infra/gitcommit.py).
