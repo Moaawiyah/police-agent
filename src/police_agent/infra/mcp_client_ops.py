@@ -12,16 +12,53 @@ import queue
 
 from police_agent.exceptions import TransportError
 
+# Fixed rather than read from config: the handshake is where startup skew is
+# largest, and this budget must hold regardless of what network.watchdog_
+# timeout_seconds is set to for the rest of the connection.
+NEGOTIATE_TIMEOUT_SECONDS = 180.0
+
+
+def greeting_in(reply) -> dict | None:
+    """The opponent's own greeting, if its dialect carried one in the reply body.
+
+    Shape-checked rather than trusted: `terms` and `nonce` are what
+    `Negotiation.verify_peer` needs, so anything without them is an
+    acknowledgement (`{"ok": true}`), not an agreement.
+    """
+    if not isinstance(reply, dict):
+        return None
+    message = reply.get("message")
+    if isinstance(message, dict) and "terms" in message and "nonce" in message:
+        return message
+    return None
+
 
 def exchange_agreement(link, signed: dict) -> dict:
-    """Send my signed agreement and block until the opponent's arrives.
+    """Send my signed agreement and return the opponent's, by either dialect.
 
-    The handshake is where startup skew is largest, so it waits the full
-    connect budget rather than the shorter per-turn reply budget.
+    The handshake is where startup skew is largest, so it waits a fixed
+    180s budget rather than the shorter per-turn reply budget.
+
+    Publishing my greeting first is what lets my own negotiate tool answer a
+    peer that reads reply bodies. Reading the reply is the mirror of that: a
+    peer which only answers in-band never dials back, so the reply is the only
+    copy of its agreement I will ever see. The inbox remains the fallback, and
+    is still the path a push peer takes.
     """
-    link._send_with_retry("negotiate", {"message": signed})
+    link.publish_greeting(signed)
+    reply = link._send_with_retry(
+        "negotiate", {"message": signed}, timeout=NEGOTIATE_TIMEOUT_SECONDS
+    )
+    peer = greeting_in(reply)
+    if peer is not None:
+        # A both-dialects peer (it pushes AND answers) leaves a duplicate behind;
+        # dropping it here stops the NEXT sub-game's handshake from completing
+        # instantly against this one's stale copy.
+        with contextlib.suppress(queue.Empty):
+            link._inboxes.agreements.get_nowait()
+        return peer
     try:
-        return link._inboxes.agreements.get(timeout=link._connect_timeout)
+        return link._inboxes.agreements.get(timeout=NEGOTIATE_TIMEOUT_SECONDS)
     except queue.Empty as exc:
         raise TransportError(f"No agreement from the opponent at {link._url}") from exc
 

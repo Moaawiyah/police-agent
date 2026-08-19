@@ -22,6 +22,7 @@ whose sealed record has its digest published at the handshake and its nonce
 withheld until the audit.
 """
 
+from police_agent.peer.step_zero import step_zero_of
 from police_agent.report.ids import SCHEMA_VERSION, consensus_signature
 
 DECLARATION_TYPE = "pre_game_declaration"
@@ -61,7 +62,15 @@ def build_declaration(facts, summary: dict, counted_games_played: int = 0) -> di
     `games_played_including_this` is the inclusive counterpart.
     """
     identity = summary.get("identity") or {}
-    peer = summary.get("peer_identity") or {}
+    # A peer may declare its hardware in the handshake identity, in the sealed
+    # step-zero record it reveals at the audit, or in both -- all conformant
+    # (book Sec. 5.5). Overlaying the revealed declaration under the identity
+    # fills the fields an identity-only reading left as "unknown", without ever
+    # letting it overwrite something the peer stated in the handshake.
+    peer = {
+        **step_zero_of(summary.get("opponent_records") or []),
+        **{key: value for key, value in (summary.get("peer_identity") or {}).items() if value},
+    }
     return {
         "_schema": SCHEMA_NOTE,
         "schema_version": SCHEMA_VERSION,
@@ -93,7 +102,7 @@ def group_block(identity: dict) -> dict:
         "repos": identity.get("repos") or {},
         "mcp_servers": identity.get("mcp_servers") or {},
         "llm_model": identity.get("llm_model") or UNKNOWN,
-        "hardware_spec": declared_hardware(identity.get("hardware_spec")),
+        "hardware_spec": declared_hardware(identity.get("hardware_spec") or identity.get("spec")),
     }
     return {**block, "signature": consensus_signature(block)}
 
@@ -104,6 +113,11 @@ def declared_hardware(spec) -> dict:
     An opponent that sent nothing yields six "unknown"s rather than an empty or
     absent block: the schema's shape is fixed, and a parser on the other side
     should not have to branch on whether we filled it in.
+
+    Callers pass either spelling of the container key: this peer publishes the
+    eight fields under `hardware_spec`, while the sibling Thief publishes the
+    same fields under `spec`. Reading only our own name silently declared six
+    "unknown"s for a Thief-owned sub-game whose identity we imported.
     """
     source = spec if isinstance(spec, dict) else {}
     return {declared: source.get(internal, UNKNOWN) for declared, internal in _DECLARED_HARDWARE}

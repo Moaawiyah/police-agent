@@ -55,8 +55,11 @@ class TestWhatTheLecturerIsSent:
         """A warm-up (no --count) leaves games_played_including_this exactly
         at the prior counted total -- it does not add itself."""
         artifact = build_result(
-            facts_from(_capture()), _series(), config_with().get("scoring"),
-            counted_games_played=3, counted=False,
+            facts_from(_capture()),
+            _series(),
+            config_with().get("scoring"),
+            counted_games_played=3,
+            counted=False,
         )
 
         assert artifact["counted"] is False
@@ -64,8 +67,11 @@ class TestWhatTheLecturerIsSent:
 
     def test_a_counted_run_adds_one_to_the_prior_count(self):
         artifact = build_result(
-            facts_from(_capture()), _series(), config_with().get("scoring"),
-            counted_games_played=3, counted=True,
+            facts_from(_capture()),
+            _series(),
+            config_with().get("scoring"),
+            counted_games_played=3,
+            counted=True,
         )
 
         assert artifact["counted"] is True

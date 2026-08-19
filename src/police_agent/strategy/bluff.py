@@ -127,10 +127,10 @@ def resolve_bluff_analyst(config=None, gate=None, ledger=None) -> BluffAnalyst:
     when the runtime supplies them: reading a hint and answering it are two calls
     to one server on one budget, and counting them apart would under-report both.
     """
-    from police_agent.strategy.talk import asker_from_config
+    from police_agent.strategy.talk import DEFAULT_PROVIDER, MODEL_PROVIDERS, asker_from_config
 
     get = config.get if config is not None else (lambda _key, default=None: default)
-    provider = str(get("trash_talk.provider") or "ollama").lower()
+    provider = str(get("trash_talk.provider") or DEFAULT_PROVIDER).lower()
     gain = float(get("bluff.gain") or DEFAULT_GAIN)
-    ask = asker_from_config(get, gate, ledger) if provider == "ollama" else None
+    ask = asker_from_config(get, gate, ledger) if provider in MODEL_PROVIDERS else None
     return BluffAnalyst(ask, gain)

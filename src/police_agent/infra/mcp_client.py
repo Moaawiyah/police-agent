@@ -74,24 +74,35 @@ class McpTransport:
         """The detector watching THIS peer's own inbound mailbox for a flood."""
         return self._inboxes.inbound_dos
 
-    def _call(self, tool: str, arguments: dict, timeout: float | None = None) -> None:
-        """One MCP call: connect, invoke, disconnect.
+    def publish_greeting(self, signed: dict | None) -> None:
+        """Make my signed greeting available to my own negotiate tool's reply."""
+        self._inboxes.greeting = signed
+
+    def _call(self, tool: str, arguments: dict, timeout: float | None = None) -> dict | None:
+        """One MCP call: connect, invoke, disconnect, and hand back the reply.
 
         A fresh session per call keeps no state to go stale across the long,
         human-speed gaps between turns; the cost is one handshake per message,
         which is nothing next to a turn.
+
+        The reply body is returned rather than dropped: a request/response peer
+        answers `negotiate` with its own greeting there, and that is the only
+        copy we get from a peer that never dials us back.
         """
         budget = self._call_timeout if timeout is None else timeout
 
-        async def invoke() -> None:
+        async def invoke() -> dict | None:
             """One connect-call-disconnect cycle over FastMCP."""
             async with Client(self._url, timeout=budget, init_timeout=budget) as client:
-                await client.call_tool(tool, arguments)
+                reply = await client.call_tool(tool, arguments)
+                return getattr(reply, "data", None) or getattr(reply, "structured_content", None)
 
-        self._gate.submit(lambda: asyncio.run(invoke()), budget=budget)
+        return self._gate.submit(lambda: asyncio.run(invoke()), budget=budget)
 
-    def _send_with_retry(self, tool: str, arguments: dict, timeout: float | None = None) -> None:
-        """Retry until the opponent answers or the deadline passes.
+    def _send_with_retry(
+        self, tool: str, arguments: dict, timeout: float | None = None
+    ) -> dict | None:
+        """Retry until the opponent answers or the deadline passes, returning its reply.
 
         Two independently launched processes never start at the same instant, so
         "connection refused" during the opening seconds is the expected case, not
@@ -100,8 +111,7 @@ class McpTransport:
         deadline = time.monotonic() + (self._connect_timeout if timeout is None else timeout)
         while True:
             try:
-                self._call(tool, arguments)
-                return
+                return self._call(tool, arguments, timeout)
             except Exception as exc:
                 if time.monotonic() >= deadline:
                     raise TransportError(
