@@ -1,0 +1,44 @@
+name: quality gates
+
+# The four Table 5 gates, run on every push and pull request so a regression is
+# caught here rather than in a submission review. Each step is the same command
+# documented in README.md's Validation section -- CI and the local instructions
+# cannot drift, because they are literally the same invocations.
+
+on:
+  push:
+    branches: [master, Moaawiyah]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Sync dependencies
+        run: uv sync --extra research
+
+      - name: Lint (0 violations required)
+        run: uv run ruff check .
+
+      - name: Format check
+        run: uv run ruff format --check .
+
+      - name: File size (<= 150 non-blank, non-comment lines)
+        run: |
+          over=$(find src tests research -name '*.py' | while read -r f; do
+            n=$(grep -vcE '^\s*(#.*)?$' "$f")
+            [ "$n" -gt 150 ] && echo "$n $f"
+          done)
+          if [ -n "$over" ]; then echo "over budget:"; echo "$over"; exit 1; fi
+          echo "all files within the 150-line budget"
+
+      - name: Tests and coverage (>= 85% required)
+        run: uv run pytest --cov --cov-report=term

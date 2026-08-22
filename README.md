@@ -152,11 +152,23 @@ The design addresses five practical dilemmas:
 Custom strategies can subclass `PoliceBrainBase` and configure
 `strategy.police_class = "package.module:ClassName"` in private `game.toml`.
 
-### 4. Reinforcement-learning curves
+### 4. Parameter study in place of reinforcement-learning curves
 
-Not applicable. This submission uses an explicit Bayesian filter and a hand-engineered,
-explainable policy; no reinforcement-learning model was trained, so no learning curve is
-claimed or fabricated.
+No reinforcement-learning model was trained, so no learning curve is claimed or
+fabricated. This submission uses an explicit Bayesian filter and a hand-engineered,
+explainable policy, and the corresponding evidence is a **sensitivity study**: all nine
+tunable constants swept one at a time over 500 episodes per point against a synthetic
+evader, with 95% confidence intervals.
+
+The analysis is in [docs/RESEARCH.md](docs/RESEARCH.md), the figures in
+[assets/](assets), the raw numbers in [docs/research-data.json](docs/research-data.json),
+and the interactive version in [notebooks/sensitivity.ipynb](notebooks/sensitivity.ipynb).
+Regenerate everything with:
+
+```bash
+uv sync --extra research
+uv run python -m research
+```
 
 ### 5. Live and replay screenshots
 
@@ -269,8 +281,15 @@ authorization flow. Never share `credentials.json` or `token.json`.
 
 ## Validation
 
-The current quality gate passes with 1,031 tests passing, 1 skipped, and 98.11% measured
+The current quality gate passes with 1,242 tests passing, 0 skipped, and 95.37% measured
 coverage (minimum 85%). Ruff, formatting and the 150 nonblank/noncomment line limit pass.
+
+Coverage omits only the four modules that construct Tk widgets and so cannot run in a
+headless test process (`gui/board_view.py`, `gui/live_controls.py`, `gui/replay_controls.py`,
+`gui/window.py`). Everything else, the rest of `gui/` included, is measured. Measured with
+no omissions at all the figure is 93%, still above the 85% floor -- the omit list changes
+which number is reported, not whether the gate is met. `research/` is measured alongside
+`src/`: the study's conclusions rest on that code, so exempting it would exempt the evidence.
 
 ```powershell
 uv run pytest
@@ -291,6 +310,8 @@ src/police_agent/
   report/    declaration, config, log and final-result artifacts
   sdk/       supported application facade and replay/report APIs
   gui/       live board, replay player and headless export
+research/    parameter sweeps and the synthetic evader they run against
+notebooks/   the sensitivity study as a runnable notebook
 ```
 
 Start with [docs/FEATURES.md](docs/FEATURES.md). Detailed pages cover the
@@ -305,7 +326,6 @@ Start with [docs/FEATURES.md](docs/FEATURES.md). Detailed pages cover the
 
 - Current public ngrok interoperability is not freshly verified on the evidence revisions.
 - Gmail OAuth authorization and a real send remain unverified.
-- The paired final-result consensus digests differ despite matching game facts.
 - Matches against two different external opponent groups have not been recorded.
 - No annotated `v1.0-submission` tag has been created.
 
@@ -325,6 +345,6 @@ Developed for the University of Haifa Orchestra of AI Police/Thief project. The 
 structure was informed by the course reference while the implementation in this repository
 was rewritten for this agent's SDK, protocol and evidence model.
 
-No license file is currently included. Copyright therefore remains with the repository
-owner; do not assume permission to redistribute or reuse the code beyond applicable law and
-course rules.
+Released under the [MIT License](LICENSE). Course rules still apply to submission and
+academic conduct: the licence governs reuse of the code, not the coursework it was written
+for.
