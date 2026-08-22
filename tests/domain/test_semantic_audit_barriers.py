@@ -21,7 +21,12 @@ def test_barrier_capture_overrides_an_incorrect_reported_survival():
     )
 
     assert result["semantic_passed"] is True
-    assert result["terminal"] == {"result": CAPTURE, "winner": "police", "step": 1, "reason": "barrier"}
+    assert result["terminal"] == {
+        "result": CAPTURE,
+        "winner": "police",
+        "step": 1,
+        "reason": "barrier",
+    }
     assert result["semantic_corrections"] == ["reported survival overridden by barrier capture"]
 
 

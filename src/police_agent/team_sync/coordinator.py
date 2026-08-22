@@ -66,15 +66,22 @@ class CoordinatorInboxes:
 
     def clear(self) -> None:
         """Discard queued messages from a failed attempt before a fresh one."""
-        for inbox in (self.subgame_results, self.acks, self.series_start, self.handoff,
-                      self.series_complete):
+        for inbox in (
+            self.subgame_results,
+            self.acks,
+            self.series_start,
+            self.handoff,
+            self.series_complete,
+        ):
             while not inbox.empty():
                 inbox.get_nowait()
         with self._seen_lock:
             self._seen_message_ids.clear()
 
 
-def _accept(inboxes: CoordinatorInboxes, secret: str | None, message: dict, inbox: queue.Queue) -> dict:
+def _accept(
+    inboxes: CoordinatorInboxes, secret: str | None, message: dict, inbox: queue.Queue
+) -> dict:
     """Verify HMAC, dedupe by message_id, and enqueue on first delivery -- shared
     by every tool below except `status_request`, which only reads state."""
     if not security.verify_message(message, secret):

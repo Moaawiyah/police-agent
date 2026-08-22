@@ -23,6 +23,5 @@ def fail(agent, store, status, message: str) -> None:
     failed = status.advance(SeriesSyncState.ERROR)
     store.save_status(failed)
     if agent.listener is not None:
-        agent.listener({"type": "team_sync", "status": f"ERROR - {message}",
-                        "state": "SYNC_ERROR"})
+        agent.listener({"type": "team_sync", "status": f"ERROR - {message}", "state": "SYNC_ERROR"})
     raise TransportError(message)

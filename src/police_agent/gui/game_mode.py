@@ -33,8 +33,11 @@ def mode_and_model(config) -> tuple[str, str]:
     if config is None:
         return TEMPLATE_MODE, NO_MODEL
     # Matches strategy/talk.py's own default, imported rather than repeated so
-    # the label cannot drift from what the hint writer actually does.
-    from police_agent.strategy.talk import DEFAULT_PROVIDER, GLM
+    # the label cannot drift from what the hint writer actually does. Taken from
+    # the SDK because a front end may not reach past that layer, and imported
+    # here rather than at module scope so this module stays as light to import
+    # as its docstring claims -- `police_agent.sdk` pulls in the whole runtime.
+    from police_agent.sdk import DEFAULT_PROVIDER, GLM
 
     provider = str(config.get("trash_talk.provider", "") or DEFAULT_PROVIDER).lower()
     model = str(config.get("trash_talk.model", "") or "")

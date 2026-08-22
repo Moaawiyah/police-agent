@@ -134,9 +134,7 @@ def chat_asker(
     def ask(prompt: str, system: str = "") -> str:
         """One gated completion: admitted through `gate`, usage recorded to `ledger`."""
         reply, usage = gate.submit(
-            lambda: ask_chat_usage(
-                prompt, system, model=model, base_url=base_url, timeout=timeout
-            ),
+            lambda: ask_chat_usage(prompt, system, model=model, base_url=base_url, timeout=timeout),
             budget=allowance,
         )
         if ledger is not None:

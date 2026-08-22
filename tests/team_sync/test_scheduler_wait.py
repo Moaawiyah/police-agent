@@ -17,9 +17,7 @@ class _Inboxes:
 
 def test_returns_the_matching_message():
     inboxes = _Inboxes()
-    inboxes.subgame_results.put(
-        {"series_id": "s1", "sender_role": "thief", "sub_game_number": 2}
-    )
+    inboxes.subgame_results.put({"series_id": "s1", "sender_role": "thief", "sub_game_number": 2})
 
     result = scheduler_wait.wait_for_thief_result(inboxes, "s1", 2)
 
@@ -29,7 +27,9 @@ def test_returns_the_matching_message():
 def test_rejects_a_mismatched_message_and_keeps_waiting(monkeypatch, capsys):
     monkeypatch.setattr(scheduler_wait, "INBOX_POLL_SECONDS", 0.05)
     inboxes = _Inboxes()
-    inboxes.subgame_results.put({"series_id": "wrong-series", "sender_role": "thief", "sub_game_number": 2})
+    inboxes.subgame_results.put(
+        {"series_id": "wrong-series", "sender_role": "thief", "sub_game_number": 2}
+    )
     inboxes.subgame_results.put({"series_id": "s1", "sender_role": "thief", "sub_game_number": 2})
 
     result = scheduler_wait.wait_for_thief_result(inboxes, "s1", 2)

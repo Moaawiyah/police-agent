@@ -113,8 +113,6 @@ def agreement_core(game_id: str, sub_games: list, totals: dict) -> dict:
     }
 
 
-
-
 def repos_of(summaries: list) -> dict:
     """Return the latest repository links declared by either group."""
     found: dict = {}
