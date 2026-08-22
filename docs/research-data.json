@@ -1,0 +1,670 @@
+{
+  "episodes": 500,
+  "policy": "flee",
+  "belief": {
+    "smell_trust": {
+      "shipped": 4.0,
+      "points": [
+        {
+          "value": 0.5,
+          "capture_rate": 0.428,
+          "ci95": [
+            0.3846,
+            0.4714
+          ],
+          "mean_steps": 26.9,
+          "hit_rate": 0.2921,
+          "mean_error": 2.952,
+          "mean_true_prob": 0.0485
+        },
+        {
+          "value": 1.0,
+          "capture_rate": 0.352,
+          "ci95": [
+            0.3101,
+            0.3939
+          ],
+          "mean_steps": 27.08,
+          "hit_rate": 0.4136,
+          "mean_error": 2.218,
+          "mean_true_prob": 0.0686
+        },
+        {
+          "value": 2.0,
+          "capture_rate": 0.356,
+          "ci95": [
+            0.314,
+            0.398
+          ],
+          "mean_steps": 27.18,
+          "hit_rate": 0.3437,
+          "mean_error": 1.998,
+          "mean_true_prob": 0.0929
+        },
+        {
+          "value": 4.0,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 8.0,
+          "capture_rate": 0.41,
+          "ci95": [
+            0.3669,
+            0.4531
+          ],
+          "mean_steps": 27.33,
+          "hit_rate": 0.2657,
+          "mean_error": 1.64,
+          "mean_true_prob": 0.1444
+        },
+        {
+          "value": 16.0,
+          "capture_rate": 0.436,
+          "ci95": [
+            0.3925,
+            0.4795
+          ],
+          "mean_steps": 27.07,
+          "hit_rate": 0.2579,
+          "mean_error": 1.525,
+          "mean_true_prob": 0.1684
+        }
+      ]
+    },
+    "smell_power": {
+      "shipped": 3.0,
+      "points": [
+        {
+          "value": 1.0,
+          "capture_rate": 0.302,
+          "ci95": [
+            0.2618,
+            0.3422
+          ],
+          "mean_steps": 28.48,
+          "hit_rate": 0.3075,
+          "mean_error": 2.6,
+          "mean_true_prob": 0.0964
+        },
+        {
+          "value": 2.0,
+          "capture_rate": 0.39,
+          "ci95": [
+            0.3472,
+            0.4328
+          ],
+          "mean_steps": 26.61,
+          "hit_rate": 0.2442,
+          "mean_error": 2.148,
+          "mean_true_prob": 0.0939
+        },
+        {
+          "value": 3.0,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 4.0,
+          "capture_rate": 0.378,
+          "ci95": [
+            0.3355,
+            0.4205
+          ],
+          "mean_steps": 27.68,
+          "hit_rate": 0.3157,
+          "mean_error": 1.526,
+          "mean_true_prob": 0.1363
+        },
+        {
+          "value": 6.0,
+          "capture_rate": 0.474,
+          "ci95": [
+            0.4302,
+            0.5178
+          ],
+          "mean_steps": 27.07,
+          "hit_rate": 0.4319,
+          "mean_error": 0.933,
+          "mean_true_prob": 0.1803
+        }
+      ]
+    },
+    "leak": {
+      "shipped": 0.03,
+      "points": [
+        {
+          "value": 0.0,
+          "capture_rate": 0.356,
+          "ci95": [
+            0.314,
+            0.398
+          ],
+          "mean_steps": 27.16,
+          "hit_rate": 0.2987,
+          "mean_error": 1.992,
+          "mean_true_prob": 0.1145
+        },
+        {
+          "value": 0.01,
+          "capture_rate": 0.366,
+          "ci95": [
+            0.3238,
+            0.4082
+          ],
+          "mean_steps": 27.18,
+          "hit_rate": 0.2928,
+          "mean_error": 1.935,
+          "mean_true_prob": 0.1144
+        },
+        {
+          "value": 0.03,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 0.08,
+          "capture_rate": 0.378,
+          "ci95": [
+            0.3355,
+            0.4205
+          ],
+          "mean_steps": 27.52,
+          "hit_rate": 0.2921,
+          "mean_error": 1.644,
+          "mean_true_prob": 0.1112
+        },
+        {
+          "value": 0.15,
+          "capture_rate": 0.42,
+          "ci95": [
+            0.3767,
+            0.4633
+          ],
+          "mean_steps": 27.34,
+          "hit_rate": 0.2938,
+          "mean_error": 1.484,
+          "mean_true_prob": 0.1062
+        }
+      ]
+    },
+    "stale_decay": {
+      "shipped": 0.85,
+      "points": [
+        {
+          "value": 0.5,
+          "capture_rate": 0.394,
+          "ci95": [
+            0.3512,
+            0.4368
+          ],
+          "mean_steps": 26.95,
+          "hit_rate": 0.3035,
+          "mean_error": 1.826,
+          "mean_true_prob": 0.1189
+        },
+        {
+          "value": 0.7,
+          "capture_rate": 0.368,
+          "ci95": [
+            0.3257,
+            0.4103
+          ],
+          "mean_steps": 27.58,
+          "hit_rate": 0.2942,
+          "mean_error": 1.848,
+          "mean_true_prob": 0.1148
+        },
+        {
+          "value": 0.85,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 0.95,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.75,
+          "hit_rate": 0.2906,
+          "mean_error": 1.839,
+          "mean_true_prob": 0.112
+        },
+        {
+          "value": 1.0,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.75,
+          "hit_rate": 0.2907,
+          "mean_error": 1.834,
+          "mean_true_prob": 0.1115
+        }
+      ]
+    },
+    "stale_support": {
+      "shipped": 0.1,
+      "points": [
+        {
+          "value": 0.0,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.839,
+          "mean_true_prob": 0.1125
+        },
+        {
+          "value": 0.05,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.841,
+          "mean_true_prob": 0.1126
+        },
+        {
+          "value": 0.1,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 0.2,
+          "capture_rate": 0.366,
+          "ci95": [
+            0.3238,
+            0.4082
+          ],
+          "mean_steps": 27.61,
+          "hit_rate": 0.2933,
+          "mean_error": 1.852,
+          "mean_true_prob": 0.1141
+        },
+        {
+          "value": 0.4,
+          "capture_rate": 0.392,
+          "ci95": [
+            0.3492,
+            0.4348
+          ],
+          "mean_steps": 27.08,
+          "hit_rate": 0.2763,
+          "mean_error": 1.861,
+          "mean_true_prob": 0.118
+        }
+      ]
+    }
+  },
+  "strategy": {
+    "TOP_K": {
+      "shipped": 3,
+      "points": [
+        {
+          "value": 1,
+          "capture_rate": 0.444,
+          "ci95": [
+            0.4004,
+            0.4876
+          ],
+          "mean_steps": 26.49,
+          "hit_rate": 0.3418,
+          "mean_error": 1.513,
+          "mean_true_prob": 0.1283
+        },
+        {
+          "value": 2,
+          "capture_rate": 0.382,
+          "ci95": [
+            0.3394,
+            0.4246
+          ],
+          "mean_steps": 27.5,
+          "hit_rate": 0.3103,
+          "mean_error": 1.737,
+          "mean_true_prob": 0.1183
+        },
+        {
+          "value": 3,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 5,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.73,
+          "hit_rate": 0.2888,
+          "mean_error": 1.848,
+          "mean_true_prob": 0.1124
+        },
+        {
+          "value": 8,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.73,
+          "hit_rate": 0.2888,
+          "mean_error": 1.848,
+          "mean_true_prob": 0.1123
+        }
+      ]
+    },
+    "ESCAPE_WEIGHT": {
+      "shipped": 0.5,
+      "points": [
+        {
+          "value": 0.0,
+          "capture_rate": 0.366,
+          "ci95": [
+            0.3238,
+            0.4082
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2916,
+          "mean_error": 1.837,
+          "mean_true_prob": 0.1131
+        },
+        {
+          "value": 0.25,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 0.5,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 1.0,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2903,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 2.0,
+          "capture_rate": 0.358,
+          "ci95": [
+            0.316,
+            0.4
+          ],
+          "mean_steps": 27.77,
+          "hit_rate": 0.2885,
+          "mean_error": 1.843,
+          "mean_true_prob": 0.1125
+        }
+      ]
+    },
+    "WIDE_REACH": {
+      "shipped": 4,
+      "points": [
+        {
+          "value": 0,
+          "capture_rate": 0.002,
+          "ci95": [
+            0.0,
+            0.0059
+          ],
+          "mean_steps": 35.0,
+          "hit_rate": 0.1982,
+          "mean_error": 2.32,
+          "mean_true_prob": 0.0881
+        },
+        {
+          "value": 1,
+          "capture_rate": 0.002,
+          "ci95": [
+            0.0,
+            0.0059
+          ],
+          "mean_steps": 35.0,
+          "hit_rate": 0.1982,
+          "mean_error": 2.32,
+          "mean_true_prob": 0.0882
+        },
+        {
+          "value": 2,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 3,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 4,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 6,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 12,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        }
+      ]
+    },
+    "MIN_GAIN_FRACTION": {
+      "shipped": 0.22,
+      "points": [
+        {
+          "value": 0.1,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 0.22,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 0.35,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 0.5,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        }
+      ]
+    },
+    "MIN_GAIN_FLOOR": {
+      "shipped": 2,
+      "points": [
+        {
+          "value": 1,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 2,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 4,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        },
+        {
+          "value": 8,
+          "capture_rate": 0.36,
+          "ci95": [
+            0.3179,
+            0.4021
+          ],
+          "mean_steps": 27.74,
+          "hit_rate": 0.2904,
+          "mean_error": 1.844,
+          "mean_true_prob": 0.1127
+        }
+      ]
+    }
+  }
+}
