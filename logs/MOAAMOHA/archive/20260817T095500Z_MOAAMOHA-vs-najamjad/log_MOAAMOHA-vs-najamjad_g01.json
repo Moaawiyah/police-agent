@@ -1,0 +1,1971 @@
+{
+  "_schema": "The step-by-step record of ONE sub-game: the step-zero declaration, then every commit-reveal commitment with its payload, nonce and hash, plus what was made of the opponent's hints. Its role is to let the replay simulator (ch. 7) re-verify the whole match cryptographically. mutual_agreement here covers THIS peer's records, so the two peers' sha256 values differ by design and only 'confirmed' is comparable between them.",
+  "schema_version": "1.1",
+  "artifact_type": "sub_game_log",
+  "game_id": "MOAAMOHA-vs-najamjad",
+  "game_uid": "1753965a-1f98-d3fb-4241-0245786936c8",
+  "links": {
+    "_remark": "These are logical roles, NOT fixed filenames. Each actual file name is derived from the game_id so that files from different games are never mixed. Match-level files (declaration, result) are named <role>_<game_id>.json; per-sub-game files (config, log) are named <role>_<game_id>_g<NN>.json where <NN> is the sub_game_number.",
+    "declaration": "declaration_MOAAMOHA-vs-najamjad.json",
+    "config": "config_MOAAMOHA-vs-najamjad_g<NN>.json",
+    "log": "log_MOAAMOHA-vs-najamjad_g<NN>.json",
+    "result": "result_MOAAMOHA-vs-najamjad.json"
+  },
+  "sub_game_number": 1,
+  "timezone": "Asia/Jerusalem",
+  "roles": {
+    "police": "MOAAMOHA",
+    "thief": "najamjad"
+  },
+  "started_at": "2026-08-17T09:20:22.435447+00:00",
+  "ended_at": "2026-08-17T09:23:00.355627+00:00",
+  "duration_seconds": 155.1,
+  "result": "capture",
+  "winner": "police",
+  "abort_reason": null,
+  "steps": 27,
+  "step_zero": {
+    "payload": {
+      "step": 0,
+      "record_type": "step_zero",
+      "declared_at": "2026-08-17T09:20:22.133347+00:00",
+      "group_id": "MOAAMOHA",
+      "group_name": "MOAAMOHA",
+      "members": [
+        "Moaawiyah hajajrah",
+        "Mohamed Selawe"
+      ],
+      "repos": {
+        "cop": "https://github.com/Moaawiyah/police-agent",
+        "thief": "https://github.com/Moaawiyah/Ai_thief"
+      },
+      "sub_game_number": 1,
+      "code_version": "1.00",
+      "repository_url": "https://github.com/Moaawiyah/police-agent",
+      "llm_model": "claude-opus-4-8[1m]",
+      "github_commit": "af5a97bf4b8a7f4fb30fc10967bb0f7f18819fd7",
+      "working_tree_dirty": false,
+      "hardware_spec": {
+        "os": "Darwin 25.6.0",
+        "cpu_type": "Apple M3",
+        "cpu_cores": 8,
+        "cpu_freq_mhz": "unknown",
+        "ram_gb": 16.0,
+        "gpu_type": "Apple M3",
+        "gpu_cores_or_cuda": 10,
+        "vram_gb": "unknown"
+      }
+    },
+    "nonce": "809e816bea2179c2ffea91ab11119d9c",
+    "commit": "8c7918f4ac4c001802dc4a1a65a237898ea2088e1fc829580ceb89c0a8f41d80"
+  },
+  "records": [
+    {
+      "payload": {
+        "step": 1,
+        "state": "grid=7x7;self=[0, 1];barriers=[]",
+        "position": [
+          0,
+          1
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 2,
+        "capture_claim": [
+          0,
+          1
+        ],
+        "rationale": "chase (4, 3): step E, gap 6",
+        "tokens_input": 0,
+        "tokens_output": 0,
+        "tokens_step": 0,
+        "tokens_total": 0,
+        "tokens": 0
+      },
+      "nonce": "8bf5d2c973c8ccb496c2c0d5980b8774",
+      "commit": "563a21da0bb6a9c86ce50899fbdff5d59960b51afcd050d13df164898a604e4e"
+    },
+    {
+      "payload": {
+        "step": 2,
+        "state": "grid=7x7;self=[1, 1];barriers=[]",
+        "position": [
+          1,
+          1
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 3,
+        "capture_claim": [
+          1,
+          1
+        ],
+        "rationale": "chase (4, 4): step S, gap 6",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 187,
+        "tokens": 187
+      },
+      "nonce": "d623ab2e266c546631622657263f22a6",
+      "commit": "23fb2e128ee01e8ccaa4ebd568e1f425ea3232aa35c2cb56e5669e9f3a1f7051"
+    },
+    {
+      "payload": {
+        "step": 3,
+        "state": "grid=7x7;self=[2, 1];barriers=[]",
+        "position": [
+          2,
+          1
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 4,
+        "capture_claim": [
+          2,
+          1
+        ],
+        "rationale": "chase (5, 4): step S, gap 6",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 374,
+        "tokens": 187
+      },
+      "nonce": "e9c1a3843bb3becec113f3dc0297faf3",
+      "commit": "bf682a338d2fcb65370e3d4eba1a6b53b9e7e3ce27bac5fa34b8350d5226ca54"
+    },
+    {
+      "payload": {
+        "step": 4,
+        "state": "grid=7x7;self=[2, 2];barriers=[]",
+        "position": [
+          2,
+          2
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 5,
+        "capture_claim": [
+          2,
+          2
+        ],
+        "rationale": "chase (5, 4): step E, gap 5",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 561,
+        "tokens": 187
+      },
+      "nonce": "763bbf0387940e94d43e51943204cc9a",
+      "commit": "e9ab28d8bace3fafa09e62c0e683b15ae6b2e2cb599f91a9c85d3df6b760b468"
+    },
+    {
+      "payload": {
+        "step": 5,
+        "state": "grid=7x7;self=[3, 2];barriers=[]",
+        "position": [
+          3,
+          2
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 6,
+        "capture_claim": [
+          3,
+          2
+        ],
+        "rationale": "chase (5, 4): step S, gap 4",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 748,
+        "tokens": 187
+      },
+      "nonce": "c778f4063c25d96748b396dfe72d6a9a",
+      "commit": "8b6aa0cfd7f3bb330cd94e758378360776d01df85fe7a702ced5b88f1eb89374"
+    },
+    {
+      "payload": {
+        "step": 6,
+        "state": "grid=7x7;self=[3, 3];barriers=[]",
+        "position": [
+          3,
+          3
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 7,
+        "capture_claim": [
+          3,
+          3
+        ],
+        "rationale": "chase (6, 5): step E, gap 5",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 935,
+        "tokens": 187
+      },
+      "nonce": "9b3e383f3071c1eed88413642715f8ab",
+      "commit": "ac6945e54315ad463cfef192a5d970dfe11fe19fa8322fc6c2dfba1eec18cb19"
+    },
+    {
+      "payload": {
+        "step": 7,
+        "state": "grid=7x7;self=[3, 4];barriers=[]",
+        "position": [
+          3,
+          4
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 8,
+        "capture_claim": [
+          3,
+          4
+        ],
+        "rationale": "chase (6, 5): step E, gap 4",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 1122,
+        "tokens": 187
+      },
+      "nonce": "a074d8ca095fd38dac21004c84f606a0",
+      "commit": "dc99c01e37a66ef3954cc2b58b0b60d8ca05aa7016590079baa35704ffe531d1"
+    },
+    {
+      "payload": {
+        "step": 8,
+        "state": "grid=7x7;self=[3, 5];barriers=[]",
+        "position": [
+          3,
+          5
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 9,
+        "capture_claim": [
+          3,
+          5
+        ],
+        "rationale": "chase (6, 5): step E, gap 3",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 1309,
+        "tokens": 187
+      },
+      "nonce": "04c1e4603fe247a63ff7eabd652d6c0a",
+      "commit": "e757424336476d021eb80792ff4a1212e1c505823b9d5bf29c5b84df0266271a"
+    },
+    {
+      "payload": {
+        "step": 9,
+        "state": "grid=7x7;self=[4, 5];barriers=[]",
+        "position": [
+          4,
+          5
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 10,
+        "capture_claim": [
+          4,
+          5
+        ],
+        "rationale": "chase (6, 5): step S, gap 2",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 1496,
+        "tokens": 187
+      },
+      "nonce": "f0ea5856dd1874118525f702fdbbee08",
+      "commit": "6a0730126c47671f44fca7be0f14269e689b6069b7cd0a0654a854394f6431d8"
+    },
+    {
+      "payload": {
+        "step": 10,
+        "state": "grid=7x7;self=[4, 4];barriers=[]",
+        "position": [
+          4,
+          4
+        ],
+        "move": "MOVE:W",
+        "barrier": null,
+        "unique_cells": 11,
+        "capture_claim": [
+          4,
+          4
+        ],
+        "rationale": "chase (6, 4): step W, gap 2",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 1683,
+        "tokens": 187
+      },
+      "nonce": "2545c388f7918ab4af74f0a3c04a0b16",
+      "commit": "9f9b2f1553a4e911d1bb06f057e0c9b81ea0b3c4ff9643c6e747423313924230"
+    },
+    {
+      "payload": {
+        "step": 11,
+        "state": "grid=7x7;self=[5, 4];barriers=[]",
+        "position": [
+          5,
+          4
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 12,
+        "capture_claim": [
+          5,
+          4
+        ],
+        "rationale": "chase (6, 4): step S, gap 1",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 1870,
+        "tokens": 187
+      },
+      "nonce": "caaeaf7c73c98fb40cff96dfe53e0022",
+      "commit": "6bea3207eade365f44a19df3bae9968297a44bc8f8be0c747c8467956c272a1b"
+    },
+    {
+      "payload": {
+        "step": 12,
+        "state": "grid=7x7;self=[5, 4];barriers=[[5, 3]]",
+        "position": [
+          5,
+          4
+        ],
+        "move": "BARRIER:W",
+        "barrier": [
+          5,
+          3
+        ],
+        "unique_cells": 12,
+        "capture_claim": null,
+        "rationale": "wall (5, 3): leaves the believed thief at (6, 3) 2 step(s)",
+        "tokens_input": 90,
+        "tokens_output": 96,
+        "tokens_step": 186,
+        "tokens_total": 2056,
+        "tokens": 186
+      },
+      "nonce": "e1e0416db87ef3c233bd27aec9d7ebe0",
+      "commit": "0fa77d8de78c9b28381042b380f3adda9eb8f0312eddacde55bfe0858cb78384"
+    },
+    {
+      "payload": {
+        "step": 13,
+        "state": "grid=7x7;self=[6, 4];barriers=[[5, 3]]",
+        "position": [
+          6,
+          4
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 13,
+        "capture_claim": [
+          6,
+          4
+        ],
+        "rationale": "chase (6, 2): step S, gap 2",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 2243,
+        "tokens": 187
+      },
+      "nonce": "a9b594a9a4ba1f9a92be828b7f5235c9",
+      "commit": "ffa100ac49c4aaa317aff5ae7fc45587458a5851d0f64c9263cfa41589fa16c7"
+    },
+    {
+      "payload": {
+        "step": 14,
+        "state": "grid=7x7;self=[6, 3];barriers=[[5, 3]]",
+        "position": [
+          6,
+          3
+        ],
+        "move": "MOVE:W",
+        "barrier": null,
+        "unique_cells": 14,
+        "capture_claim": [
+          6,
+          3
+        ],
+        "rationale": "chase (6, 2): step W, gap 1",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 2430,
+        "tokens": 187
+      },
+      "nonce": "35d3fe6b86e34c6908a6c3f19ba5d89f",
+      "commit": "609f8b6e51b00225f2f76d275827c7174c0871a67889883b0c31d55f404cde5f"
+    },
+    {
+      "payload": {
+        "step": 15,
+        "state": "grid=7x7;self=[6, 2];barriers=[[5, 3]]",
+        "position": [
+          6,
+          2
+        ],
+        "move": "MOVE:W",
+        "barrier": null,
+        "unique_cells": 15,
+        "capture_claim": [
+          6,
+          2
+        ],
+        "rationale": "chase (5, 1): step W, gap 2",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 2617,
+        "tokens": 187
+      },
+      "nonce": "d0b56589666cc9bb69295a911bfda7bc",
+      "commit": "f75d8ca99b796886a66d507bcd358d147357509917afe93bc0a64a9ad2032c14"
+    },
+    {
+      "payload": {
+        "step": 16,
+        "state": "grid=7x7;self=[6, 2];barriers=[[5, 2], [5, 3]]",
+        "position": [
+          6,
+          2
+        ],
+        "move": "BARRIER:N",
+        "barrier": [
+          5,
+          2
+        ],
+        "unique_cells": 15,
+        "capture_claim": null,
+        "rationale": "wall (5, 2): leaves the believed thief at (5, 1) 3 step(s)",
+        "tokens_input": 90,
+        "tokens_output": 96,
+        "tokens_step": 186,
+        "tokens_total": 2803,
+        "tokens": 186
+      },
+      "nonce": "364f77604d962532d250d90b667408b1",
+      "commit": "7d307a4e844f1870aadf48061ceb11f52a51dd8cf03451a5afe05eb1004177f1"
+    },
+    {
+      "payload": {
+        "step": 17,
+        "state": "grid=7x7;self=[6, 1];barriers=[[5, 2], [5, 3]]",
+        "position": [
+          6,
+          1
+        ],
+        "move": "MOVE:W",
+        "barrier": null,
+        "unique_cells": 16,
+        "capture_claim": [
+          6,
+          1
+        ],
+        "rationale": "chase (4, 1): step W, gap 2",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 2990,
+        "tokens": 187
+      },
+      "nonce": "cee8794b88ef50f61ca0e1824ec0cc10",
+      "commit": "e724dc6b87ef25678672272496da1c226c5edb15737fae42ba5588099c637c59"
+    },
+    {
+      "payload": {
+        "step": 18,
+        "state": "grid=7x7;self=[5, 1];barriers=[[5, 2], [5, 3]]",
+        "position": [
+          5,
+          1
+        ],
+        "move": "MOVE:N",
+        "barrier": null,
+        "unique_cells": 17,
+        "capture_claim": [
+          5,
+          1
+        ],
+        "rationale": "chase (4, 1): step N, gap 1",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 3177,
+        "tokens": 187
+      },
+      "nonce": "d198e2a892ae89e3415f9f7a9ef03f36",
+      "commit": "4f1581b3ab84802862a65d350072faae517ea881f9c5eb94bc746d5cd79e7cc5"
+    },
+    {
+      "payload": {
+        "step": 19,
+        "state": "grid=7x7;self=[4, 1];barriers=[[5, 2], [5, 3]]",
+        "position": [
+          4,
+          1
+        ],
+        "move": "MOVE:N",
+        "barrier": null,
+        "unique_cells": 18,
+        "capture_claim": [
+          4,
+          1
+        ],
+        "rationale": "chase (2, 1): step N, gap 2",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 3364,
+        "tokens": 187
+      },
+      "nonce": "a3683c467aa67df46911867a9e52c4df",
+      "commit": "78c5b327083a70eea238c51fd510e2c931fd6659eaac0aae6cba2c82e96c7bb4"
+    },
+    {
+      "payload": {
+        "step": 20,
+        "state": "grid=7x7;self=[3, 1];barriers=[[5, 2], [5, 3]]",
+        "position": [
+          3,
+          1
+        ],
+        "move": "MOVE:N",
+        "barrier": null,
+        "unique_cells": 19,
+        "capture_claim": [
+          3,
+          1
+        ],
+        "rationale": "chase (1, 2): step N, gap 3",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 3551,
+        "tokens": 187
+      },
+      "nonce": "673626ea184a528ad0b52e231fe703d8",
+      "commit": "4fb5b3d44e8dfe7cfa4f99e260bbecf01101347e212772314b87cf8ee3dcce21"
+    },
+    {
+      "payload": {
+        "step": 21,
+        "state": "grid=7x7;self=[2, 1];barriers=[[5, 2], [5, 3]]",
+        "position": [
+          2,
+          1
+        ],
+        "move": "MOVE:N",
+        "barrier": null,
+        "unique_cells": 19,
+        "capture_claim": [
+          2,
+          1
+        ],
+        "rationale": "chase (1, 3): step N, gap 3",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 3738,
+        "tokens": 187
+      },
+      "nonce": "04c25f7b8e0c31455d3baad11bf0744a",
+      "commit": "cc04be8f959be7982bb14c03295800fdf1d0b80685456f4b1a8fc9b22c1edc48"
+    },
+    {
+      "payload": {
+        "step": 22,
+        "state": "grid=7x7;self=[2, 2];barriers=[[5, 2], [5, 3]]",
+        "position": [
+          2,
+          2
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 19,
+        "capture_claim": [
+          2,
+          2
+        ],
+        "rationale": "chase (1, 3): step E, gap 2",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 3925,
+        "tokens": 187
+      },
+      "nonce": "305ed05977d1f52a56ee20125a2ec6ce",
+      "commit": "c1f4a2d8b9b7760448d9eff7efb4143f792e63602b21a6240571953012e23d9f"
+    },
+    {
+      "payload": {
+        "step": 23,
+        "state": "grid=7x7;self=[2, 3];barriers=[[5, 2], [5, 3]]",
+        "position": [
+          2,
+          3
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 20,
+        "capture_claim": [
+          2,
+          3
+        ],
+        "rationale": "chase (0, 5): step E, gap 4",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 4112,
+        "tokens": 187
+      },
+      "nonce": "4bf6f311ac35c6e1ecec193816b419bf",
+      "commit": "68249abc33f11638d776097053da558c4e0801d5e1044148a7ff27f294f785d5"
+    },
+    {
+      "payload": {
+        "step": 24,
+        "state": "grid=7x7;self=[2, 4];barriers=[[5, 2], [5, 3]]",
+        "position": [
+          2,
+          4
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 21,
+        "capture_claim": [
+          2,
+          4
+        ],
+        "rationale": "chase (0, 5): step E, gap 3",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 4299,
+        "tokens": 187
+      },
+      "nonce": "8a90f1f278710140030b28176c4551a9",
+      "commit": "dd2d081dde3e3b2d4afc72068250f08c373ce4588fed5cda8a78a3aaaf09b600"
+    },
+    {
+      "payload": {
+        "step": 25,
+        "state": "grid=7x7;self=[1, 4];barriers=[[5, 2], [5, 3]]",
+        "position": [
+          1,
+          4
+        ],
+        "move": "MOVE:N",
+        "barrier": null,
+        "unique_cells": 22,
+        "capture_claim": [
+          1,
+          4
+        ],
+        "rationale": "chase (0, 5): step N, gap 2",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 4486,
+        "tokens": 187
+      },
+      "nonce": "f61476174211c1d1d449671b95065292",
+      "commit": "14aee85bacde2681005a7558083bcfcc2827651d64d7fa164832af505593951d"
+    },
+    {
+      "payload": {
+        "step": 26,
+        "state": "grid=7x7;self=[1, 4];barriers=[[0, 4], [5, 2], [5, 3]]",
+        "position": [
+          1,
+          4
+        ],
+        "move": "BARRIER:N",
+        "barrier": [
+          0,
+          4
+        ],
+        "unique_cells": 22,
+        "capture_claim": null,
+        "rationale": "wall (0, 4): leaves the believed thief at (0, 5) 2 step(s)",
+        "tokens_input": 90,
+        "tokens_output": 96,
+        "tokens_step": 186,
+        "tokens_total": 4672,
+        "tokens": 186
+      },
+      "nonce": "ca5d5d3e922dcb95664f08b3ade9707a",
+      "commit": "f7467c0be1175a58986708b9c48905262fb0987c50a22fb603ad8a6d04956285"
+    },
+    {
+      "payload": {
+        "step": 27,
+        "state": "grid=7x7;self=[1, 5];barriers=[[0, 4], [5, 2], [5, 3]]",
+        "position": [
+          1,
+          5
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 23,
+        "capture_claim": [
+          1,
+          5
+        ],
+        "rationale": "chase (1, 5): step E, gap 0",
+        "tokens_input": 91,
+        "tokens_output": 96,
+        "tokens_step": 187,
+        "tokens_total": 4859,
+        "tokens": 187
+      },
+      "nonce": "c1c93bd69ee8fe2d9a7603d77551e036",
+      "commit": "41e557842c0136cc89d96555a2bb824705d2b563c77518d04c87f0ce544306db"
+    }
+  ],
+  "opponent_messages": [
+    {
+      "step": 1,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "2,1": 0.3,
+        "2,2": 0.3,
+        "2,3": 0.3,
+        "2,4": 0.3,
+        "2,5": 0.3,
+        "3,1": 0.3,
+        "3,2": 0.6,
+        "3,3": 0.6,
+        "3,4": 0.6,
+        "3,5": 0.3,
+        "4,1": 0.3,
+        "4,2": 0.6,
+        "4,3": 0.9,
+        "4,4": 0.6,
+        "4,5": 0.3,
+        "5,1": 0.3,
+        "5,2": 0.6,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.3,
+        "6,1": 0.3,
+        "6,2": 0.3,
+        "6,3": 0.3,
+        "6,4": 0.3,
+        "6,5": 0.3
+      },
+      "commit": "5a0dacaa9b640277b7f49766ed643d75637ee8b0b9676957534e145257af8cd6",
+      "timestamp": "2026-08-17T09:20:24.635935+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": null,
+      "win_claim": null
+    },
+    {
+      "step": 2,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "2,1": 0.2,
+        "2,2": 0.3,
+        "2,3": 0.3,
+        "2,4": 0.3,
+        "2,5": 0.3,
+        "3,1": 0.2,
+        "3,2": 0.5,
+        "3,3": 0.6,
+        "3,4": 0.6,
+        "3,5": 0.6,
+        "4,1": 0.2,
+        "4,2": 0.5,
+        "4,3": 0.8,
+        "4,4": 0.9,
+        "4,5": 0.6,
+        "5,1": 0.2,
+        "5,2": 0.5,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.6,
+        "6,1": 0.2,
+        "6,2": 0.3,
+        "6,3": 0.3,
+        "6,4": 0.3,
+        "6,5": 0.3,
+        "2,6": 0.3,
+        "3,6": 0.3,
+        "4,6": 0.3,
+        "5,6": 0.3,
+        "6,6": 0.3
+      },
+      "commit": "1b46309efc5f69dcc8c8220134f86b5ed4f0f88f14ccb151790e9083bff85c81",
+      "timestamp": "2026-08-17T09:20:31.471842+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          0,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 3,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "2,1": 0.1,
+        "2,2": 0.2,
+        "2,3": 0.2,
+        "2,4": 0.2,
+        "2,5": 0.2,
+        "3,1": 0.1,
+        "3,2": 0.4,
+        "3,3": 0.5,
+        "3,4": 0.5,
+        "3,5": 0.5,
+        "4,1": 0.1,
+        "4,2": 0.4,
+        "4,3": 0.7,
+        "4,4": 0.8,
+        "4,5": 0.6,
+        "5,1": 0.1,
+        "5,2": 0.4,
+        "5,3": 0.6,
+        "5,4": 0.9,
+        "5,5": 0.6,
+        "6,1": 0.1,
+        "6,2": 0.3,
+        "6,3": 0.6,
+        "6,4": 0.6,
+        "6,5": 0.6,
+        "2,6": 0.2,
+        "3,6": 0.3,
+        "4,6": 0.3,
+        "5,6": 0.3,
+        "6,6": 0.3
+      },
+      "commit": "3fc49d6226619d810ab97962dd33bc7738e04fa35df1db0c86f40c07d57b98f1",
+      "timestamp": "2026-08-17T09:20:36.717597+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          1,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 4,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "2,2": 0.1,
+        "2,3": 0.1,
+        "2,4": 0.1,
+        "2,5": 0.1,
+        "3,2": 0.3,
+        "3,3": 0.4,
+        "3,4": 0.4,
+        "3,5": 0.4,
+        "4,2": 0.3,
+        "4,3": 0.6,
+        "4,4": 0.7,
+        "4,5": 0.6,
+        "5,2": 0.3,
+        "5,3": 0.5,
+        "5,4": 0.8,
+        "5,5": 0.9,
+        "6,2": 0.2,
+        "6,3": 0.5,
+        "6,4": 0.6,
+        "6,5": 0.6,
+        "2,6": 0.1,
+        "3,6": 0.3,
+        "4,6": 0.6,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "fced91e8b6b86ff878ba704fcfcab1b3789d8822656434ae8b03fa023986668b",
+      "timestamp": "2026-08-17T09:20:42.100881+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 5,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "3,2": 0.2,
+        "3,3": 0.3,
+        "3,4": 0.3,
+        "3,5": 0.3,
+        "4,2": 0.2,
+        "4,3": 0.5,
+        "4,4": 0.6,
+        "4,5": 0.5,
+        "5,2": 0.2,
+        "5,3": 0.4,
+        "5,4": 0.7,
+        "5,5": 0.8,
+        "6,2": 0.1,
+        "6,3": 0.4,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "3,6": 0.2,
+        "4,6": 0.5,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "c604e1649d1ec2544c94bd8be95fd1f2623aa1c9fee1a62f635624bbfbfd98e8",
+      "timestamp": "2026-08-17T09:20:47.244657+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          2
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 6,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "3,2": 0.1,
+        "3,3": 0.2,
+        "3,4": 0.2,
+        "3,5": 0.2,
+        "4,2": 0.1,
+        "4,3": 0.4,
+        "4,4": 0.5,
+        "4,5": 0.4,
+        "5,2": 0.1,
+        "5,3": 0.3,
+        "5,4": 0.6,
+        "5,5": 0.7,
+        "6,3": 0.3,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "3,6": 0.1,
+        "4,6": 0.4,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "c852cc40b4e29de8d88a32d12032ddffcf85046f0e1448bf439323114232f352",
+      "timestamp": "2026-08-17T09:20:52.448236+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          3,
+          2
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 7,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "3,3": 0.1,
+        "3,4": 0.1,
+        "3,5": 0.1,
+        "4,3": 0.3,
+        "4,4": 0.4,
+        "4,5": 0.3,
+        "5,3": 0.3,
+        "5,4": 0.6,
+        "5,5": 0.6,
+        "6,3": 0.3,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "4,6": 0.3,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "5ea59b468637b3efdcf824751aed00b682af5ad848951e3a002e50261e7d0cf7",
+      "timestamp": "2026-08-17T09:20:57.707155+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          3,
+          3
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 8,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.3,
+        "4,5": 0.3,
+        "5,3": 0.3,
+        "5,4": 0.6,
+        "5,5": 0.6,
+        "6,3": 0.3,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "4,6": 0.3,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "2500795181f1ddc364f96281c08d0f0543362766e838021a6a0325ad73b1fb25",
+      "timestamp": "2026-08-17T09:21:02.956029+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          3,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 9,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.3,
+        "4,5": 0.3,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.6,
+        "6,3": 0.6,
+        "6,4": 0.9,
+        "6,5": 0.8,
+        "4,6": 0.3,
+        "5,6": 0.5,
+        "6,6": 0.5,
+        "4,2": 0.3,
+        "5,2": 0.3,
+        "6,2": 0.3
+      },
+      "commit": "1e15bd69b9a6d7fe38165d25870cb7e71c0211864857f63c2faa245e0f1f2857",
+      "timestamp": "2026-08-17T09:21:08.180249+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          3,
+          5
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 10,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.3,
+        "4,5": 0.3,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.5,
+        "6,3": 0.9,
+        "6,4": 0.8,
+        "6,5": 0.7,
+        "4,6": 0.2,
+        "5,6": 0.4,
+        "6,6": 0.4,
+        "4,2": 0.3,
+        "5,2": 0.6,
+        "6,2": 0.6,
+        "4,1": 0.3,
+        "5,1": 0.3,
+        "6,1": 0.3
+      },
+      "commit": "2b73954baaeb604b5efa658f8622777afde1dcde631db8ec7ba86224ac23bf20",
+      "timestamp": "2026-08-17T09:21:13.668166+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          4,
+          5
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 11,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.3,
+        "4,5": 0.2,
+        "5,3": 0.6,
+        "5,4": 0.5,
+        "5,5": 0.4,
+        "6,3": 0.8,
+        "6,4": 0.7,
+        "6,5": 0.6,
+        "4,6": 0.1,
+        "5,6": 0.3,
+        "6,6": 0.3,
+        "4,2": 0.3,
+        "5,2": 0.6,
+        "6,2": 0.9,
+        "4,1": 0.3,
+        "5,1": 0.6,
+        "6,1": 0.6,
+        "4,0": 0.3,
+        "5,0": 0.3,
+        "6,0": 0.3
+      },
+      "commit": "2d5ab5ceab1617197f2484e69bbeaa389c639187c6e50dc566509d48fd7dec23",
+      "timestamp": "2026-08-17T09:21:18.883860+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          4,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 12,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.2,
+        "4,5": 0.1,
+        "5,3": 0.5,
+        "5,4": 0.4,
+        "5,5": 0.3,
+        "6,3": 0.7,
+        "6,4": 0.6,
+        "6,5": 0.5,
+        "5,6": 0.2,
+        "6,6": 0.2,
+        "4,2": 0.3,
+        "5,2": 0.6,
+        "6,2": 0.8,
+        "4,1": 0.3,
+        "5,1": 0.6,
+        "6,1": 0.9,
+        "4,0": 0.3,
+        "5,0": 0.6,
+        "6,0": 0.6
+      },
+      "commit": "61027eff8d45e88d135b26f89f55c84e06442f6cd234a59ebfabba0aa92d1a9d",
+      "timestamp": "2026-08-17T09:21:24.145935+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          5,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 13,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.1,
+        "5,3": 0.4,
+        "5,4": 0.3,
+        "5,5": 0.2,
+        "6,3": 0.6,
+        "6,4": 0.5,
+        "6,5": 0.4,
+        "5,6": 0.1,
+        "6,6": 0.1,
+        "4,2": 0.6,
+        "5,2": 0.6,
+        "6,2": 0.7,
+        "4,1": 0.6,
+        "5,1": 0.9,
+        "6,1": 0.8,
+        "4,0": 0.6,
+        "5,0": 0.6,
+        "6,0": 0.6,
+        "3,0": 0.3,
+        "3,1": 0.3,
+        "3,2": 0.3,
+        "3,3": 0.3
+      },
+      "commit": "d07299e1230d2a6284c9ec76b254964f9ec4b9644d80f87fc1ee1a3554c4c69e",
+      "timestamp": "2026-08-17T09:21:29.726869+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": null,
+      "win_claim": null
+    },
+    {
+      "step": 14,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.3,
+        "5,4": 0.2,
+        "5,5": 0.1,
+        "6,3": 0.5,
+        "6,4": 0.4,
+        "6,5": 0.3,
+        "4,2": 0.6,
+        "5,2": 0.6,
+        "6,2": 0.6,
+        "4,1": 0.9,
+        "5,1": 0.8,
+        "6,1": 0.7,
+        "4,0": 0.6,
+        "5,0": 0.6,
+        "6,0": 0.5,
+        "3,0": 0.6,
+        "3,1": 0.6,
+        "3,2": 0.6,
+        "3,3": 0.3,
+        "2,0": 0.3,
+        "2,1": 0.3,
+        "2,2": 0.3,
+        "2,3": 0.3
+      },
+      "commit": "cf27b0ccb4f6a0e76eb2c7d895f6d0aa5f9d1d066547706049fc0dc2970998d0",
+      "timestamp": "2026-08-17T09:21:34.934615+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          6,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 15,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.3,
+        "5,4": 0.1,
+        "6,3": 0.4,
+        "6,4": 0.3,
+        "6,5": 0.2,
+        "4,2": 0.6,
+        "5,2": 0.5,
+        "6,2": 0.5,
+        "4,1": 0.8,
+        "5,1": 0.7,
+        "6,1": 0.6,
+        "4,0": 0.6,
+        "5,0": 0.5,
+        "6,0": 0.4,
+        "3,0": 0.6,
+        "3,1": 0.9,
+        "3,2": 0.6,
+        "3,3": 0.3,
+        "2,0": 0.6,
+        "2,1": 0.6,
+        "2,2": 0.6,
+        "2,3": 0.3,
+        "1,0": 0.3,
+        "1,1": 0.3,
+        "1,2": 0.3,
+        "1,3": 0.3
+      },
+      "commit": "98dd8659b9c9424ed0d1d11b1f1b5f9ffdd7d95d9d819ba2c8ad288d77a43928",
+      "timestamp": "2026-08-17T09:21:40.098864+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          6,
+          3
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 16,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.2,
+        "6,3": 0.3,
+        "6,4": 0.2,
+        "6,5": 0.1,
+        "4,2": 0.5,
+        "5,2": 0.4,
+        "6,2": 0.4,
+        "4,1": 0.7,
+        "5,1": 0.6,
+        "6,1": 0.5,
+        "4,0": 0.5,
+        "5,0": 0.4,
+        "6,0": 0.3,
+        "3,0": 0.6,
+        "3,1": 0.8,
+        "3,2": 0.6,
+        "3,3": 0.3,
+        "2,0": 0.6,
+        "2,1": 0.9,
+        "2,2": 0.6,
+        "2,3": 0.3,
+        "1,0": 0.6,
+        "1,1": 0.6,
+        "1,2": 0.6,
+        "1,3": 0.3,
+        "0,0": 0.3,
+        "0,1": 0.3,
+        "0,2": 0.3,
+        "0,3": 0.3
+      },
+      "commit": "e9bd8d47af00234f089bf3bde2a63fc2f2b426b72bb40c3da9621300e3d5f271",
+      "timestamp": "2026-08-17T09:21:45.260828+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          6,
+          2
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 17,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,3": 0.2,
+        "5,3": 0.1,
+        "6,3": 0.2,
+        "6,4": 0.1,
+        "4,2": 0.4,
+        "5,2": 0.3,
+        "6,2": 0.3,
+        "4,1": 0.6,
+        "5,1": 0.5,
+        "6,1": 0.4,
+        "4,0": 0.4,
+        "5,0": 0.3,
+        "6,0": 0.2,
+        "3,0": 0.5,
+        "3,1": 0.7,
+        "3,2": 0.5,
+        "3,3": 0.3,
+        "2,0": 0.6,
+        "2,1": 0.8,
+        "2,2": 0.6,
+        "2,3": 0.3,
+        "1,0": 0.6,
+        "1,1": 0.9,
+        "1,2": 0.6,
+        "1,3": 0.3,
+        "0,0": 0.6,
+        "0,1": 0.6,
+        "0,2": 0.6,
+        "0,3": 0.3
+      },
+      "commit": "6b2069f3473f8fdaf3f0a89ca11f91d28190c12e4aed6a7f4a8db7352a6b9aaa",
+      "timestamp": "2026-08-17T09:21:53.439608+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": null,
+      "win_claim": null
+    },
+    {
+      "step": 18,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,3": 0.1,
+        "6,3": 0.1,
+        "4,2": 0.3,
+        "5,2": 0.2,
+        "6,2": 0.2,
+        "4,1": 0.5,
+        "5,1": 0.4,
+        "6,1": 0.3,
+        "4,0": 0.3,
+        "5,0": 0.2,
+        "6,0": 0.1,
+        "3,0": 0.4,
+        "3,1": 0.6,
+        "3,2": 0.4,
+        "3,3": 0.3,
+        "2,0": 0.5,
+        "2,1": 0.7,
+        "2,2": 0.6,
+        "2,3": 0.6,
+        "1,0": 0.5,
+        "1,1": 0.8,
+        "1,2": 0.9,
+        "1,3": 0.6,
+        "0,0": 0.5,
+        "0,1": 0.6,
+        "0,2": 0.6,
+        "0,3": 0.6,
+        "0,4": 0.3,
+        "1,4": 0.3,
+        "2,4": 0.3,
+        "3,4": 0.3
+      },
+      "commit": "b633185cdb58c2d0778a7dd191e3c852460c92f8b95dd29bf9dedd155c85efbd",
+      "timestamp": "2026-08-17T09:21:58.653710+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          6,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 19,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,2": 0.2,
+        "5,2": 0.1,
+        "6,2": 0.1,
+        "4,1": 0.4,
+        "5,1": 0.3,
+        "6,1": 0.2,
+        "4,0": 0.2,
+        "5,0": 0.1,
+        "3,0": 0.3,
+        "3,1": 0.5,
+        "3,2": 0.3,
+        "3,3": 0.3,
+        "2,0": 0.4,
+        "2,1": 0.6,
+        "2,2": 0.6,
+        "2,3": 0.6,
+        "1,0": 0.4,
+        "1,1": 0.7,
+        "1,2": 0.8,
+        "1,3": 0.9,
+        "0,0": 0.4,
+        "0,1": 0.5,
+        "0,2": 0.6,
+        "0,3": 0.6,
+        "0,4": 0.6,
+        "1,4": 0.6,
+        "2,4": 0.6,
+        "3,4": 0.3,
+        "0,5": 0.3,
+        "1,5": 0.3,
+        "2,5": 0.3,
+        "3,5": 0.3
+      },
+      "commit": "dc0f32317755d9da6ecda2ee24e720645fffa7156841b46e488da44d6c3503ed",
+      "timestamp": "2026-08-17T09:22:03.859543+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          5,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 20,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,2": 0.1,
+        "4,1": 0.3,
+        "5,1": 0.2,
+        "6,1": 0.1,
+        "4,0": 0.1,
+        "3,0": 0.2,
+        "3,1": 0.4,
+        "3,2": 0.3,
+        "3,3": 0.3,
+        "2,0": 0.3,
+        "2,1": 0.5,
+        "2,2": 0.5,
+        "2,3": 0.6,
+        "1,0": 0.3,
+        "1,1": 0.6,
+        "1,2": 0.7,
+        "1,3": 0.8,
+        "0,0": 0.3,
+        "0,1": 0.4,
+        "0,2": 0.5,
+        "0,3": 0.6,
+        "0,4": 0.6,
+        "1,4": 0.9,
+        "2,4": 0.6,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.6,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.3,
+        "1,6": 0.3,
+        "2,6": 0.3,
+        "3,6": 0.3
+      },
+      "commit": "ea7ed509c3da45a42a45874f06aabfe603f50fc50013080f463a6f4582257116",
+      "timestamp": "2026-08-17T09:22:09.061691+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          4,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 21,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,1": 0.2,
+        "5,1": 0.1,
+        "3,0": 0.1,
+        "3,1": 0.3,
+        "3,2": 0.2,
+        "3,3": 0.3,
+        "2,0": 0.2,
+        "2,1": 0.4,
+        "2,2": 0.4,
+        "2,3": 0.5,
+        "1,0": 0.2,
+        "1,1": 0.5,
+        "1,2": 0.6,
+        "1,3": 0.7,
+        "0,0": 0.2,
+        "0,1": 0.3,
+        "0,2": 0.4,
+        "0,3": 0.5,
+        "0,4": 0.6,
+        "1,4": 0.8,
+        "2,4": 0.6,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.9,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.6,
+        "2,6": 0.6,
+        "3,6": 0.3
+      },
+      "commit": "aba6742237e3d42374cc44b0125655c1de8b6815816ac0e2c3ffb56018dc766f",
+      "timestamp": "2026-08-17T09:22:14.272479+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          3,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 22,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "4,1": 0.1,
+        "3,1": 0.2,
+        "3,2": 0.1,
+        "3,3": 0.2,
+        "2,0": 0.1,
+        "2,1": 0.3,
+        "2,2": 0.3,
+        "2,3": 0.4,
+        "1,0": 0.1,
+        "1,1": 0.4,
+        "1,2": 0.5,
+        "1,3": 0.6,
+        "0,0": 0.1,
+        "0,1": 0.2,
+        "0,2": 0.3,
+        "0,3": 0.4,
+        "0,4": 0.6,
+        "1,4": 0.7,
+        "2,4": 0.5,
+        "3,4": 0.2,
+        "0,5": 0.9,
+        "1,5": 0.8,
+        "2,5": 0.5,
+        "3,5": 0.2,
+        "0,6": 0.6,
+        "1,6": 0.6,
+        "2,6": 0.5,
+        "3,6": 0.2
+      },
+      "commit": "45b1cd45e633a25123630e03914c1f772b982a7c9663dd662e060eb818a853af",
+      "timestamp": "2026-08-17T09:22:19.487781+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 23,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "3,1": 0.1,
+        "3,3": 0.1,
+        "2,1": 0.2,
+        "2,2": 0.2,
+        "2,3": 0.3,
+        "1,1": 0.3,
+        "1,2": 0.4,
+        "1,3": 0.5,
+        "0,1": 0.1,
+        "0,2": 0.2,
+        "0,3": 0.3,
+        "0,4": 0.6,
+        "1,4": 0.6,
+        "2,4": 0.4,
+        "3,4": 0.1,
+        "0,5": 0.9,
+        "1,5": 0.7,
+        "2,5": 0.4,
+        "3,5": 0.1,
+        "0,6": 0.6,
+        "1,6": 0.6,
+        "2,6": 0.4,
+        "3,6": 0.1
+      },
+      "commit": "3417a81715e4eb95e4626d79639a5f393ccf3848d1f7f73ccfd55a20aa1e9987",
+      "timestamp": "2026-08-17T09:22:24.692330+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          2
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 24,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "2,1": 0.1,
+        "2,2": 0.1,
+        "2,3": 0.3,
+        "1,1": 0.2,
+        "1,2": 0.3,
+        "1,3": 0.4,
+        "0,2": 0.1,
+        "0,3": 0.3,
+        "0,4": 0.6,
+        "1,4": 0.6,
+        "2,4": 0.3,
+        "0,5": 0.9,
+        "1,5": 0.6,
+        "2,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.6,
+        "2,6": 0.3
+      },
+      "commit": "6cb53c776b42c3e03bc00f988119ff728578c7731c66f3a2e030d9ec8d74f6de",
+      "timestamp": "2026-08-17T09:22:31.145417+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          3
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 25,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "2,3": 0.3,
+        "1,1": 0.1,
+        "1,2": 0.2,
+        "1,3": 0.3,
+        "0,3": 0.3,
+        "0,4": 0.6,
+        "1,4": 0.6,
+        "2,4": 0.3,
+        "0,5": 0.9,
+        "1,5": 0.6,
+        "2,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.6,
+        "2,6": 0.3
+      },
+      "commit": "60fb1d9913d59b8936575a1c21bcebf3ada2d53bf071691ee6199d228e2f33c1",
+      "timestamp": "2026-08-17T09:22:39.763589+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 26,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "2,3": 0.3,
+        "1,2": 0.1,
+        "1,3": 0.3,
+        "0,3": 0.3,
+        "0,4": 0.6,
+        "1,4": 0.6,
+        "2,4": 0.3,
+        "0,5": 0.9,
+        "1,5": 0.6,
+        "2,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.6,
+        "2,6": 0.3
+      },
+      "commit": "5f52105f3ca018a5fcdb497fcb92e0560294bd7e52e8f2ea2079c46a11e63d84",
+      "timestamp": "2026-08-17T09:22:44.949068+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          1,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 27,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "2,3": 0.3,
+        "1,3": 0.3,
+        "0,3": 0.3,
+        "0,4": 0.6,
+        "1,4": 0.6,
+        "2,4": 0.6,
+        "0,5": 0.8,
+        "1,5": 0.9,
+        "2,5": 0.6,
+        "0,6": 0.6,
+        "1,6": 0.6,
+        "2,6": 0.6,
+        "3,3": 0.3,
+        "3,4": 0.3,
+        "3,5": 0.3,
+        "3,6": 0.3
+      },
+      "commit": "b0cca362ca183b5b9d7a52c69f92f714e8b439f9a446cb13b73113c95f6fba99",
+      "timestamp": "2026-08-17T09:22:51.171837+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": null,
+      "win_claim": null
+    },
+    {
+      "step": 28,
+      "sender": "thief",
+      "hint": "",
+      "smell_grid": {
+        "2,3": 0.3,
+        "1,3": 0.3,
+        "0,3": 0.3,
+        "0,4": 0.5,
+        "1,4": 0.6,
+        "2,4": 0.6,
+        "0,5": 0.7,
+        "1,5": 0.8,
+        "2,5": 0.9,
+        "0,6": 0.5,
+        "1,6": 0.6,
+        "2,6": 0.6,
+        "3,3": 0.3,
+        "3,4": 0.6,
+        "3,5": 0.6,
+        "3,6": 0.6,
+        "4,3": 0.3,
+        "4,4": 0.3,
+        "4,5": 0.3,
+        "4,6": 0.3
+      },
+      "commit": "c1ca3fa0e4646dd6443fb5f6e8d143a33d4cbc17ba6af24d1989fca8e6cc60d6",
+      "timestamp": "2026-08-17T09:22:57.559137+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          1,
+          5
+        ],
+        "caught": true
+      },
+      "win_claim": null
+    }
+  ],
+  "hint_readings": [
+    "step 1: no direction claimed",
+    "step 2: no direction claimed",
+    "step 3: no direction claimed",
+    "step 4: no direction claimed",
+    "step 5: no direction claimed",
+    "step 6: no direction claimed",
+    "step 7: no direction claimed",
+    "step 8: no direction claimed",
+    "step 9: no direction claimed",
+    "step 10: no direction claimed",
+    "step 11: no direction claimed",
+    "step 12: no direction claimed",
+    "step 13: no direction claimed",
+    "step 14: no direction claimed",
+    "step 15: no direction claimed",
+    "step 16: no direction claimed",
+    "step 17: no direction claimed",
+    "step 18: no direction claimed",
+    "step 19: no direction claimed",
+    "step 20: no direction claimed",
+    "step 21: no direction claimed",
+    "step 22: no direction claimed",
+    "step 23: no direction claimed",
+    "step 24: no direction claimed",
+    "step 25: no direction claimed",
+    "step 26: no direction claimed",
+    "step 27: no direction claimed",
+    "step 28: no direction claimed"
+  ],
+  "opponent_reliability": 0.5,
+  "disputes": [],
+  "tokens": {
+    "tokens_step": 187,
+    "tokens_total": 4859,
+    "prompt_tokens": 2363,
+    "completion_tokens": 2496,
+    "model_calls": 26,
+    "budget_per_series": 200000,
+    "peer_tokens_total": 0
+  },
+  "gatekeeper": {
+    "limits": {
+      "requests_per_minute": 30,
+      "concurrent_requests": 2,
+      "retry_backoff_seconds": 5.0,
+      "max_retries": 3,
+      "queue_depth": 100
+    },
+    "submitted": 27,
+    "sent": 26,
+    "retried": 0,
+    "rejected": 0,
+    "failed": 1,
+    "queued": 0,
+    "quota": null,
+    "dos": {
+      "tripped": false,
+      "limit_per_minute": 300.0,
+      "peak_per_minute": 12.0
+    }
+  },
+  "audit": {
+    "passed": true,
+    "verified_steps": 29,
+    "failed_steps": [],
+    "peer_tokens_total": 0,
+    "semantic_passed": true,
+    "semantic_failures": [],
+    "semantic_corrections": [],
+    "terminal": {
+      "result": "capture",
+      "winner": "police",
+      "step": 28,
+      "reason": "claim"
+    }
+  },
+  "mutual_agreement": {
+    "_remark": "Asymmetric on purpose: sha256 is over this peer's own sealed records. The symmetric digest both peers must agree on is in the result artifact.",
+    "confirmed": true,
+    "sha256": "30b72806093c91aaaba94f9d32b0db44211c4d13330600060c86db197e5b8edf"
+  }
+}

@@ -1,0 +1,6214 @@
+{
+  "result": "tamper_forfeit",
+  "winner": "police",
+  "abort_reason": null,
+  "role": "police",
+  "steps": 26,
+  "unique_cells": 23,
+  "barriers_used": 2,
+  "started_at": "2026-08-15T16:11:45.416955+00:00",
+  "ended_at": "2026-08-15T16:15:58.624381+00:00",
+  "duration_seconds": 250.7,
+  "group_name": "MOAAMOHA",
+  "peer_identity": {
+    "counted_matches_played": 3,
+    "counted_games_played": 3,
+    "counted_matches_remaining": 7,
+    "opponents_already_counted": [
+      "uoh-ay26",
+      "imreeyal",
+      "vibecode"
+    ],
+    "group_id": "najamjad",
+    "group_name": "NajAmjad",
+    "members": [
+      "Naji Kayal",
+      "Amjad Abed"
+    ],
+    "repos": {
+      "cop": "https://github.com/najikay/najamjad-cop",
+      "thief": "https://github.com/najikay/najamjad-thief"
+    },
+    "mcp_servers": {
+      "cop": "https://thief.4laboratory.com/mcp",
+      "thief": "https://thief.4laboratory.com/mcp"
+    },
+    "llm_model": "deepseek-v4-flash",
+    "git_commit_hash": "d17ab3c99f99bdc43035e82306cc1f17c897c451",
+    "github_commit": "d17ab3c99f99bdc43035e82306cc1f17c897c451",
+    "spec": {
+      "os": "Linux 6.6.87.2-microsoft-standard-WSL2",
+      "cpu_type": "11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz",
+      "cpu_cores": 8,
+      "cpu_freq_mhz": 2800,
+      "ram_gb": 7.5,
+      "gpu_type": "none detected",
+      "vram_gb": 0.0,
+      "python": "3.12.3",
+      "cpu_model": "11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz",
+      "gpu_model": "none detected"
+    }
+  },
+  "terms": {
+    "board_size": 7,
+    "smell_grid_size": 5,
+    "decay_per_step": 0.1,
+    "emit_intensity": 0.9,
+    "min_center_intensity": 0.5,
+    "max_steps": 35,
+    "barriers_max": 14,
+    "setting": "New York",
+    "hint_max_words": 15,
+    "axis_origin_corner": "top-left",
+    "axis_start_index": 0,
+    "thief_start": [
+      3,
+      3
+    ],
+    "cop_start": [
+      0,
+      0
+    ],
+    "num_games": 6
+  },
+  "identity": {
+    "group_id": "MOAAMOHA",
+    "group_name": "MOAAMOHA",
+    "members": [
+      "Moaawiyah hajajrah",
+      "Mohamed Selawe"
+    ],
+    "repos": {
+      "cop": "https://github.com/Moaawiyah/police-agent",
+      "thief": "https://github.com/Moaawiyah/Ai_thief"
+    },
+    "mcp_servers": {
+      "cop": "https://calm-lantern-322.local.dev/mcp",
+      "thief": "https://bright-harbor-604.local.dev/mcp"
+    },
+    "llm_model": "claude-opus-4-8[1m]",
+    "code_version": "1.00",
+    "hardware_spec": {
+      "os": "Darwin 25.6.0",
+      "cpu_type": "Apple M3",
+      "cpu_cores": 8,
+      "cpu_freq_mhz": "unknown",
+      "ram_gb": 16.0,
+      "gpu_type": "Apple M3",
+      "gpu_cores_or_cuda": 10,
+      "vram_gb": "unknown"
+    },
+    "github_commit": "f5210e3ce2b514d10e0f39d6f3ac5f8b43dfd59f",
+    "step_zero_commit": "90ca4004f86cd403707be2a86d44d613f60f6df0751753f65b81f7df559a6700"
+  },
+  "step_zero": {
+    "step": 0,
+    "record_type": "step_zero",
+    "declared_at": "2026-08-15T16:11:45.155243+00:00",
+    "group_id": "MOAAMOHA",
+    "group_name": "MOAAMOHA",
+    "members": [
+      "Moaawiyah hajajrah",
+      "Mohamed Selawe"
+    ],
+    "repos": {
+      "cop": "https://github.com/Moaawiyah/police-agent",
+      "thief": "https://github.com/Moaawiyah/Ai_thief"
+    },
+    "sub_game_number": 1,
+    "code_version": "1.00",
+    "repository_url": "https://github.com/Moaawiyah/police-agent",
+    "llm_model": "claude-opus-4-8[1m]",
+    "github_commit": "f5210e3ce2b514d10e0f39d6f3ac5f8b43dfd59f",
+    "working_tree_dirty": true,
+    "hardware_spec": {
+      "os": "Darwin 25.6.0",
+      "cpu_type": "Apple M3",
+      "cpu_cores": 8,
+      "cpu_freq_mhz": "unknown",
+      "ram_gb": 16.0,
+      "gpu_type": "Apple M3",
+      "gpu_cores_or_cuda": 10,
+      "vram_gb": "unknown"
+    }
+  },
+  "audit": {
+    "passed": true,
+    "verified_steps": 28,
+    "failed_steps": [],
+    "peer_tokens_total": 0,
+    "semantic_passed": false,
+    "semantic_failures": [
+      "turn 6 has an illegal move",
+      "turn 11 has an illegal move",
+      "turn 12 has an illegal move",
+      "turn 23 has an illegal move",
+      "turn 24 has an illegal move",
+      "turn 25 has an illegal move"
+    ],
+    "semantic_corrections": [],
+    "terminal": {
+      "result": "capture",
+      "winner": "police",
+      "step": 27,
+      "reason": "claim"
+    }
+  },
+  "opponent_reliability": 0.632,
+  "tokens": {
+    "tokens_step": 400,
+    "tokens_total": 10370,
+    "prompt_tokens": 5378,
+    "completion_tokens": 4992,
+    "model_calls": 52,
+    "budget_per_series": 200000,
+    "peer_tokens_total": 0
+  },
+  "gatekeeper": {
+    "limits": {
+      "requests_per_minute": 30,
+      "concurrent_requests": 2,
+      "retry_backoff_seconds": 5.0,
+      "max_retries": 3,
+      "queue_depth": 100
+    },
+    "submitted": 53,
+    "sent": 52,
+    "retried": 0,
+    "rejected": 0,
+    "failed": 1,
+    "queued": 0,
+    "quota": null,
+    "dos": {
+      "tripped": false,
+      "limit_per_minute": 300.0,
+      "peak_per_minute": 14.0
+    }
+  },
+  "inbound_dos": {
+    "tripped": false,
+    "limit_per_minute": 6000.0,
+    "peak_per_minute": 8.0
+  },
+  "hint_readings": [
+    "step 1: claimed E, scent corroborated it (reliability 0.67)",
+    "step 2: claimed S, scent inconclusive",
+    "step 3: claimed S, scent corroborated it (reliability 0.75)",
+    "step 4: no direction claimed",
+    "step 5: claimed S, scent corroborated it (reliability 0.80)",
+    "step 6: claimed S, scent corroborated it (reliability 0.83)",
+    "step 7: claimed S, scent corroborated it (reliability 0.86)",
+    "step 8: claimed N, scent inconclusive",
+    "step 9: claimed S, scent inconclusive",
+    "step 10: claimed S, scent inconclusive",
+    "step 11: no direction claimed",
+    "step 12: claimed S, scent inconclusive",
+    "step 13: claimed S, scent contradicted it (reliability 0.75)",
+    "step 14: claimed S, scent contradicted it (reliability 0.67)",
+    "step 15: claimed N, scent corroborated it (reliability 0.70)",
+    "step 16: claimed S, scent contradicted it (reliability 0.64)",
+    "step 17: claimed S, scent contradicted it (reliability 0.58)",
+    "step 18: claimed N, scent corroborated it (reliability 0.62)",
+    "step 19: claimed S, scent contradicted it (reliability 0.57)",
+    "step 20: claimed N, scent corroborated it (reliability 0.60)",
+    "step 21: claimed N, scent corroborated it (reliability 0.62)",
+    "step 22: claimed N, scent corroborated it (reliability 0.65)",
+    "step 23: claimed S, scent contradicted it (reliability 0.61)",
+    "step 24: no direction claimed",
+    "step 25: claimed S, scent inconclusive",
+    "step 26: claimed S, scent inconclusive",
+    "step 27: claimed W, scent corroborated it (reliability 0.63)"
+  ],
+  "disputes": [],
+  "records": [
+    {
+      "payload": {
+        "step": 0,
+        "record_type": "step_zero",
+        "declared_at": "2026-08-15T16:11:45.155243+00:00",
+        "group_id": "MOAAMOHA",
+        "group_name": "MOAAMOHA",
+        "members": [
+          "Moaawiyah hajajrah",
+          "Mohamed Selawe"
+        ],
+        "repos": {
+          "cop": "https://github.com/Moaawiyah/police-agent",
+          "thief": "https://github.com/Moaawiyah/Ai_thief"
+        },
+        "sub_game_number": 1,
+        "code_version": "1.00",
+        "repository_url": "https://github.com/Moaawiyah/police-agent",
+        "llm_model": "claude-opus-4-8[1m]",
+        "github_commit": "f5210e3ce2b514d10e0f39d6f3ac5f8b43dfd59f",
+        "working_tree_dirty": true,
+        "hardware_spec": {
+          "os": "Darwin 25.6.0",
+          "cpu_type": "Apple M3",
+          "cpu_cores": 8,
+          "cpu_freq_mhz": "unknown",
+          "ram_gb": 16.0,
+          "gpu_type": "Apple M3",
+          "gpu_cores_or_cuda": 10,
+          "vram_gb": "unknown"
+        }
+      },
+      "nonce": "84e83c68d10970239f600b9efbae3b7f",
+      "commit": "90ca4004f86cd403707be2a86d44d613f60f6df0751753f65b81f7df559a6700"
+    },
+    {
+      "payload": {
+        "step": 1,
+        "state": "grid=7x7;self=[0, 1];barriers=[]",
+        "position": [
+          0,
+          1
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 2,
+        "capture_claim": [
+          0,
+          1
+        ],
+        "rationale": "chase (4, 3): step E, gap 6",
+        "tokens_input": 106,
+        "tokens_output": 96,
+        "tokens_step": 202,
+        "tokens_total": 202,
+        "tokens": 202
+      },
+      "nonce": "898c55e3e086ad0f966ce74e2e919a8b",
+      "commit": "b2ebb4357a6dbeca5c597f5e17834313281503b59c08038ed2fffc81179dc26f"
+    },
+    {
+      "payload": {
+        "step": 2,
+        "state": "grid=7x7;self=[0, 2];barriers=[]",
+        "position": [
+          0,
+          2
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 3,
+        "capture_claim": [
+          0,
+          2
+        ],
+        "rationale": "chase (4, 4): step E, gap 6",
+        "tokens_input": 105,
+        "tokens_output": 96,
+        "tokens_step": 201,
+        "tokens_total": 600,
+        "tokens": 201
+      },
+      "nonce": "7558e4b343d4cdfe8046408576668a92",
+      "commit": "479897447beaef659d8e0dc5d9d5fc9757d617ba71af4aba31bfc544a62451b5"
+    },
+    {
+      "payload": {
+        "step": 3,
+        "state": "grid=7x7;self=[1, 2];barriers=[]",
+        "position": [
+          1,
+          2
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 4,
+        "capture_claim": [
+          1,
+          2
+        ],
+        "rationale": "chase (5, 4): step S, gap 6",
+        "tokens_input": 105,
+        "tokens_output": 96,
+        "tokens_step": 201,
+        "tokens_total": 998,
+        "tokens": 201
+      },
+      "nonce": "d4b87d98623aebb69ae9460e3aebe1a2",
+      "commit": "6604bb44889fa8948239fa17287bc8bd5a34d837172007a68256d54de3906654"
+    },
+    {
+      "payload": {
+        "step": 4,
+        "state": "grid=7x7;self=[1, 3];barriers=[]",
+        "position": [
+          1,
+          3
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 5,
+        "capture_claim": [
+          1,
+          3
+        ],
+        "rationale": "chase (5, 4): step E, gap 5",
+        "tokens_input": 107,
+        "tokens_output": 96,
+        "tokens_step": 203,
+        "tokens_total": 1400,
+        "tokens": 203
+      },
+      "nonce": "844260099a89c2e4b744f702a987486c",
+      "commit": "403e81716a51661cc9d04eb2b27136df97f771e4206c0b95ad4d417206262e43"
+    },
+    {
+      "payload": {
+        "step": 5,
+        "state": "grid=7x7;self=[1, 4];barriers=[]",
+        "position": [
+          1,
+          4
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 6,
+        "capture_claim": [
+          1,
+          4
+        ],
+        "rationale": "chase (5, 4): step E, gap 4",
+        "tokens_input": 105,
+        "tokens_output": 96,
+        "tokens_step": 201,
+        "tokens_total": 1798,
+        "tokens": 201
+      },
+      "nonce": "b78bc0f14a4081a6abadf14382a8d706",
+      "commit": "1746cd51ea100b47a3ad655074d06a59a138db3438352dd4e8126da76432aaca"
+    },
+    {
+      "payload": {
+        "step": 6,
+        "state": "grid=7x7;self=[1, 5];barriers=[]",
+        "position": [
+          1,
+          5
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 7,
+        "capture_claim": [
+          1,
+          5
+        ],
+        "rationale": "chase (6, 5): step E, gap 5",
+        "tokens_input": 106,
+        "tokens_output": 96,
+        "tokens_step": 202,
+        "tokens_total": 2198,
+        "tokens": 202
+      },
+      "nonce": "16fc812e8b12ae5091696b5ce7a55e1e",
+      "commit": "6c6c67d9c45b0dea8a057269dec2f290a25cc1a31a2494b218e3683b8ac7d646"
+    },
+    {
+      "payload": {
+        "step": 7,
+        "state": "grid=7x7;self=[2, 5];barriers=[]",
+        "position": [
+          2,
+          5
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 8,
+        "capture_claim": [
+          2,
+          5
+        ],
+        "rationale": "chase (6, 4): step S, gap 5",
+        "tokens_input": 104,
+        "tokens_output": 96,
+        "tokens_step": 200,
+        "tokens_total": 2594,
+        "tokens": 200
+      },
+      "nonce": "6a93f901128f4d5cecc96ef84b6401b4",
+      "commit": "0d468bc2bdb94d3a396deea8010377336c4baf7b11a3f4ec11479b3f7cc1dd2a"
+    },
+    {
+      "payload": {
+        "step": 8,
+        "state": "grid=7x7;self=[3, 5];barriers=[]",
+        "position": [
+          3,
+          5
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 9,
+        "capture_claim": [
+          3,
+          5
+        ],
+        "rationale": "chase (6, 4): step S, gap 4",
+        "tokens_input": 110,
+        "tokens_output": 96,
+        "tokens_step": 206,
+        "tokens_total": 3002,
+        "tokens": 206
+      },
+      "nonce": "7e660e9779bca0eb671120c59d0d822d",
+      "commit": "333c6f6a7fdaecc80d5943f69d70a07cd86f0c24999cec6436f6c49b8a80a93a"
+    },
+    {
+      "payload": {
+        "step": 9,
+        "state": "grid=7x7;self=[3, 4];barriers=[]",
+        "position": [
+          3,
+          4
+        ],
+        "move": "MOVE:W",
+        "barrier": null,
+        "unique_cells": 10,
+        "capture_claim": [
+          3,
+          4
+        ],
+        "rationale": "chase (6, 4): step W, gap 3",
+        "tokens_input": 108,
+        "tokens_output": 96,
+        "tokens_step": 204,
+        "tokens_total": 3406,
+        "tokens": 204
+      },
+      "nonce": "434e288d4c7d5fb0cb62bedd03d2b26c",
+      "commit": "153d763339c89f8329e0ba415c9cbc49d27bf1c5b4b3253a3178bd2ba6df0ce6"
+    },
+    {
+      "payload": {
+        "step": 10,
+        "state": "grid=7x7;self=[4, 4];barriers=[]",
+        "position": [
+          4,
+          4
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 11,
+        "capture_claim": [
+          4,
+          4
+        ],
+        "rationale": "chase (6, 3): step S, gap 3",
+        "tokens_input": 108,
+        "tokens_output": 96,
+        "tokens_step": 204,
+        "tokens_total": 3810,
+        "tokens": 204
+      },
+      "nonce": "6ba1c7fc078d532e80f69cf223f64afc",
+      "commit": "48177c51003b5d9d8067f4eaf536d8fbd5b10317510907535dc5fae1507776e4"
+    },
+    {
+      "payload": {
+        "step": 11,
+        "state": "grid=7x7;self=[5, 4];barriers=[]",
+        "position": [
+          5,
+          4
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 12,
+        "capture_claim": [
+          5,
+          4
+        ],
+        "rationale": "chase (6, 2): step S, gap 3",
+        "tokens_input": 104,
+        "tokens_output": 96,
+        "tokens_step": 200,
+        "tokens_total": 4206,
+        "tokens": 200
+      },
+      "nonce": "5194504f496afb48d79dd06c9ef69b0c",
+      "commit": "36f54ffbfdba1952f663b645ef1a6e6b598cede2e22b788daf0036580cff8c9a"
+    },
+    {
+      "payload": {
+        "step": 12,
+        "state": "grid=7x7;self=[6, 4];barriers=[]",
+        "position": [
+          6,
+          4
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 13,
+        "capture_claim": [
+          6,
+          4
+        ],
+        "rationale": "chase (6, 1): step S, gap 3",
+        "tokens_input": 104,
+        "tokens_output": 96,
+        "tokens_step": 200,
+        "tokens_total": 4602,
+        "tokens": 200
+      },
+      "nonce": "3737dde9209b238aad06591b0014764a",
+      "commit": "e17af97f28e69d2c1de145deb628330ac980299c903d1e3ef4cf3f579683bc9f"
+    },
+    {
+      "payload": {
+        "step": 13,
+        "state": "grid=7x7;self=[6, 3];barriers=[]",
+        "position": [
+          6,
+          3
+        ],
+        "move": "MOVE:W",
+        "barrier": null,
+        "unique_cells": 14,
+        "capture_claim": [
+          6,
+          3
+        ],
+        "rationale": "chase (6, 1): step W, gap 2",
+        "tokens_input": 107,
+        "tokens_output": 96,
+        "tokens_step": 203,
+        "tokens_total": 5004,
+        "tokens": 203
+      },
+      "nonce": "d27f6b8dd856f701d61302c4306c7298",
+      "commit": "87fbbe5b0ac18e47c2d9aa5d620786f3b59de3ab4da077ce382a9c2d79dad633"
+    },
+    {
+      "payload": {
+        "step": 14,
+        "state": "grid=7x7;self=[6, 2];barriers=[]",
+        "position": [
+          6,
+          2
+        ],
+        "move": "MOVE:W",
+        "barrier": null,
+        "unique_cells": 15,
+        "capture_claim": [
+          6,
+          2
+        ],
+        "rationale": "chase (5, 1): step W, gap 2",
+        "tokens_input": 101,
+        "tokens_output": 96,
+        "tokens_step": 197,
+        "tokens_total": 5394,
+        "tokens": 197
+      },
+      "nonce": "341b5e2ed421129fb8126d28f3960237",
+      "commit": "ef30c2839fe46d8e8e21b16ba37febb11df5f7f386b69aab0ecc3d99c5324704"
+    },
+    {
+      "payload": {
+        "step": 15,
+        "state": "grid=7x7;self=[6, 2];barriers=[[5, 2]]",
+        "position": [
+          6,
+          2
+        ],
+        "move": "BARRIER:N",
+        "barrier": [
+          5,
+          2
+        ],
+        "unique_cells": 15,
+        "capture_claim": null,
+        "rationale": "wall (5, 2): leaves the believed thief at (5, 1) 3 step(s)",
+        "tokens_input": 107,
+        "tokens_output": 96,
+        "tokens_step": 203,
+        "tokens_total": 5797,
+        "tokens": 203
+      },
+      "nonce": "851dff349b1380fedfe384dcc2dc9ce8",
+      "commit": "1730339922c2cf187a2eda710e072ae072628466e228760c5693f2e48a5e5c50"
+    },
+    {
+      "payload": {
+        "step": 16,
+        "state": "grid=7x7;self=[6, 1];barriers=[[5, 2]]",
+        "position": [
+          6,
+          1
+        ],
+        "move": "MOVE:W",
+        "barrier": null,
+        "unique_cells": 16,
+        "capture_claim": [
+          6,
+          1
+        ],
+        "rationale": "chase (4, 1): step W, gap 2",
+        "tokens_input": 107,
+        "tokens_output": 96,
+        "tokens_step": 203,
+        "tokens_total": 6199,
+        "tokens": 203
+      },
+      "nonce": "d8fead9b48b1ed3d391cb6189dff4992",
+      "commit": "5e0117f5afd28a7437b9459984e6a6ebce976003eb5229472c4b10a94756ea83"
+    },
+    {
+      "payload": {
+        "step": 17,
+        "state": "grid=7x7;self=[5, 1];barriers=[[5, 2]]",
+        "position": [
+          5,
+          1
+        ],
+        "move": "MOVE:N",
+        "barrier": null,
+        "unique_cells": 17,
+        "capture_claim": [
+          5,
+          1
+        ],
+        "rationale": "chase (4, 1): step N, gap 1",
+        "tokens_input": 104,
+        "tokens_output": 96,
+        "tokens_step": 200,
+        "tokens_total": 6595,
+        "tokens": 200
+      },
+      "nonce": "25e8c1378617e86dd0039b70fd198dc4",
+      "commit": "a857ec3b700b8a39cfdc16a0ec5ba4a8602afd1d319a20cf2c7ca3601f5b6e31"
+    },
+    {
+      "payload": {
+        "step": 18,
+        "state": "grid=7x7;self=[4, 1];barriers=[[5, 2]]",
+        "position": [
+          4,
+          1
+        ],
+        "move": "MOVE:N",
+        "barrier": null,
+        "unique_cells": 18,
+        "capture_claim": [
+          4,
+          1
+        ],
+        "rationale": "chase (3, 1): step N, gap 1",
+        "tokens_input": 101,
+        "tokens_output": 96,
+        "tokens_step": 197,
+        "tokens_total": 6985,
+        "tokens": 197
+      },
+      "nonce": "8eb0c717b32584d332f3ec2bcbbc5e62",
+      "commit": "b0227e8a2308f16a1a65ab64b581f8e75991c651ac00b1feb7492d93caf9ba72"
+    },
+    {
+      "payload": {
+        "step": 19,
+        "state": "grid=7x7;self=[3, 1];barriers=[[5, 2]]",
+        "position": [
+          3,
+          1
+        ],
+        "move": "MOVE:N",
+        "barrier": null,
+        "unique_cells": 19,
+        "capture_claim": [
+          3,
+          1
+        ],
+        "rationale": "chase (2, 2): step N, gap 2",
+        "tokens_input": 106,
+        "tokens_output": 96,
+        "tokens_step": 202,
+        "tokens_total": 7385,
+        "tokens": 202
+      },
+      "nonce": "d39efbc4498bf5bb00d9ecc081ea18b6",
+      "commit": "eaaf1e8d681bfae1b5213c72ed73d28b373228e78a04250275efa75330dec054"
+    },
+    {
+      "payload": {
+        "step": 20,
+        "state": "grid=7x7;self=[2, 1];barriers=[[5, 2]]",
+        "position": [
+          2,
+          1
+        ],
+        "move": "MOVE:N",
+        "barrier": null,
+        "unique_cells": 20,
+        "capture_claim": [
+          2,
+          1
+        ],
+        "rationale": "chase (2, 3): step N, gap 2",
+        "tokens_input": 105,
+        "tokens_output": 96,
+        "tokens_step": 201,
+        "tokens_total": 7783,
+        "tokens": 201
+      },
+      "nonce": "627a4f499ade75f70fc099c2480e0843",
+      "commit": "0379650f6f4be586f15f4b81a4e9abefb348ca018cc7aebbbab843be98468f1f"
+    },
+    {
+      "payload": {
+        "step": 21,
+        "state": "grid=7x7;self=[2, 2];barriers=[[5, 2]]",
+        "position": [
+          2,
+          2
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 21,
+        "capture_claim": [
+          2,
+          2
+        ],
+        "rationale": "chase (2, 3): step E, gap 1",
+        "tokens_input": 106,
+        "tokens_output": 96,
+        "tokens_step": 202,
+        "tokens_total": 8183,
+        "tokens": 202
+      },
+      "nonce": "d4f784fc8cccf4c224ff1ba7f0725950",
+      "commit": "3762d92d9b98e150303dbb71d51b55cce564c3178e2ae848d13455772b9fd702"
+    },
+    {
+      "payload": {
+        "step": 22,
+        "state": "grid=7x7;self=[2, 3];barriers=[[5, 2]]",
+        "position": [
+          2,
+          3
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 22,
+        "capture_claim": [
+          2,
+          3
+        ],
+        "rationale": "chase (1, 4): step E, gap 2",
+        "tokens_input": 108,
+        "tokens_output": 96,
+        "tokens_step": 204,
+        "tokens_total": 8587,
+        "tokens": 204
+      },
+      "nonce": "512e5487fc6c2ac37a396b5e3fe7d450",
+      "commit": "d87681a04489f8e95aa9fc79867d1ea292eee731d1b853b745cde1784c96f8b5"
+    },
+    {
+      "payload": {
+        "step": 23,
+        "state": "grid=7x7;self=[2, 4];barriers=[[5, 2]]",
+        "position": [
+          2,
+          4
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 23,
+        "capture_claim": [
+          2,
+          4
+        ],
+        "rationale": "chase (1, 5): step E, gap 2",
+        "tokens_input": 106,
+        "tokens_output": 96,
+        "tokens_step": 202,
+        "tokens_total": 8987,
+        "tokens": 202
+      },
+      "nonce": "820718fa61d0992e4abad6004c9ff77a",
+      "commit": "288c092cf8143bad81747e514601e218c2772e7b52aa112524013eae3f399b71"
+    },
+    {
+      "payload": {
+        "step": 24,
+        "state": "grid=7x7;self=[2, 5];barriers=[[5, 2]]",
+        "position": [
+          2,
+          5
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 23,
+        "capture_claim": [
+          2,
+          5
+        ],
+        "rationale": "chase (1, 6): step E, gap 2",
+        "tokens_input": 101,
+        "tokens_output": 96,
+        "tokens_step": 197,
+        "tokens_total": 9377,
+        "tokens": 197
+      },
+      "nonce": "cd0e98a6b13e185e59ccaf073d43ef80",
+      "commit": "f9890eb91bbcd5d7a181e8c53043fcd84369d87d6b8d9adb3415a5f6ab73362a"
+    },
+    {
+      "payload": {
+        "step": 25,
+        "state": "grid=7x7;self=[2, 5];barriers=[[2, 6], [5, 2]]",
+        "position": [
+          2,
+          5
+        ],
+        "move": "BARRIER:E",
+        "barrier": [
+          2,
+          6
+        ],
+        "unique_cells": 23,
+        "capture_claim": null,
+        "rationale": "wall (2, 6): leaves the believed thief at (1, 6) 2 step(s)",
+        "tokens_input": 103,
+        "tokens_output": 96,
+        "tokens_step": 199,
+        "tokens_total": 9772,
+        "tokens": 199
+      },
+      "nonce": "c85779cbff93b45c39100a90d9e07dd9",
+      "commit": "05107bf840e4aa46ec765d7f53cba9a9aac48c8457d305bb2153d7a743af2c19"
+    },
+    {
+      "payload": {
+        "step": 26,
+        "state": "grid=7x7;self=[1, 5];barriers=[[2, 6], [5, 2]]",
+        "position": [
+          1,
+          5
+        ],
+        "move": "MOVE:N",
+        "barrier": null,
+        "unique_cells": 23,
+        "capture_claim": [
+          1,
+          5
+        ],
+        "rationale": "chase (1, 5): step N, gap 0",
+        "tokens_input": 106,
+        "tokens_output": 96,
+        "tokens_step": 202,
+        "tokens_total": 10172,
+        "tokens": 202
+      },
+      "nonce": "835ff731653df4c388e6cc181a0b5334",
+      "commit": "b8c0627cada05b08dda6349c6789b9c18d2d51bd92820e9d39bd2b2b8502c1d1"
+    }
+  ],
+  "opponent_records": [
+    {
+      "payload": {
+        "step": 0,
+        "type": "system_spec",
+        "spec": {
+          "os": "Linux 6.6.87.2-microsoft-standard-WSL2",
+          "cpu_type": "11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz",
+          "cpu_cores": 8,
+          "cpu_freq_mhz": 2800,
+          "ram_gb": 7.5,
+          "gpu_type": "none detected",
+          "vram_gb": 0.0,
+          "python": "3.12.3"
+        },
+        "model": "deepseek-v4-flash",
+        "code_version": "1.00",
+        "github_commit": "d17ab3c99f99bdc43035e82306cc1f17c897c451",
+        "group_name": "NajAmjad",
+        "opponent_group_id": "MOAAMOHA",
+        "role": "thief",
+        "sub_game": 1,
+        "tokens_total": 97
+      },
+      "nonce": "1572043801294682f616fa15d36be26f",
+      "commit": "f4ff01ed01cc551017d7ba718f635f062e9801da685449bf4c250bc65c81d46f"
+    },
+    {
+      "payload": {
+        "step": 1,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          4,
+          3
+        ],
+        "move": "MOVE:S",
+        "intent": "lie",
+        "hint": "You will not find me anywhere near the East Village.",
+        "state": "grid=7x7;self=[4, 3];barriers=[]",
+        "smell_grid": {
+          "2,1": 0.3,
+          "2,2": 0.3,
+          "2,3": 0.3,
+          "2,4": 0.3,
+          "2,5": 0.3,
+          "3,1": 0.3,
+          "3,2": 0.6,
+          "3,3": 0.6,
+          "3,4": 0.6,
+          "3,5": 0.3,
+          "4,1": 0.3,
+          "4,2": 0.6,
+          "4,3": 0.9,
+          "4,4": 0.6,
+          "4,5": 0.3,
+          "5,1": 0.3,
+          "5,2": 0.6,
+          "5,3": 0.6,
+          "5,4": 0.6,
+          "5,5": 0.3,
+          "6,1": 0.3,
+          "6,2": 0.3,
+          "6,3": 0.3,
+          "6,4": 0.3,
+          "6,5": 0.3
+        }
+      },
+      "nonce": "78d374a89ca6eecaa34390dd9c884a34",
+      "commit": "9d21856899a9e984ebb7199a8ff0a6cb0c667a0be3e8909dac44119024f1fb5e"
+    },
+    {
+      "payload": {
+        "step": 2,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          4,
+          4
+        ],
+        "move": "MOVE:E",
+        "intent": "truth",
+        "hint": "Still moving south — Harlem is behind me now.",
+        "state": "grid=7x7;self=[4, 4];barriers=[]",
+        "smell_grid": {
+          "2,1": 0.2,
+          "2,2": 0.3,
+          "2,3": 0.3,
+          "2,4": 0.3,
+          "2,5": 0.3,
+          "3,1": 0.2,
+          "3,2": 0.5,
+          "3,3": 0.6,
+          "3,4": 0.6,
+          "3,5": 0.6,
+          "4,1": 0.2,
+          "4,2": 0.5,
+          "4,3": 0.8,
+          "4,4": 0.9,
+          "4,5": 0.6,
+          "5,1": 0.2,
+          "5,2": 0.5,
+          "5,3": 0.6,
+          "5,4": 0.6,
+          "5,5": 0.6,
+          "6,1": 0.2,
+          "6,2": 0.3,
+          "6,3": 0.3,
+          "6,4": 0.3,
+          "6,5": 0.3,
+          "2,6": 0.3,
+          "3,6": 0.3,
+          "4,6": 0.3,
+          "5,6": 0.3,
+          "6,6": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            0,
+            1
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "c3d7d0e35f1cea0927c39e32e5e21369",
+      "commit": "13bab9989acd2f6e433ea48849b095bfc477d7a92a6986710b61bbf09ea9220b"
+    },
+    {
+      "payload": {
+        "step": 3,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          5,
+          4
+        ],
+        "move": "MOVE:S",
+        "intent": "lie",
+        "hint": "You will not find me anywhere near the waterfront.",
+        "state": "grid=7x7;self=[5, 4];barriers=[]",
+        "smell_grid": {
+          "2,1": 0.1,
+          "2,2": 0.2,
+          "2,3": 0.2,
+          "2,4": 0.2,
+          "2,5": 0.2,
+          "3,1": 0.1,
+          "3,2": 0.4,
+          "3,3": 0.5,
+          "3,4": 0.5,
+          "3,5": 0.5,
+          "4,1": 0.1,
+          "4,2": 0.4,
+          "4,3": 0.7,
+          "4,4": 0.8,
+          "4,5": 0.6,
+          "5,1": 0.1,
+          "5,2": 0.4,
+          "5,3": 0.6,
+          "5,4": 0.9,
+          "5,5": 0.6,
+          "6,1": 0.1,
+          "6,2": 0.3,
+          "6,3": 0.6,
+          "6,4": 0.6,
+          "6,5": 0.6,
+          "2,6": 0.2,
+          "3,6": 0.3,
+          "4,6": 0.3,
+          "5,6": 0.3,
+          "6,6": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            0,
+            2
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "bd1c2f50cb934e9f5c4c5dd3470bae67",
+      "commit": "63e6a33ec5a8115ec0064d88dc9fc505252612608f77ca239ab709553bcb83dd"
+    },
+    {
+      "payload": {
+        "step": 4,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          5,
+          5
+        ],
+        "move": "MOVE:E",
+        "intent": "truth",
+        "hint": "I am the thief, and you will not catch me.",
+        "state": "grid=7x7;self=[5, 5];barriers=[]",
+        "smell_grid": {
+          "2,2": 0.1,
+          "2,3": 0.1,
+          "2,4": 0.1,
+          "2,5": 0.1,
+          "3,2": 0.3,
+          "3,3": 0.4,
+          "3,4": 0.4,
+          "3,5": 0.4,
+          "4,2": 0.3,
+          "4,3": 0.6,
+          "4,4": 0.7,
+          "4,5": 0.6,
+          "5,2": 0.3,
+          "5,3": 0.5,
+          "5,4": 0.8,
+          "5,5": 0.9,
+          "6,2": 0.2,
+          "6,3": 0.5,
+          "6,4": 0.6,
+          "6,5": 0.6,
+          "2,6": 0.1,
+          "3,6": 0.3,
+          "4,6": 0.6,
+          "5,6": 0.6,
+          "6,6": 0.6
+        },
+        "claim_response": {
+          "claim": [
+            1,
+            2
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "c8ce18507510e283f5cb11b5cc243352",
+      "commit": "7fcdc7c30ef118be2cd1a232eb54445f2cca467db32e22d03edfa45f03f950de"
+    },
+    {
+      "payload": {
+        "step": 5,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          6,
+          5
+        ],
+        "move": "MOVE:S",
+        "intent": "lie",
+        "hint": "Taking the long way round by the Brooklyn Bridge.",
+        "state": "grid=7x7;self=[6, 5];barriers=[]",
+        "smell_grid": {
+          "3,2": 0.2,
+          "3,3": 0.3,
+          "3,4": 0.3,
+          "3,5": 0.3,
+          "4,2": 0.2,
+          "4,3": 0.5,
+          "4,4": 0.6,
+          "4,5": 0.5,
+          "5,2": 0.2,
+          "5,3": 0.4,
+          "5,4": 0.7,
+          "5,5": 0.8,
+          "6,2": 0.1,
+          "6,3": 0.4,
+          "6,4": 0.6,
+          "6,5": 0.9,
+          "3,6": 0.2,
+          "4,6": 0.5,
+          "5,6": 0.6,
+          "6,6": 0.6
+        },
+        "claim_response": {
+          "claim": [
+            1,
+            3
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "0968ff1f39c9d18f628b15aecd956691",
+      "commit": "35bb5442e89ee9cc0bc3ac9a4253a1b88a4319ed672640aa738350336ab1808d"
+    },
+    {
+      "payload": {
+        "step": 6,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          6,
+          5
+        ],
+        "move": "MOVE:STAY",
+        "intent": "truth",
+        "hint": "Still moving south — Wall Street is behind me now.",
+        "state": "grid=7x7;self=[6, 5];barriers=[]",
+        "smell_grid": {
+          "3,2": 0.1,
+          "3,3": 0.2,
+          "3,4": 0.2,
+          "3,5": 0.2,
+          "4,2": 0.1,
+          "4,3": 0.4,
+          "4,4": 0.5,
+          "4,5": 0.4,
+          "5,2": 0.1,
+          "5,3": 0.3,
+          "5,4": 0.6,
+          "5,5": 0.7,
+          "6,3": 0.3,
+          "6,4": 0.6,
+          "6,5": 0.9,
+          "3,6": 0.1,
+          "4,6": 0.4,
+          "5,6": 0.6,
+          "6,6": 0.6
+        },
+        "claim_response": {
+          "claim": [
+            1,
+            4
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "906d2962054c234078b93de42e576ca6",
+      "commit": "88db404430d1c6f49ff8ee63ec4cf48aec1ff335108cc9a4a849c03a4c750d83"
+    },
+    {
+      "payload": {
+        "step": 7,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          6,
+          4
+        ],
+        "move": "MOVE:W",
+        "intent": "truth",
+        "hint": "Taking the long way round by Times Square.",
+        "state": "grid=7x7;self=[6, 4];barriers=[]",
+        "smell_grid": {
+          "3,3": 0.1,
+          "3,4": 0.1,
+          "3,5": 0.1,
+          "4,3": 0.3,
+          "4,4": 0.4,
+          "4,5": 0.3,
+          "5,3": 0.6,
+          "5,4": 0.6,
+          "5,5": 0.6,
+          "6,3": 0.6,
+          "6,4": 0.9,
+          "6,5": 0.8,
+          "4,6": 0.3,
+          "5,6": 0.5,
+          "6,6": 0.5,
+          "4,2": 0.3,
+          "5,2": 0.3,
+          "6,2": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            1,
+            5
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "e7aaa203a6699254f9b85f6a82e40d72",
+      "commit": "1731c67f4222eaf73f69abf9e6242566bb525073e6a8abe1b516ff0522d98c5b"
+    },
+    {
+      "payload": {
+        "step": 8,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          6,
+          3
+        ],
+        "move": "MOVE:W",
+        "intent": "lie",
+        "hint": "I'm heading toward Central Park, but you'll never catch me there.",
+        "state": "grid=7x7;self=[6, 3];barriers=[]",
+        "smell_grid": {
+          "4,3": 0.3,
+          "4,4": 0.3,
+          "4,5": 0.3,
+          "5,3": 0.6,
+          "5,4": 0.6,
+          "5,5": 0.5,
+          "6,3": 0.9,
+          "6,4": 0.8,
+          "6,5": 0.7,
+          "4,6": 0.2,
+          "5,6": 0.4,
+          "6,6": 0.4,
+          "4,2": 0.3,
+          "5,2": 0.6,
+          "6,2": 0.6,
+          "4,1": 0.3,
+          "5,1": 0.3,
+          "6,1": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            2,
+            5
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "b163ff1ac7d5e62e2d66ae243d7174dc",
+      "commit": "1c4fe33793974fedc8bf0143cd3eeebeb8efe291a27cbba9cbc67fcce3f53e8e"
+    },
+    {
+      "payload": {
+        "step": 9,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          6,
+          2
+        ],
+        "move": "MOVE:W",
+        "intent": "truth",
+        "hint": "Slipping past the East Village while you look the wrong way.",
+        "state": "grid=7x7;self=[6, 2];barriers=[]",
+        "smell_grid": {
+          "4,3": 0.3,
+          "4,4": 0.3,
+          "4,5": 0.2,
+          "5,3": 0.6,
+          "5,4": 0.5,
+          "5,5": 0.4,
+          "6,3": 0.8,
+          "6,4": 0.7,
+          "6,5": 0.6,
+          "4,6": 0.1,
+          "5,6": 0.3,
+          "6,6": 0.3,
+          "4,2": 0.3,
+          "5,2": 0.6,
+          "6,2": 0.9,
+          "4,1": 0.3,
+          "5,1": 0.6,
+          "6,1": 0.6,
+          "4,0": 0.3,
+          "5,0": 0.3,
+          "6,0": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            3,
+            5
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "47afa60dac892b7b3603428df10896f5",
+      "commit": "264cbfb73766cf7629bd4e01ae1080e401b84fe0e5175aa2c149cab7cf74c1c9"
+    },
+    {
+      "payload": {
+        "step": 10,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          6,
+          1
+        ],
+        "move": "MOVE:W",
+        "intent": "lie",
+        "hint": "I'm heading toward the riverfront, past the old pier.",
+        "state": "grid=7x7;self=[6, 1];barriers=[]",
+        "smell_grid": {
+          "4,3": 0.3,
+          "4,4": 0.2,
+          "4,5": 0.1,
+          "5,3": 0.5,
+          "5,4": 0.4,
+          "5,5": 0.3,
+          "6,3": 0.7,
+          "6,4": 0.6,
+          "6,5": 0.5,
+          "5,6": 0.2,
+          "6,6": 0.2,
+          "4,2": 0.3,
+          "5,2": 0.6,
+          "6,2": 0.8,
+          "4,1": 0.3,
+          "5,1": 0.6,
+          "6,1": 0.9,
+          "4,0": 0.3,
+          "5,0": 0.6,
+          "6,0": 0.6
+        },
+        "claim_response": {
+          "claim": [
+            3,
+            4
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "fe1e675e88c7adc2923a717fb892f464",
+      "commit": "9ccb5f5cee3d5d603df825cc287b7cb501982b05a3e8c2524b3d5b8262bc6b74"
+    },
+    {
+      "payload": {
+        "step": 11,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          6,
+          1
+        ],
+        "move": "MOVE:STAY",
+        "intent": "truth",
+        "hint": "Taking the long way round by Times Square.",
+        "state": "grid=7x7;self=[6, 1];barriers=[]",
+        "smell_grid": {
+          "4,3": 0.3,
+          "4,4": 0.1,
+          "5,3": 0.4,
+          "5,4": 0.3,
+          "5,5": 0.2,
+          "6,3": 0.6,
+          "6,4": 0.5,
+          "6,5": 0.4,
+          "5,6": 0.1,
+          "6,6": 0.1,
+          "4,2": 0.3,
+          "5,2": 0.6,
+          "6,2": 0.7,
+          "4,1": 0.3,
+          "5,1": 0.6,
+          "6,1": 0.9,
+          "4,0": 0.3,
+          "5,0": 0.6,
+          "6,0": 0.6
+        },
+        "claim_response": {
+          "claim": [
+            4,
+            4
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "1aac2deab19d5540f478213812dd5568",
+      "commit": "8c2fb60f954cf6b69202c9832b8dfa240f11aab4f8d54edd5ff38643c9bfc079"
+    },
+    {
+      "payload": {
+        "step": 12,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          6,
+          1
+        ],
+        "move": "MOVE:STAY",
+        "intent": "truth",
+        "hint": "The subway runs all night in New York.",
+        "state": "grid=7x7;self=[6, 1];barriers=[]",
+        "smell_grid": {
+          "4,3": 0.3,
+          "5,3": 0.3,
+          "5,4": 0.2,
+          "5,5": 0.1,
+          "6,3": 0.5,
+          "6,4": 0.4,
+          "6,5": 0.3,
+          "4,2": 0.3,
+          "5,2": 0.6,
+          "6,2": 0.6,
+          "4,1": 0.3,
+          "5,1": 0.6,
+          "6,1": 0.9,
+          "4,0": 0.3,
+          "5,0": 0.6,
+          "6,0": 0.6
+        },
+        "claim_response": {
+          "claim": [
+            5,
+            4
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "f41ca48c65141b52f6a1cb29dba2809f",
+      "commit": "1730a60c1776ef224d6cc4e1576a8690493fbbdbea342ad70774e7ab3048800b"
+    },
+    {
+      "payload": {
+        "step": 13,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          5,
+          1
+        ],
+        "move": "MOVE:N",
+        "intent": "truth",
+        "hint": "Slipping past Central Park while you look the wrong way.",
+        "state": "grid=7x7;self=[5, 1];barriers=[]",
+        "smell_grid": {
+          "4,3": 0.3,
+          "5,3": 0.3,
+          "5,4": 0.1,
+          "6,3": 0.4,
+          "6,4": 0.3,
+          "6,5": 0.2,
+          "4,2": 0.6,
+          "5,2": 0.6,
+          "6,2": 0.6,
+          "4,1": 0.6,
+          "5,1": 0.9,
+          "6,1": 0.8,
+          "4,0": 0.6,
+          "5,0": 0.6,
+          "6,0": 0.6,
+          "3,0": 0.3,
+          "3,1": 0.3,
+          "3,2": 0.3,
+          "3,3": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            6,
+            4
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "0ec3d30a7071489c618aa4465be33c6f",
+      "commit": "ea7b94ca08b2ba1cef21345c01901fbcce9c46ff8ba384db712a55bee194873d"
+    },
+    {
+      "payload": {
+        "step": 14,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          4,
+          1
+        ],
+        "move": "MOVE:N",
+        "intent": "truth",
+        "hint": "Still moving through the streets.",
+        "state": "grid=7x7;self=[4, 1];barriers=[]",
+        "smell_grid": {
+          "4,3": 0.3,
+          "5,3": 0.3,
+          "6,3": 0.3,
+          "6,4": 0.2,
+          "6,5": 0.1,
+          "4,2": 0.6,
+          "5,2": 0.6,
+          "6,2": 0.5,
+          "4,1": 0.9,
+          "5,1": 0.8,
+          "6,1": 0.7,
+          "4,0": 0.6,
+          "5,0": 0.6,
+          "6,0": 0.5,
+          "3,0": 0.6,
+          "3,1": 0.6,
+          "3,2": 0.6,
+          "3,3": 0.3,
+          "2,0": 0.3,
+          "2,1": 0.3,
+          "2,2": 0.3,
+          "2,3": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            6,
+            3
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "000c54f0f3546203aacef407d3c31408",
+      "commit": "bdd35adad24d2dc1f56507a0497a6ad3d1894d1f607fc65cc95ff2b68d300b65"
+    },
+    {
+      "payload": {
+        "step": 15,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          3,
+          1
+        ],
+        "move": "MOVE:N",
+        "intent": "lie",
+        "hint": "Slipping past the Brooklyn Bridge while you look the wrong way.",
+        "state": "grid=7x7;self=[3, 1];barriers=[]",
+        "smell_grid": {
+          "4,3": 0.3,
+          "5,3": 0.3,
+          "6,3": 0.2,
+          "6,4": 0.1,
+          "4,2": 0.6,
+          "5,2": 0.5,
+          "6,2": 0.4,
+          "4,1": 0.8,
+          "5,1": 0.7,
+          "6,1": 0.6,
+          "4,0": 0.6,
+          "5,0": 0.5,
+          "6,0": 0.4,
+          "3,0": 0.6,
+          "3,1": 0.9,
+          "3,2": 0.6,
+          "3,3": 0.3,
+          "2,0": 0.6,
+          "2,1": 0.6,
+          "2,2": 0.6,
+          "2,3": 0.3,
+          "1,0": 0.3,
+          "1,1": 0.3,
+          "1,2": 0.3,
+          "1,3": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            6,
+            2
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "9611b366b23e7951ad393e4adc47473d",
+      "commit": "bf0451684a7e9fd1095e540dc6c6f65483afd0d4dcced7fbdb251d4dd3f95617"
+    },
+    {
+      "payload": {
+        "step": 16,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          2,
+          1
+        ],
+        "move": "MOVE:N",
+        "intent": "lie",
+        "hint": "I'm hiding near the Brooklyn Bridge, watching the water.",
+        "state": "grid=7x7;self=[2, 1];barriers=[[5, 2]]",
+        "smell_grid": {
+          "4,3": 0.3,
+          "5,3": 0.2,
+          "6,3": 0.1,
+          "4,2": 0.5,
+          "5,2": 0.4,
+          "6,2": 0.3,
+          "4,1": 0.7,
+          "5,1": 0.6,
+          "6,1": 0.5,
+          "4,0": 0.5,
+          "5,0": 0.4,
+          "6,0": 0.3,
+          "3,0": 0.6,
+          "3,1": 0.8,
+          "3,2": 0.6,
+          "3,3": 0.3,
+          "2,0": 0.6,
+          "2,1": 0.9,
+          "2,2": 0.6,
+          "2,3": 0.3,
+          "1,0": 0.6,
+          "1,1": 0.6,
+          "1,2": 0.6,
+          "1,3": 0.3,
+          "0,0": 0.3,
+          "0,1": 0.3,
+          "0,2": 0.3,
+          "0,3": 0.3
+        }
+      },
+      "nonce": "2c02bf72c06d7c68078843f4c19276c6",
+      "commit": "a55fc28dea577a625ea2a3493fbaf498b3abaee26dccf471e99e7dbfbf514d1d"
+    },
+    {
+      "payload": {
+        "step": 17,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          2,
+          2
+        ],
+        "move": "MOVE:E",
+        "intent": "truth",
+        "hint": "Taking the long way round by Central Park.",
+        "state": "grid=7x7;self=[2, 2];barriers=[[5, 2]]",
+        "smell_grid": {
+          "4,3": 0.3,
+          "5,3": 0.1,
+          "4,2": 0.4,
+          "5,2": 0.3,
+          "6,2": 0.2,
+          "4,1": 0.6,
+          "5,1": 0.5,
+          "6,1": 0.4,
+          "4,0": 0.4,
+          "5,0": 0.3,
+          "6,0": 0.2,
+          "3,0": 0.5,
+          "3,1": 0.7,
+          "3,2": 0.6,
+          "3,3": 0.6,
+          "2,0": 0.5,
+          "2,1": 0.8,
+          "2,2": 0.9,
+          "2,3": 0.6,
+          "1,0": 0.5,
+          "1,1": 0.6,
+          "1,2": 0.6,
+          "1,3": 0.6,
+          "0,0": 0.3,
+          "0,1": 0.3,
+          "0,2": 0.3,
+          "0,3": 0.3,
+          "0,4": 0.3,
+          "1,4": 0.3,
+          "2,4": 0.3,
+          "3,4": 0.3,
+          "4,4": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            6,
+            1
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "49bb9004f5bfd907f91fef44d8bf5747",
+      "commit": "74d8547c375e3655d036b8e37ef5ca9b3f7903f966d30e65d25a960afabfe7d6"
+    },
+    {
+      "payload": {
+        "step": 18,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          2,
+          3
+        ],
+        "move": "MOVE:E",
+        "intent": "truth",
+        "hint": "Still moving through the streets.",
+        "state": "grid=7x7;self=[2, 3];barriers=[[5, 2]]",
+        "smell_grid": {
+          "4,3": 0.3,
+          "4,2": 0.3,
+          "5,2": 0.2,
+          "6,2": 0.1,
+          "4,1": 0.5,
+          "5,1": 0.4,
+          "6,1": 0.3,
+          "4,0": 0.3,
+          "5,0": 0.2,
+          "6,0": 0.1,
+          "3,0": 0.4,
+          "3,1": 0.6,
+          "3,2": 0.6,
+          "3,3": 0.6,
+          "2,0": 0.4,
+          "2,1": 0.7,
+          "2,2": 0.8,
+          "2,3": 0.9,
+          "1,0": 0.4,
+          "1,1": 0.5,
+          "1,2": 0.6,
+          "1,3": 0.6,
+          "0,0": 0.2,
+          "0,1": 0.3,
+          "0,2": 0.3,
+          "0,3": 0.3,
+          "0,4": 0.3,
+          "1,4": 0.6,
+          "2,4": 0.6,
+          "3,4": 0.6,
+          "4,4": 0.3,
+          "0,5": 0.3,
+          "1,5": 0.3,
+          "2,5": 0.3,
+          "3,5": 0.3,
+          "4,5": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            5,
+            1
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "68b81c099fe757ff1c9eb042746c6fa6",
+      "commit": "0b6b1cb548529de3d241ad0ed79621d769c53a5ecab3585bde095547160186b6"
+    },
+    {
+      "payload": {
+        "step": 19,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          2,
+          4
+        ],
+        "move": "MOVE:E",
+        "intent": "truth",
+        "hint": "You will not find me anywhere near the East Village.",
+        "state": "grid=7x7;self=[2, 4];barriers=[[5, 2]]",
+        "smell_grid": {
+          "4,3": 0.3,
+          "4,2": 0.3,
+          "5,2": 0.1,
+          "4,1": 0.4,
+          "5,1": 0.3,
+          "6,1": 0.2,
+          "4,0": 0.2,
+          "5,0": 0.1,
+          "3,0": 0.3,
+          "3,1": 0.5,
+          "3,2": 0.5,
+          "3,3": 0.6,
+          "2,0": 0.3,
+          "2,1": 0.6,
+          "2,2": 0.7,
+          "2,3": 0.8,
+          "1,0": 0.3,
+          "1,1": 0.4,
+          "1,2": 0.5,
+          "1,3": 0.6,
+          "0,0": 0.1,
+          "0,1": 0.2,
+          "0,2": 0.3,
+          "0,3": 0.3,
+          "0,4": 0.3,
+          "1,4": 0.6,
+          "2,4": 0.9,
+          "3,4": 0.6,
+          "4,4": 0.3,
+          "0,5": 0.3,
+          "1,5": 0.6,
+          "2,5": 0.6,
+          "3,5": 0.6,
+          "4,5": 0.3,
+          "0,6": 0.3,
+          "1,6": 0.3,
+          "2,6": 0.3,
+          "3,6": 0.3,
+          "4,6": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            4,
+            1
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "51575758ff64823586b0f7ef90b56469",
+      "commit": "d5ca4348fd96234caae896b1b1b1bfb171214c2ff223444dd5792056396eb504"
+    },
+    {
+      "payload": {
+        "step": 20,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          1,
+          4
+        ],
+        "move": "MOVE:N",
+        "intent": "truth",
+        "hint": "Taking the long way round by the East Village.",
+        "state": "grid=7x7;self=[1, 4];barriers=[[5, 2]]",
+        "smell_grid": {
+          "4,3": 0.2,
+          "4,2": 0.2,
+          "4,1": 0.3,
+          "5,1": 0.2,
+          "6,1": 0.1,
+          "4,0": 0.1,
+          "3,0": 0.2,
+          "3,1": 0.4,
+          "3,2": 0.4,
+          "3,3": 0.5,
+          "2,0": 0.2,
+          "2,1": 0.5,
+          "2,2": 0.6,
+          "2,3": 0.7,
+          "1,0": 0.2,
+          "1,1": 0.3,
+          "1,2": 0.4,
+          "1,3": 0.6,
+          "0,1": 0.1,
+          "0,2": 0.3,
+          "0,3": 0.6,
+          "0,4": 0.6,
+          "1,4": 0.9,
+          "2,4": 0.8,
+          "3,4": 0.5,
+          "4,4": 0.2,
+          "0,5": 0.6,
+          "1,5": 0.6,
+          "2,5": 0.6,
+          "3,5": 0.5,
+          "4,5": 0.2,
+          "0,6": 0.3,
+          "1,6": 0.3,
+          "2,6": 0.3,
+          "3,6": 0.3,
+          "4,6": 0.2
+        },
+        "claim_response": {
+          "claim": [
+            3,
+            1
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "888501a779f74405aa3c189787c3b000",
+      "commit": "005740dd96f731eb9e7cd1b890dca7b522830d43836811b30ae05a2d45ba1180"
+    },
+    {
+      "payload": {
+        "step": 21,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          1,
+          5
+        ],
+        "move": "MOVE:E",
+        "intent": "truth",
+        "hint": "Still moving north — the waterfront is behind me now.",
+        "state": "grid=7x7;self=[1, 5];barriers=[[5, 2]]",
+        "smell_grid": {
+          "4,3": 0.1,
+          "4,2": 0.1,
+          "4,1": 0.2,
+          "5,1": 0.1,
+          "3,0": 0.1,
+          "3,1": 0.3,
+          "3,2": 0.3,
+          "3,3": 0.4,
+          "2,0": 0.1,
+          "2,1": 0.4,
+          "2,2": 0.5,
+          "2,3": 0.6,
+          "1,0": 0.1,
+          "1,1": 0.2,
+          "1,2": 0.3,
+          "1,3": 0.5,
+          "0,2": 0.2,
+          "0,3": 0.5,
+          "0,4": 0.6,
+          "1,4": 0.8,
+          "2,4": 0.7,
+          "3,4": 0.4,
+          "4,4": 0.1,
+          "0,5": 0.6,
+          "1,5": 0.9,
+          "2,5": 0.6,
+          "3,5": 0.4,
+          "4,5": 0.1,
+          "0,6": 0.6,
+          "1,6": 0.6,
+          "2,6": 0.6,
+          "3,6": 0.3,
+          "4,6": 0.1
+        },
+        "claim_response": {
+          "claim": [
+            2,
+            1
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "cfd3cc0c2d651067f7c5cc0569b4dc7d",
+      "commit": "bd2c4ab53630911f60c48ff4b4886971ac5a5b3e65b875ffd080b17e47a8ae2c"
+    },
+    {
+      "payload": {
+        "step": 22,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          1,
+          6
+        ],
+        "move": "MOVE:E",
+        "intent": "lie",
+        "hint": "I'm waiting by the Brooklyn Bridge, watching the river glow.",
+        "state": "grid=7x7;self=[1, 6];barriers=[[5, 2]]",
+        "smell_grid": {
+          "4,1": 0.1,
+          "3,1": 0.2,
+          "3,2": 0.2,
+          "3,3": 0.3,
+          "2,1": 0.3,
+          "2,2": 0.4,
+          "2,3": 0.5,
+          "1,1": 0.1,
+          "1,2": 0.2,
+          "1,3": 0.4,
+          "0,2": 0.1,
+          "0,3": 0.4,
+          "0,4": 0.5,
+          "1,4": 0.7,
+          "2,4": 0.6,
+          "3,4": 0.3,
+          "0,5": 0.6,
+          "1,5": 0.8,
+          "2,5": 0.6,
+          "3,5": 0.3,
+          "0,6": 0.6,
+          "1,6": 0.9,
+          "2,6": 0.6,
+          "3,6": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            2,
+            2
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "8ccb3d97004da077b595ec47fa092d12",
+      "commit": "c4334ae2b0f74facb2fa7b3d0010f7faf36912e42f183e9d4788e45530cdd125"
+    },
+    {
+      "payload": {
+        "step": 23,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          1,
+          6
+        ],
+        "move": "MOVE:STAY",
+        "intent": "truth",
+        "hint": "You will not find me anywhere near the Brooklyn Bridge.",
+        "state": "grid=7x7;self=[1, 6];barriers=[[5, 2]]",
+        "smell_grid": {
+          "3,1": 0.1,
+          "3,2": 0.1,
+          "3,3": 0.2,
+          "2,1": 0.2,
+          "2,2": 0.3,
+          "2,3": 0.4,
+          "1,2": 0.1,
+          "1,3": 0.3,
+          "0,3": 0.3,
+          "0,4": 0.4,
+          "1,4": 0.6,
+          "2,4": 0.5,
+          "3,4": 0.3,
+          "0,5": 0.6,
+          "1,5": 0.7,
+          "2,5": 0.6,
+          "3,5": 0.3,
+          "0,6": 0.6,
+          "1,6": 0.9,
+          "2,6": 0.6,
+          "3,6": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            2,
+            3
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "bc6a5d6898735dddfd71d05be27bdd28",
+      "commit": "34fc5b18c7e78590b9008fedba9fa208c13a2e8101fd2d94c321bfb9995e57b2"
+    },
+    {
+      "payload": {
+        "step": 24,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          1,
+          6
+        ],
+        "move": "MOVE:STAY",
+        "intent": "truth",
+        "hint": "Still moving through the streets.",
+        "state": "grid=7x7;self=[1, 6];barriers=[[5, 2]]",
+        "smell_grid": {
+          "3,3": 0.1,
+          "2,1": 0.1,
+          "2,2": 0.2,
+          "2,3": 0.3,
+          "1,3": 0.2,
+          "0,3": 0.2,
+          "0,4": 0.3,
+          "1,4": 0.5,
+          "2,4": 0.4,
+          "3,4": 0.3,
+          "0,5": 0.6,
+          "1,5": 0.6,
+          "2,5": 0.6,
+          "3,5": 0.3,
+          "0,6": 0.6,
+          "1,6": 0.9,
+          "2,6": 0.6,
+          "3,6": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            2,
+            4
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "e321c9763c6a070acbdf9f9e0f0cd29d",
+      "commit": "6e52d37073fc691a0980d951553c026b6a8f0bbcc3bb53b9ed4b2ce95955ecae"
+    },
+    {
+      "payload": {
+        "step": 25,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          1,
+          6
+        ],
+        "move": "MOVE:STAY",
+        "intent": "lie",
+        "hint": "Taking the long way round by Times Square.",
+        "state": "grid=7x7;self=[1, 6];barriers=[[5, 2]]",
+        "smell_grid": {
+          "2,2": 0.1,
+          "2,3": 0.2,
+          "1,3": 0.1,
+          "0,3": 0.1,
+          "0,4": 0.3,
+          "1,4": 0.4,
+          "2,4": 0.3,
+          "3,4": 0.3,
+          "0,5": 0.6,
+          "1,5": 0.6,
+          "2,5": 0.6,
+          "3,5": 0.3,
+          "0,6": 0.6,
+          "1,6": 0.9,
+          "2,6": 0.6,
+          "3,6": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            2,
+            5
+          ],
+          "caught": false
+        }
+      },
+      "nonce": "9f02f9cdade1b6e13a8ec18b606a11af",
+      "commit": "f751b65dd61630669d7053a81cc9b85cf227361c6911f1b5a11ec9d83fe4075b"
+    },
+    {
+      "payload": {
+        "step": 26,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          1,
+          5
+        ],
+        "move": "MOVE:W",
+        "intent": "truth",
+        "hint": "Still moving north — Central Park is behind me now.",
+        "state": "grid=7x7;self=[1, 5];barriers=[[2, 6], [5, 2]]",
+        "smell_grid": {
+          "2,3": 0.3,
+          "0,4": 0.6,
+          "1,4": 0.6,
+          "2,4": 0.6,
+          "3,4": 0.3,
+          "0,5": 0.6,
+          "1,5": 0.9,
+          "2,5": 0.6,
+          "3,5": 0.3,
+          "0,6": 0.6,
+          "1,6": 0.8,
+          "2,6": 0.6,
+          "3,6": 0.3,
+          "0,3": 0.3,
+          "1,3": 0.3,
+          "3,3": 0.3
+        }
+      },
+      "nonce": "c165470a9c00518d5f48799ac0c73fe3",
+      "commit": "4585b15e0bcc1914726e4e27f39ac3f317deba551a5f59c9961e950bdfa0be4f"
+    },
+    {
+      "payload": {
+        "step": 27,
+        "role": "thief",
+        "sub_game": 1,
+        "position": [
+          1,
+          4
+        ],
+        "move": "MOVE:W",
+        "intent": "truth",
+        "hint": "Still moving west — Central Park is behind me now.",
+        "state": "grid=7x7;self=[1, 4];barriers=[[2, 6], [5, 2]]",
+        "smell_grid": {
+          "2,3": 0.6,
+          "0,4": 0.6,
+          "1,4": 0.9,
+          "2,4": 0.6,
+          "3,4": 0.3,
+          "0,5": 0.6,
+          "1,5": 0.8,
+          "2,5": 0.6,
+          "3,5": 0.3,
+          "0,6": 0.5,
+          "1,6": 0.7,
+          "2,6": 0.5,
+          "3,6": 0.3,
+          "0,3": 0.6,
+          "1,3": 0.6,
+          "3,3": 0.3,
+          "0,2": 0.3,
+          "1,2": 0.3,
+          "2,2": 0.3,
+          "3,2": 0.3
+        },
+        "claim_response": {
+          "claim": [
+            1,
+            5
+          ],
+          "caught": true
+        }
+      },
+      "nonce": "72661c7e664a20a2bc622f8176d74472",
+      "commit": "0a8c7427c9ac0dd77e533c32d8a41caa9cc10ca196383f1270230089c0007255"
+    }
+  ],
+  "history": [
+    {
+      "step": 1,
+      "sender": "thief",
+      "hint": "You will not find me anywhere near the East Village.",
+      "smell_grid": {
+        "2,1": 0.3,
+        "2,2": 0.3,
+        "2,3": 0.3,
+        "2,4": 0.3,
+        "2,5": 0.3,
+        "3,1": 0.3,
+        "3,2": 0.6,
+        "3,3": 0.6,
+        "3,4": 0.6,
+        "3,5": 0.3,
+        "4,1": 0.3,
+        "4,2": 0.6,
+        "4,3": 0.9,
+        "4,4": 0.6,
+        "4,5": 0.3,
+        "5,1": 0.3,
+        "5,2": 0.6,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.3,
+        "6,1": 0.3,
+        "6,2": 0.3,
+        "6,3": 0.3,
+        "6,4": 0.3,
+        "6,5": 0.3
+      },
+      "commit": "9d21856899a9e984ebb7199a8ff0a6cb0c667a0be3e8909dac44119024f1fb5e",
+      "timestamp": "2026-08-15T16:11:46.938922+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": null,
+      "win_claim": null
+    },
+    {
+      "step": 2,
+      "sender": "thief",
+      "hint": "Still moving south — Harlem is behind me now.",
+      "smell_grid": {
+        "2,1": 0.2,
+        "2,2": 0.3,
+        "2,3": 0.3,
+        "2,4": 0.3,
+        "2,5": 0.3,
+        "3,1": 0.2,
+        "3,2": 0.5,
+        "3,3": 0.6,
+        "3,4": 0.6,
+        "3,5": 0.6,
+        "4,1": 0.2,
+        "4,2": 0.5,
+        "4,3": 0.8,
+        "4,4": 0.9,
+        "4,5": 0.6,
+        "5,1": 0.2,
+        "5,2": 0.5,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.6,
+        "6,1": 0.2,
+        "6,2": 0.3,
+        "6,3": 0.3,
+        "6,4": 0.3,
+        "6,5": 0.3,
+        "2,6": 0.3,
+        "3,6": 0.3,
+        "4,6": 0.3,
+        "5,6": 0.3,
+        "6,6": 0.3
+      },
+      "commit": "13bab9989acd2f6e433ea48849b095bfc477d7a92a6986710b61bbf09ea9220b",
+      "timestamp": "2026-08-15T16:11:59.609326+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          0,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 3,
+      "sender": "thief",
+      "hint": "You will not find me anywhere near the waterfront.",
+      "smell_grid": {
+        "2,1": 0.1,
+        "2,2": 0.2,
+        "2,3": 0.2,
+        "2,4": 0.2,
+        "2,5": 0.2,
+        "3,1": 0.1,
+        "3,2": 0.4,
+        "3,3": 0.5,
+        "3,4": 0.5,
+        "3,5": 0.5,
+        "4,1": 0.1,
+        "4,2": 0.4,
+        "4,3": 0.7,
+        "4,4": 0.8,
+        "4,5": 0.6,
+        "5,1": 0.1,
+        "5,2": 0.4,
+        "5,3": 0.6,
+        "5,4": 0.9,
+        "5,5": 0.6,
+        "6,1": 0.1,
+        "6,2": 0.3,
+        "6,3": 0.6,
+        "6,4": 0.6,
+        "6,5": 0.6,
+        "2,6": 0.2,
+        "3,6": 0.3,
+        "4,6": 0.3,
+        "5,6": 0.3,
+        "6,6": 0.3
+      },
+      "commit": "63e6a33ec5a8115ec0064d88dc9fc505252612608f77ca239ab709553bcb83dd",
+      "timestamp": "2026-08-15T16:12:07.725930+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          0,
+          2
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 4,
+      "sender": "thief",
+      "hint": "I am the thief, and you will not catch me.",
+      "smell_grid": {
+        "2,2": 0.1,
+        "2,3": 0.1,
+        "2,4": 0.1,
+        "2,5": 0.1,
+        "3,2": 0.3,
+        "3,3": 0.4,
+        "3,4": 0.4,
+        "3,5": 0.4,
+        "4,2": 0.3,
+        "4,3": 0.6,
+        "4,4": 0.7,
+        "4,5": 0.6,
+        "5,2": 0.3,
+        "5,3": 0.5,
+        "5,4": 0.8,
+        "5,5": 0.9,
+        "6,2": 0.2,
+        "6,3": 0.5,
+        "6,4": 0.6,
+        "6,5": 0.6,
+        "2,6": 0.1,
+        "3,6": 0.3,
+        "4,6": 0.6,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "7fcdc7c30ef118be2cd1a232eb54445f2cca467db32e22d03edfa45f03f950de",
+      "timestamp": "2026-08-15T16:12:18.055539+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          1,
+          2
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 5,
+      "sender": "thief",
+      "hint": "Taking the long way round by the Brooklyn Bridge.",
+      "smell_grid": {
+        "3,2": 0.2,
+        "3,3": 0.3,
+        "3,4": 0.3,
+        "3,5": 0.3,
+        "4,2": 0.2,
+        "4,3": 0.5,
+        "4,4": 0.6,
+        "4,5": 0.5,
+        "5,2": 0.2,
+        "5,3": 0.4,
+        "5,4": 0.7,
+        "5,5": 0.8,
+        "6,2": 0.1,
+        "6,3": 0.4,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "3,6": 0.2,
+        "4,6": 0.5,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "35bb5442e89ee9cc0bc3ac9a4253a1b88a4319ed672640aa738350336ab1808d",
+      "timestamp": "2026-08-15T16:12:27.634437+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          1,
+          3
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 6,
+      "sender": "thief",
+      "hint": "Still moving south — Wall Street is behind me now.",
+      "smell_grid": {
+        "3,2": 0.1,
+        "3,3": 0.2,
+        "3,4": 0.2,
+        "3,5": 0.2,
+        "4,2": 0.1,
+        "4,3": 0.4,
+        "4,4": 0.5,
+        "4,5": 0.4,
+        "5,2": 0.1,
+        "5,3": 0.3,
+        "5,4": 0.6,
+        "5,5": 0.7,
+        "6,3": 0.3,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "3,6": 0.1,
+        "4,6": 0.4,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "88db404430d1c6f49ff8ee63ec4cf48aec1ff335108cc9a4a849c03a4c750d83",
+      "timestamp": "2026-08-15T16:12:38.810697+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          1,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 7,
+      "sender": "thief",
+      "hint": "Taking the long way round by Times Square.",
+      "smell_grid": {
+        "3,3": 0.1,
+        "3,4": 0.1,
+        "3,5": 0.1,
+        "4,3": 0.3,
+        "4,4": 0.4,
+        "4,5": 0.3,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.6,
+        "6,3": 0.6,
+        "6,4": 0.9,
+        "6,5": 0.8,
+        "4,6": 0.3,
+        "5,6": 0.5,
+        "6,6": 0.5,
+        "4,2": 0.3,
+        "5,2": 0.3,
+        "6,2": 0.3
+      },
+      "commit": "1731c67f4222eaf73f69abf9e6242566bb525073e6a8abe1b516ff0522d98c5b",
+      "timestamp": "2026-08-15T16:12:46.931698+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          1,
+          5
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 8,
+      "sender": "thief",
+      "hint": "I'm heading toward Central Park, but you'll never catch me there.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.3,
+        "4,5": 0.3,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.5,
+        "6,3": 0.9,
+        "6,4": 0.8,
+        "6,5": 0.7,
+        "4,6": 0.2,
+        "5,6": 0.4,
+        "6,6": 0.4,
+        "4,2": 0.3,
+        "5,2": 0.6,
+        "6,2": 0.6,
+        "4,1": 0.3,
+        "5,1": 0.3,
+        "6,1": 0.3
+      },
+      "commit": "1c4fe33793974fedc8bf0143cd3eeebeb8efe291a27cbba9cbc67fcce3f53e8e",
+      "timestamp": "2026-08-15T16:12:57.125583+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          5
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 9,
+      "sender": "thief",
+      "hint": "Slipping past the East Village while you look the wrong way.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.3,
+        "4,5": 0.2,
+        "5,3": 0.6,
+        "5,4": 0.5,
+        "5,5": 0.4,
+        "6,3": 0.8,
+        "6,4": 0.7,
+        "6,5": 0.6,
+        "4,6": 0.1,
+        "5,6": 0.3,
+        "6,6": 0.3,
+        "4,2": 0.3,
+        "5,2": 0.6,
+        "6,2": 0.9,
+        "4,1": 0.3,
+        "5,1": 0.6,
+        "6,1": 0.6,
+        "4,0": 0.3,
+        "5,0": 0.3,
+        "6,0": 0.3
+      },
+      "commit": "264cbfb73766cf7629bd4e01ae1080e401b84fe0e5175aa2c149cab7cf74c1c9",
+      "timestamp": "2026-08-15T16:13:05.055135+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          3,
+          5
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 10,
+      "sender": "thief",
+      "hint": "I'm heading toward the riverfront, past the old pier.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.2,
+        "4,5": 0.1,
+        "5,3": 0.5,
+        "5,4": 0.4,
+        "5,5": 0.3,
+        "6,3": 0.7,
+        "6,4": 0.6,
+        "6,5": 0.5,
+        "5,6": 0.2,
+        "6,6": 0.2,
+        "4,2": 0.3,
+        "5,2": 0.6,
+        "6,2": 0.8,
+        "4,1": 0.3,
+        "5,1": 0.6,
+        "6,1": 0.9,
+        "4,0": 0.3,
+        "5,0": 0.6,
+        "6,0": 0.6
+      },
+      "commit": "9ccb5f5cee3d5d603df825cc287b7cb501982b05a3e8c2524b3d5b8262bc6b74",
+      "timestamp": "2026-08-15T16:13:15.257976+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          3,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 11,
+      "sender": "thief",
+      "hint": "Taking the long way round by Times Square.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.1,
+        "5,3": 0.4,
+        "5,4": 0.3,
+        "5,5": 0.2,
+        "6,3": 0.6,
+        "6,4": 0.5,
+        "6,5": 0.4,
+        "5,6": 0.1,
+        "6,6": 0.1,
+        "4,2": 0.3,
+        "5,2": 0.6,
+        "6,2": 0.7,
+        "4,1": 0.3,
+        "5,1": 0.6,
+        "6,1": 0.9,
+        "4,0": 0.3,
+        "5,0": 0.6,
+        "6,0": 0.6
+      },
+      "commit": "8c2fb60f954cf6b69202c9832b8dfa240f11aab4f8d54edd5ff38643c9bfc079",
+      "timestamp": "2026-08-15T16:13:23.189908+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          4,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 12,
+      "sender": "thief",
+      "hint": "The subway runs all night in New York.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.3,
+        "5,4": 0.2,
+        "5,5": 0.1,
+        "6,3": 0.5,
+        "6,4": 0.4,
+        "6,5": 0.3,
+        "4,2": 0.3,
+        "5,2": 0.6,
+        "6,2": 0.6,
+        "4,1": 0.3,
+        "5,1": 0.6,
+        "6,1": 0.9,
+        "4,0": 0.3,
+        "5,0": 0.6,
+        "6,0": 0.6
+      },
+      "commit": "1730a60c1776ef224d6cc4e1576a8690493fbbdbea342ad70774e7ab3048800b",
+      "timestamp": "2026-08-15T16:13:33.637550+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          5,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 13,
+      "sender": "thief",
+      "hint": "Slipping past Central Park while you look the wrong way.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.3,
+        "5,4": 0.1,
+        "6,3": 0.4,
+        "6,4": 0.3,
+        "6,5": 0.2,
+        "4,2": 0.6,
+        "5,2": 0.6,
+        "6,2": 0.6,
+        "4,1": 0.6,
+        "5,1": 0.9,
+        "6,1": 0.8,
+        "4,0": 0.6,
+        "5,0": 0.6,
+        "6,0": 0.6,
+        "3,0": 0.3,
+        "3,1": 0.3,
+        "3,2": 0.3,
+        "3,3": 0.3
+      },
+      "commit": "ea7b94ca08b2ba1cef21345c01901fbcce9c46ff8ba384db712a55bee194873d",
+      "timestamp": "2026-08-15T16:13:42.259487+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          6,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 14,
+      "sender": "thief",
+      "hint": "Still moving through the streets.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.3,
+        "6,3": 0.3,
+        "6,4": 0.2,
+        "6,5": 0.1,
+        "4,2": 0.6,
+        "5,2": 0.6,
+        "6,2": 0.5,
+        "4,1": 0.9,
+        "5,1": 0.8,
+        "6,1": 0.7,
+        "4,0": 0.6,
+        "5,0": 0.6,
+        "6,0": 0.5,
+        "3,0": 0.6,
+        "3,1": 0.6,
+        "3,2": 0.6,
+        "3,3": 0.3,
+        "2,0": 0.3,
+        "2,1": 0.3,
+        "2,2": 0.3,
+        "2,3": 0.3
+      },
+      "commit": "bdd35adad24d2dc1f56507a0497a6ad3d1894d1f607fc65cc95ff2b68d300b65",
+      "timestamp": "2026-08-15T16:13:52.921034+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          6,
+          3
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 15,
+      "sender": "thief",
+      "hint": "Slipping past the Brooklyn Bridge while you look the wrong way.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.3,
+        "6,3": 0.2,
+        "6,4": 0.1,
+        "4,2": 0.6,
+        "5,2": 0.5,
+        "6,2": 0.4,
+        "4,1": 0.8,
+        "5,1": 0.7,
+        "6,1": 0.6,
+        "4,0": 0.6,
+        "5,0": 0.5,
+        "6,0": 0.4,
+        "3,0": 0.6,
+        "3,1": 0.9,
+        "3,2": 0.6,
+        "3,3": 0.3,
+        "2,0": 0.6,
+        "2,1": 0.6,
+        "2,2": 0.6,
+        "2,3": 0.3,
+        "1,0": 0.3,
+        "1,1": 0.3,
+        "1,2": 0.3,
+        "1,3": 0.3
+      },
+      "commit": "bf0451684a7e9fd1095e540dc6c6f65483afd0d4dcced7fbdb251d4dd3f95617",
+      "timestamp": "2026-08-15T16:14:01.782511+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          6,
+          2
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 16,
+      "sender": "thief",
+      "hint": "I'm hiding near the Brooklyn Bridge, watching the water.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.2,
+        "6,3": 0.1,
+        "4,2": 0.5,
+        "5,2": 0.4,
+        "6,2": 0.3,
+        "4,1": 0.7,
+        "5,1": 0.6,
+        "6,1": 0.5,
+        "4,0": 0.5,
+        "5,0": 0.4,
+        "6,0": 0.3,
+        "3,0": 0.6,
+        "3,1": 0.8,
+        "3,2": 0.6,
+        "3,3": 0.3,
+        "2,0": 0.6,
+        "2,1": 0.9,
+        "2,2": 0.6,
+        "2,3": 0.3,
+        "1,0": 0.6,
+        "1,1": 0.6,
+        "1,2": 0.6,
+        "1,3": 0.3,
+        "0,0": 0.3,
+        "0,1": 0.3,
+        "0,2": 0.3,
+        "0,3": 0.3
+      },
+      "commit": "a55fc28dea577a625ea2a3493fbaf498b3abaee26dccf471e99e7dbfbf514d1d",
+      "timestamp": "2026-08-15T16:14:12.018950+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": null,
+      "win_claim": null
+    },
+    {
+      "step": 17,
+      "sender": "thief",
+      "hint": "Taking the long way round by Central Park.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.1,
+        "4,2": 0.4,
+        "5,2": 0.3,
+        "6,2": 0.2,
+        "4,1": 0.6,
+        "5,1": 0.5,
+        "6,1": 0.4,
+        "4,0": 0.4,
+        "5,0": 0.3,
+        "6,0": 0.2,
+        "3,0": 0.5,
+        "3,1": 0.7,
+        "3,2": 0.6,
+        "3,3": 0.6,
+        "2,0": 0.5,
+        "2,1": 0.8,
+        "2,2": 0.9,
+        "2,3": 0.6,
+        "1,0": 0.5,
+        "1,1": 0.6,
+        "1,2": 0.6,
+        "1,3": 0.6,
+        "0,0": 0.3,
+        "0,1": 0.3,
+        "0,2": 0.3,
+        "0,3": 0.3,
+        "0,4": 0.3,
+        "1,4": 0.3,
+        "2,4": 0.3,
+        "3,4": 0.3,
+        "4,4": 0.3
+      },
+      "commit": "74d8547c375e3655d036b8e37ef5ca9b3f7903f966d30e65d25a960afabfe7d6",
+      "timestamp": "2026-08-15T16:14:20.577450+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          6,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 18,
+      "sender": "thief",
+      "hint": "Still moving through the streets.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,2": 0.3,
+        "5,2": 0.2,
+        "6,2": 0.1,
+        "4,1": 0.5,
+        "5,1": 0.4,
+        "6,1": 0.3,
+        "4,0": 0.3,
+        "5,0": 0.2,
+        "6,0": 0.1,
+        "3,0": 0.4,
+        "3,1": 0.6,
+        "3,2": 0.6,
+        "3,3": 0.6,
+        "2,0": 0.4,
+        "2,1": 0.7,
+        "2,2": 0.8,
+        "2,3": 0.9,
+        "1,0": 0.4,
+        "1,1": 0.5,
+        "1,2": 0.6,
+        "1,3": 0.6,
+        "0,0": 0.2,
+        "0,1": 0.3,
+        "0,2": 0.3,
+        "0,3": 0.3,
+        "0,4": 0.3,
+        "1,4": 0.6,
+        "2,4": 0.6,
+        "3,4": 0.6,
+        "4,4": 0.3,
+        "0,5": 0.3,
+        "1,5": 0.3,
+        "2,5": 0.3,
+        "3,5": 0.3,
+        "4,5": 0.3
+      },
+      "commit": "0b6b1cb548529de3d241ad0ed79621d769c53a5ecab3585bde095547160186b6",
+      "timestamp": "2026-08-15T16:14:30.709459+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          5,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 19,
+      "sender": "thief",
+      "hint": "You will not find me anywhere near the East Village.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,2": 0.3,
+        "5,2": 0.1,
+        "4,1": 0.4,
+        "5,1": 0.3,
+        "6,1": 0.2,
+        "4,0": 0.2,
+        "5,0": 0.1,
+        "3,0": 0.3,
+        "3,1": 0.5,
+        "3,2": 0.5,
+        "3,3": 0.6,
+        "2,0": 0.3,
+        "2,1": 0.6,
+        "2,2": 0.7,
+        "2,3": 0.8,
+        "1,0": 0.3,
+        "1,1": 0.4,
+        "1,2": 0.5,
+        "1,3": 0.6,
+        "0,0": 0.1,
+        "0,1": 0.2,
+        "0,2": 0.3,
+        "0,3": 0.3,
+        "0,4": 0.3,
+        "1,4": 0.6,
+        "2,4": 0.9,
+        "3,4": 0.6,
+        "4,4": 0.3,
+        "0,5": 0.3,
+        "1,5": 0.6,
+        "2,5": 0.6,
+        "3,5": 0.6,
+        "4,5": 0.3,
+        "0,6": 0.3,
+        "1,6": 0.3,
+        "2,6": 0.3,
+        "3,6": 0.3,
+        "4,6": 0.3
+      },
+      "commit": "d5ca4348fd96234caae896b1b1b1bfb171214c2ff223444dd5792056396eb504",
+      "timestamp": "2026-08-15T16:14:38.648044+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          4,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 20,
+      "sender": "thief",
+      "hint": "Taking the long way round by the East Village.",
+      "smell_grid": {
+        "4,3": 0.2,
+        "4,2": 0.2,
+        "4,1": 0.3,
+        "5,1": 0.2,
+        "6,1": 0.1,
+        "4,0": 0.1,
+        "3,0": 0.2,
+        "3,1": 0.4,
+        "3,2": 0.4,
+        "3,3": 0.5,
+        "2,0": 0.2,
+        "2,1": 0.5,
+        "2,2": 0.6,
+        "2,3": 0.7,
+        "1,0": 0.2,
+        "1,1": 0.3,
+        "1,2": 0.4,
+        "1,3": 0.6,
+        "0,1": 0.1,
+        "0,2": 0.3,
+        "0,3": 0.6,
+        "0,4": 0.6,
+        "1,4": 0.9,
+        "2,4": 0.8,
+        "3,4": 0.5,
+        "4,4": 0.2,
+        "0,5": 0.6,
+        "1,5": 0.6,
+        "2,5": 0.6,
+        "3,5": 0.5,
+        "4,5": 0.2,
+        "0,6": 0.3,
+        "1,6": 0.3,
+        "2,6": 0.3,
+        "3,6": 0.3,
+        "4,6": 0.2
+      },
+      "commit": "005740dd96f731eb9e7cd1b890dca7b522830d43836811b30ae05a2d45ba1180",
+      "timestamp": "2026-08-15T16:14:49.150803+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          3,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 21,
+      "sender": "thief",
+      "hint": "Still moving north — the waterfront is behind me now.",
+      "smell_grid": {
+        "4,3": 0.1,
+        "4,2": 0.1,
+        "4,1": 0.2,
+        "5,1": 0.1,
+        "3,0": 0.1,
+        "3,1": 0.3,
+        "3,2": 0.3,
+        "3,3": 0.4,
+        "2,0": 0.1,
+        "2,1": 0.4,
+        "2,2": 0.5,
+        "2,3": 0.6,
+        "1,0": 0.1,
+        "1,1": 0.2,
+        "1,2": 0.3,
+        "1,3": 0.5,
+        "0,2": 0.2,
+        "0,3": 0.5,
+        "0,4": 0.6,
+        "1,4": 0.8,
+        "2,4": 0.7,
+        "3,4": 0.4,
+        "4,4": 0.1,
+        "0,5": 0.6,
+        "1,5": 0.9,
+        "2,5": 0.6,
+        "3,5": 0.4,
+        "4,5": 0.1,
+        "0,6": 0.6,
+        "1,6": 0.6,
+        "2,6": 0.6,
+        "3,6": 0.3,
+        "4,6": 0.1
+      },
+      "commit": "bd2c4ab53630911f60c48ff4b4886971ac5a5b3e65b875ffd080b17e47a8ae2c",
+      "timestamp": "2026-08-15T16:14:57.150871+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 22,
+      "sender": "thief",
+      "hint": "I'm waiting by the Brooklyn Bridge, watching the river glow.",
+      "smell_grid": {
+        "4,1": 0.1,
+        "3,1": 0.2,
+        "3,2": 0.2,
+        "3,3": 0.3,
+        "2,1": 0.3,
+        "2,2": 0.4,
+        "2,3": 0.5,
+        "1,1": 0.1,
+        "1,2": 0.2,
+        "1,3": 0.4,
+        "0,2": 0.1,
+        "0,3": 0.4,
+        "0,4": 0.5,
+        "1,4": 0.7,
+        "2,4": 0.6,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.8,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.9,
+        "2,6": 0.6,
+        "3,6": 0.3
+      },
+      "commit": "c4334ae2b0f74facb2fa7b3d0010f7faf36912e42f183e9d4788e45530cdd125",
+      "timestamp": "2026-08-15T16:15:07.475759+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          2
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 23,
+      "sender": "thief",
+      "hint": "You will not find me anywhere near the Brooklyn Bridge.",
+      "smell_grid": {
+        "3,1": 0.1,
+        "3,2": 0.1,
+        "3,3": 0.2,
+        "2,1": 0.2,
+        "2,2": 0.3,
+        "2,3": 0.4,
+        "1,2": 0.1,
+        "1,3": 0.3,
+        "0,3": 0.3,
+        "0,4": 0.4,
+        "1,4": 0.6,
+        "2,4": 0.5,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.7,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.9,
+        "2,6": 0.6,
+        "3,6": 0.3
+      },
+      "commit": "34fc5b18c7e78590b9008fedba9fa208c13a2e8101fd2d94c321bfb9995e57b2",
+      "timestamp": "2026-08-15T16:15:15.394378+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          3
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 24,
+      "sender": "thief",
+      "hint": "Still moving through the streets.",
+      "smell_grid": {
+        "3,3": 0.1,
+        "2,1": 0.1,
+        "2,2": 0.2,
+        "2,3": 0.3,
+        "1,3": 0.2,
+        "0,3": 0.2,
+        "0,4": 0.3,
+        "1,4": 0.5,
+        "2,4": 0.4,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.6,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.9,
+        "2,6": 0.6,
+        "3,6": 0.3
+      },
+      "commit": "6e52d37073fc691a0980d951553c026b6a8f0bbcc3bb53b9ed4b2ce95955ecae",
+      "timestamp": "2026-08-15T16:15:25.710715+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 25,
+      "sender": "thief",
+      "hint": "Taking the long way round by Times Square.",
+      "smell_grid": {
+        "2,2": 0.1,
+        "2,3": 0.2,
+        "1,3": 0.1,
+        "0,3": 0.1,
+        "0,4": 0.3,
+        "1,4": 0.4,
+        "2,4": 0.3,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.6,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.9,
+        "2,6": 0.6,
+        "3,6": 0.3
+      },
+      "commit": "f751b65dd61630669d7053a81cc9b85cf227361c6911f1b5a11ec9d83fe4075b",
+      "timestamp": "2026-08-15T16:15:33.640427+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          5
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 26,
+      "sender": "thief",
+      "hint": "Still moving north — Central Park is behind me now.",
+      "smell_grid": {
+        "2,3": 0.3,
+        "0,4": 0.6,
+        "1,4": 0.6,
+        "2,4": 0.6,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.9,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.8,
+        "2,6": 0.6,
+        "3,6": 0.3,
+        "0,3": 0.3,
+        "1,3": 0.3,
+        "3,3": 0.3
+      },
+      "commit": "4585b15e0bcc1914726e4e27f39ac3f317deba551a5f59c9961e950bdfa0be4f",
+      "timestamp": "2026-08-15T16:15:44.104412+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": null,
+      "win_claim": null
+    },
+    {
+      "step": 27,
+      "sender": "thief",
+      "hint": "Still moving west — Central Park is behind me now.",
+      "smell_grid": {
+        "2,3": 0.6,
+        "0,4": 0.6,
+        "1,4": 0.9,
+        "2,4": 0.6,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.8,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.5,
+        "1,6": 0.7,
+        "2,6": 0.5,
+        "3,6": 0.3,
+        "0,3": 0.6,
+        "1,3": 0.6,
+        "3,3": 0.3,
+        "0,2": 0.3,
+        "1,2": 0.3,
+        "2,2": 0.3,
+        "3,2": 0.3
+      },
+      "commit": "0a8c7427c9ac0dd77e533c32d8a41caa9cc10ca196383f1270230089c0007255",
+      "timestamp": "2026-08-15T16:15:52.027599+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          1,
+          5
+        ],
+        "caught": true
+      },
+      "win_claim": null
+    }
+  ],
+  "my_log": [
+    {
+      "step": 1,
+      "position": [
+        0,
+        1
+      ],
+      "move": "MOVE:E",
+      "unique_cells": 2,
+      "barrier": null
+    },
+    {
+      "step": 2,
+      "position": [
+        0,
+        2
+      ],
+      "move": "MOVE:E",
+      "unique_cells": 3,
+      "barrier": null
+    },
+    {
+      "step": 3,
+      "position": [
+        1,
+        2
+      ],
+      "move": "MOVE:S",
+      "unique_cells": 4,
+      "barrier": null
+    },
+    {
+      "step": 4,
+      "position": [
+        1,
+        3
+      ],
+      "move": "MOVE:E",
+      "unique_cells": 5,
+      "barrier": null
+    },
+    {
+      "step": 5,
+      "position": [
+        1,
+        4
+      ],
+      "move": "MOVE:E",
+      "unique_cells": 6,
+      "barrier": null
+    },
+    {
+      "step": 6,
+      "position": [
+        1,
+        5
+      ],
+      "move": "MOVE:E",
+      "unique_cells": 7,
+      "barrier": null
+    },
+    {
+      "step": 7,
+      "position": [
+        2,
+        5
+      ],
+      "move": "MOVE:S",
+      "unique_cells": 8,
+      "barrier": null
+    },
+    {
+      "step": 8,
+      "position": [
+        3,
+        5
+      ],
+      "move": "MOVE:S",
+      "unique_cells": 9,
+      "barrier": null
+    },
+    {
+      "step": 9,
+      "position": [
+        3,
+        4
+      ],
+      "move": "MOVE:W",
+      "unique_cells": 10,
+      "barrier": null
+    },
+    {
+      "step": 10,
+      "position": [
+        4,
+        4
+      ],
+      "move": "MOVE:S",
+      "unique_cells": 11,
+      "barrier": null
+    },
+    {
+      "step": 11,
+      "position": [
+        5,
+        4
+      ],
+      "move": "MOVE:S",
+      "unique_cells": 12,
+      "barrier": null
+    },
+    {
+      "step": 12,
+      "position": [
+        6,
+        4
+      ],
+      "move": "MOVE:S",
+      "unique_cells": 13,
+      "barrier": null
+    },
+    {
+      "step": 13,
+      "position": [
+        6,
+        3
+      ],
+      "move": "MOVE:W",
+      "unique_cells": 14,
+      "barrier": null
+    },
+    {
+      "step": 14,
+      "position": [
+        6,
+        2
+      ],
+      "move": "MOVE:W",
+      "unique_cells": 15,
+      "barrier": null
+    },
+    {
+      "step": 15,
+      "position": [
+        6,
+        2
+      ],
+      "move": "BARRIER:N",
+      "unique_cells": 15,
+      "barrier": [
+        5,
+        2
+      ]
+    },
+    {
+      "step": 16,
+      "position": [
+        6,
+        1
+      ],
+      "move": "MOVE:W",
+      "unique_cells": 16,
+      "barrier": null
+    },
+    {
+      "step": 17,
+      "position": [
+        5,
+        1
+      ],
+      "move": "MOVE:N",
+      "unique_cells": 17,
+      "barrier": null
+    },
+    {
+      "step": 18,
+      "position": [
+        4,
+        1
+      ],
+      "move": "MOVE:N",
+      "unique_cells": 18,
+      "barrier": null
+    },
+    {
+      "step": 19,
+      "position": [
+        3,
+        1
+      ],
+      "move": "MOVE:N",
+      "unique_cells": 19,
+      "barrier": null
+    },
+    {
+      "step": 20,
+      "position": [
+        2,
+        1
+      ],
+      "move": "MOVE:N",
+      "unique_cells": 20,
+      "barrier": null
+    },
+    {
+      "step": 21,
+      "position": [
+        2,
+        2
+      ],
+      "move": "MOVE:E",
+      "unique_cells": 21,
+      "barrier": null
+    },
+    {
+      "step": 22,
+      "position": [
+        2,
+        3
+      ],
+      "move": "MOVE:E",
+      "unique_cells": 22,
+      "barrier": null
+    },
+    {
+      "step": 23,
+      "position": [
+        2,
+        4
+      ],
+      "move": "MOVE:E",
+      "unique_cells": 23,
+      "barrier": null
+    },
+    {
+      "step": 24,
+      "position": [
+        2,
+        5
+      ],
+      "move": "MOVE:E",
+      "unique_cells": 23,
+      "barrier": null
+    },
+    {
+      "step": 25,
+      "position": [
+        2,
+        5
+      ],
+      "move": "BARRIER:E",
+      "unique_cells": 23,
+      "barrier": [
+        2,
+        6
+      ]
+    },
+    {
+      "step": 26,
+      "position": [
+        1,
+        5
+      ],
+      "move": "MOVE:N",
+      "unique_cells": 23,
+      "barrier": null
+    }
+  ],
+  "belief_log": [
+    {
+      "step": 1,
+      "smell_grid": {
+        "2,1": 0.3,
+        "2,2": 0.3,
+        "2,3": 0.3,
+        "2,4": 0.3,
+        "2,5": 0.3,
+        "3,1": 0.3,
+        "3,2": 0.6,
+        "3,3": 0.6,
+        "3,4": 0.6,
+        "3,5": 0.3,
+        "4,1": 0.3,
+        "4,2": 0.6,
+        "4,3": 0.9,
+        "4,4": 0.6,
+        "4,5": 0.3,
+        "5,1": 0.3,
+        "5,2": 0.6,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.3,
+        "6,1": 0.3,
+        "6,2": 0.3,
+        "6,3": 0.3,
+        "6,4": 0.3,
+        "6,5": 0.3
+      },
+      "belief": [
+        [
+          0.011770477625166295,
+          0.014448453479696003,
+          0.013332630206975293,
+          0.013332630206975293,
+          0.013332630206975293,
+          0.014448453479696003,
+          0.011770477625166295
+        ],
+        [
+          0.014448453479696003,
+          0.015341112097872568,
+          0.014671618134240146,
+          0.014671618134240146,
+          0.014671618134240146,
+          0.015341112097872568,
+          0.014448453479696003
+        ],
+        [
+          0.013332630206975291,
+          0.019603119421911678,
+          0.01869879206362823,
+          0.01869879206362823,
+          0.01869879206362823,
+          0.019603119421911674,
+          0.013332630206975291
+        ],
+        [
+          0.013332630206975291,
+          0.019603119421911678,
+          0.03503502821326478,
+          0.03503502821326478,
+          0.03503502821326478,
+          0.019603119421911674,
+          0.013332630206975291
+        ],
+        [
+          0.013332630206975291,
+          0.019603119421911678,
+          0.03503502821326478,
+          0.07937624061942114,
+          0.03503502821326478,
+          0.019603119421911674,
+          0.013332630206975291
+        ],
+        [
+          0.014448453479696003,
+          0.02050744678019513,
+          0.03675616737903006,
+          0.03675616737903006,
+          0.03675616737903006,
+          0.020507446780195126,
+          0.014448453479696003
+        ],
+        [
+          0.011770477625166295,
+          0.01930167696915053,
+          0.017794464705344775,
+          0.017794464705344775,
+          0.017794464705344775,
+          0.01930167696915053,
+          0.011770477625166295
+        ]
+      ]
+    },
+    {
+      "step": 2,
+      "smell_grid": {
+        "2,1": 0.2,
+        "2,2": 0.3,
+        "2,3": 0.3,
+        "2,4": 0.3,
+        "2,5": 0.3,
+        "3,1": 0.2,
+        "3,2": 0.5,
+        "3,3": 0.6,
+        "3,4": 0.6,
+        "3,5": 0.6,
+        "4,1": 0.2,
+        "4,2": 0.5,
+        "4,3": 0.8,
+        "4,4": 0.9,
+        "4,5": 0.6,
+        "5,1": 0.2,
+        "5,2": 0.5,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.6,
+        "6,1": 0.2,
+        "6,2": 0.3,
+        "6,3": 0.3,
+        "6,4": 0.3,
+        "6,5": 0.3,
+        "2,6": 0.3,
+        "3,6": 0.3,
+        "4,6": 0.3,
+        "5,6": 0.3,
+        "6,6": 0.3
+      },
+      "belief": [
+        [
+          0.006338393498826049,
+          0.0077711309623020135,
+          0.007399120315389555,
+          0.0072558315916936775,
+          0.007399120315389555,
+          0.0077711309623020135,
+          0.006338393498826049
+        ],
+        [
+          0.007771130962302012,
+          0.009420193768406408,
+          0.008835847350999397,
+          0.008767068763625378,
+          0.008835847350999397,
+          0.009420193768406412,
+          0.007771130962302012
+        ],
+        [
+          0.007905744289053093,
+          0.01195613766755413,
+          0.015419682945141795,
+          0.015294192326687482,
+          0.015419682945141795,
+          0.013089036288433518,
+          0.010464030567846382
+        ],
+        [
+          0.007762455565357217,
+          0.01455495034148717,
+          0.02983238903482276,
+          0.05427304138505416,
+          0.03848668721693696,
+          0.02979848638487125,
+          0.010270481529302931
+        ],
+        [
+          0.007905744289053093,
+          0.014669046351814211,
+          0.042546522769045456,
+          0.1024701499436135,
+          0.12498201124467151,
+          0.03003732336838107,
+          0.010464030567846382
+        ],
+        [
+          0.008301879887092387,
+          0.01563294679793418,
+          0.03144021209170582,
+          0.056572786372969745,
+          0.04057070847781141,
+          0.03205505452563352,
+          0.010999115689380943
+        ],
+        [
+          0.006961621402935958,
+          0.011525045668049797,
+          0.015234023430599125,
+          0.014972584642152635,
+          0.015234023430599125,
+          0.012614891737073298,
+          0.009188744752176178
+        ]
+      ]
+    },
+    {
+      "step": 3,
+      "smell_grid": {
+        "2,1": 0.1,
+        "2,2": 0.2,
+        "2,3": 0.2,
+        "2,4": 0.2,
+        "2,5": 0.2,
+        "3,1": 0.1,
+        "3,2": 0.4,
+        "3,3": 0.5,
+        "3,4": 0.5,
+        "3,5": 0.5,
+        "4,1": 0.1,
+        "4,2": 0.4,
+        "4,3": 0.7,
+        "4,4": 0.8,
+        "4,5": 0.6,
+        "5,1": 0.1,
+        "5,2": 0.4,
+        "5,3": 0.6,
+        "5,4": 0.9,
+        "5,5": 0.6,
+        "6,1": 0.1,
+        "6,2": 0.3,
+        "6,3": 0.6,
+        "6,4": 0.6,
+        "6,5": 0.6,
+        "2,6": 0.2,
+        "3,6": 0.3,
+        "4,6": 0.3,
+        "5,6": 0.3,
+        "6,6": 0.3
+      },
+      "belief": [
+        [
+          0.003244146070055163,
+          0.004029998767340555,
+          0.003847598081998492,
+          0.0038007557204004414,
+          0.003847598081998492,
+          0.004029998767340555,
+          0.003244146070055163
+        ],
+        [
+          0.004085571602807366,
+          0.004968352844088574,
+          0.0051483965398594345,
+          0.005070387823015363,
+          0.0051483965398594345,
+          0.005067769203252847,
+          0.004366196345889104
+        ],
+        [
+          0.004232561636624672,
+          0.0069686401304529764,
+          0.009378211862227629,
+          0.012378084194978916,
+          0.010432995368875455,
+          0.00932100534358147,
+          0.005863002935348412
+        ],
+        [
+          0.004475383851846002,
+          0.008991043813019236,
+          0.022460767016439953,
+          0.04244611407413855,
+          0.04638022818132183,
+          0.022237804639141122,
+          0.008767042643440345
+        ],
+        [
+          0.0045288493230197634,
+          0.010711122222131286,
+          0.031434679674758874,
+          0.11392899381225673,
+          0.13296768637366685,
+          0.052489267782829085,
+          0.008874635882205925
+        ],
+        [
+          0.004780135759894007,
+          0.009594187228847775,
+          0.02366159159526821,
+          0.056959878881411026,
+          0.14164996643905386,
+          0.030431983532259062,
+          0.009407355359711411
+        ],
+        [
+          0.003805292622094496,
+          0.0069116857293942836,
+          0.010522319293237882,
+          0.02618914883166598,
+          0.021840514633290453,
+          0.01915210062818653,
+          0.0059264062454188835
+        ]
+      ]
+    },
+    {
+      "step": 4,
+      "smell_grid": {
+        "2,2": 0.1,
+        "2,3": 0.1,
+        "2,4": 0.1,
+        "2,5": 0.1,
+        "3,2": 0.3,
+        "3,3": 0.4,
+        "3,4": 0.4,
+        "3,5": 0.4,
+        "4,2": 0.3,
+        "4,3": 0.6,
+        "4,4": 0.7,
+        "4,5": 0.6,
+        "5,2": 0.3,
+        "5,3": 0.5,
+        "5,4": 0.8,
+        "5,5": 0.9,
+        "6,2": 0.2,
+        "6,3": 0.5,
+        "6,4": 0.6,
+        "6,5": 0.6,
+        "2,6": 0.1,
+        "3,6": 0.3,
+        "4,6": 0.6,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "belief": [
+        [
+          0.0019020277438678102,
+          0.0022894165958875995,
+          0.0022499451143384724,
+          0.002224565625556626,
+          0.0022499451143384724,
+          0.002297661881625247,
+          0.0019311204305646182
+        ],
+        [
+          0.002335087505140905,
+          0.0028706047509545352,
+          0.0030485039436907585,
+          0.003307380155546004,
+          0.0031442297153039585,
+          0.0031030406278445043,
+          0.0025414551837958507
+        ],
+        [
+          0.0025165208710355097,
+          0.0035645460317085455,
+          0.006139082902040316,
+          0.008432038054972163,
+          0.008820047836594439,
+          0.005948186730228863,
+          0.003856321348187419
+        ],
+        [
+          0.002730207891447125,
+          0.00515103395364809,
+          0.013463076453240982,
+          0.03193597290316958,
+          0.03416014929074611,
+          0.019252310988564447,
+          0.006394983439360808
+        ],
+        [
+          0.0029296335144238066,
+          0.006118600142087552,
+          0.023264002175621825,
+          0.08115140763341662,
+          0.13767749503506158,
+          0.05374962456608629,
+          0.019012794394635157
+        ],
+        [
+          0.0028990289285537006,
+          0.005470828308190307,
+          0.015713991525531143,
+          0.06130059633001318,
+          0.14531373991643703,
+          0.12758891807028347,
+          0.0140792736837086
+        ],
+        [
+          0.002350348039562174,
+          0.003741358998652672,
+          0.008576409688455279,
+          0.022021274441757617,
+          0.048719278401443585,
+          0.020132072771812524,
+          0.010329860350866131
+        ]
+      ]
+    },
+    {
+      "step": 5,
+      "smell_grid": {
+        "3,2": 0.2,
+        "3,3": 0.3,
+        "3,4": 0.3,
+        "3,5": 0.3,
+        "4,2": 0.2,
+        "4,3": 0.5,
+        "4,4": 0.6,
+        "4,5": 0.5,
+        "5,2": 0.2,
+        "5,3": 0.4,
+        "5,4": 0.7,
+        "5,5": 0.8,
+        "6,2": 0.1,
+        "6,3": 0.4,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "3,6": 0.2,
+        "4,6": 0.5,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "belief": [
+        [
+          0.0013639050440862333,
+          0.001596035156293457,
+          0.0015782788408882902,
+          0.001595875333075487,
+          0.0015871832309111596,
+          0.0016204921020382683,
+          0.0013905054216114127
+        ],
+        [
+          0.0016288124801733803,
+          0.0018941094312764158,
+          0.0021387977462096293,
+          0.0023516699326533463,
+          0.0023914982611909262,
+          0.002144369710169302,
+          0.0018147090872871186
+        ],
+        [
+          0.0017074709115791967,
+          0.0023649434850435648,
+          0.0035218523921521825,
+          0.0055362563872697786,
+          0.005693306197011043,
+          0.0041346182651712275,
+          0.002454650322887986
+        ],
+        [
+          0.0019031120393428983,
+          0.0032751895314062805,
+          0.008858173138202068,
+          0.019798834650779237,
+          0.026911547748919944,
+          0.014349601265647001,
+          0.006370493901644595
+        ],
+        [
+          0.002024519179558696,
+          0.004279271979898466,
+          0.015021273910921385,
+          0.056464771785831175,
+          0.09820639503493304,
+          0.06091273848613452,
+          0.017786001769185933
+        ],
+        [
+          0.0020124863907751657,
+          0.003602190601937261,
+          0.012624310310787331,
+          0.04479896268982697,
+          0.15231485641606593,
+          0.13964314814606751,
+          0.04080480869638765
+        ],
+        [
+          0.0016382659019016951,
+          0.0026936643191535006,
+          0.0064373105480403665,
+          0.022030619232103723,
+          0.05650745940377921,
+          0.11465911938130753,
+          0.013561533800481536
+        ]
+      ]
+    },
+    {
+      "step": 6,
+      "smell_grid": {
+        "3,2": 0.1,
+        "3,3": 0.2,
+        "3,4": 0.2,
+        "3,5": 0.2,
+        "4,2": 0.1,
+        "4,3": 0.4,
+        "4,4": 0.5,
+        "4,5": 0.4,
+        "5,2": 0.1,
+        "5,3": 0.3,
+        "5,4": 0.6,
+        "5,5": 0.7,
+        "6,3": 0.3,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "3,6": 0.1,
+        "4,6": 0.4,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "belief": [
+        [
+          0.0011498886520678363,
+          0.0013060368279193932,
+          0.0013031676882599348,
+          0.0013203784093115969,
+          0.0013282751763785462,
+          0.00133471713680454,
+          0.001176094048971576
+        ],
+        [
+          0.0013233033635517435,
+          0.0015016531726130726,
+          0.0016253448275559107,
+          0.001841433791793217,
+          0.001854376046927137,
+          0.0017178947144358876,
+          0.0014478965803549075
+        ],
+        [
+          0.001372473168192906,
+          0.0017371640360759452,
+          0.0025242907118190466,
+          0.003759349624359427,
+          0.004421597973396714,
+          0.003118728698394335,
+          0.0020991050165083203
+        ],
+        [
+          0.001492285435882729,
+          0.002416531011231293,
+          0.005704367717618144,
+          0.012926139174987155,
+          0.017889639745169064,
+          0.012580720432458538,
+          0.005415660594336754
+        ],
+        [
+          0.0016104323301798114,
+          0.003060596993024994,
+          0.010422934790066379,
+          0.032374125403401066,
+          0.0673937420102171,
+          0.04607367076341296,
+          0.019878176085197107
+        ],
+        [
+          0.0015826703186271273,
+          0.002862730840352988,
+          0.00909587148292217,
+          0.034450352683470215,
+          0.11146248476676213,
+          0.15884210453801206,
+          0.05224120344924657
+        ],
+        [
+          0.001346798204568197,
+          0.002125706258271084,
+          0.005010824393895169,
+          0.018009091277626395,
+          0.08695378523537248,
+          0.1893403770575332,
+          0.04817380734046504
+        ]
+      ]
+    },
+    {
+      "step": 7,
+      "smell_grid": {
+        "3,3": 0.1,
+        "3,4": 0.1,
+        "3,5": 0.1,
+        "4,3": 0.3,
+        "4,4": 0.4,
+        "4,5": 0.3,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.6,
+        "6,3": 0.6,
+        "6,4": 0.9,
+        "6,5": 0.8,
+        "4,6": 0.3,
+        "5,6": 0.5,
+        "6,6": 0.5,
+        "4,2": 0.3,
+        "5,2": 0.3,
+        "6,2": 0.3
+      },
+      "belief": [
+        [
+          0.0010039300177801015,
+          0.0011150772928398018,
+          0.0011043639449018045,
+          0.0011227233528434415,
+          0.001126666363466963,
+          0.001139704757890029,
+          0.001021640576530951
+        ],
+        [
+          0.0011232235429629305,
+          0.0012258266308204353,
+          0.0012989102464318458,
+          0.001420055362799206,
+          0.001477618412301663,
+          0.0013777706979718452,
+          0.0012228882287726327
+        ],
+        [
+          0.001137103863260656,
+          0.0013571416988265282,
+          0.0017678067687287174,
+          0.002529796574596516,
+          0.0029491633938020685,
+          0.0024537663115674034,
+          0.0016903859416182324
+        ],
+        [
+          0.0012152637510670018,
+          0.001725161545466295,
+          0.0031712775890308706,
+          0.0070819574779635245,
+          0.010871712619340938,
+          0.008308934405285554,
+          0.004136920960647969
+        ],
+        [
+          0.0012835271106619846,
+          0.0021762157914314273,
+          0.006780133872758243,
+          0.016634191482354205,
+          0.03354275087339392,
+          0.03210739143442691,
+          0.01515217683470788
+        ],
+        [
+          0.0012971856725703878,
+          0.0020918163938229905,
+          0.007027989101794535,
+          0.04123224827102576,
+          0.09366750682046486,
+          0.12028011541274236,
+          0.04977569019103298
+        ],
+        [
+          0.001130170191020238,
+          0.0016682542060698308,
+          0.004733251323442229,
+          0.033882762242195115,
+          0.21287136265241852,
+          0.19780173238567128,
+          0.057686735406478326
+        ]
+      ]
+    },
+    {
+      "step": 8,
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.3,
+        "4,5": 0.3,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.5,
+        "6,3": 0.9,
+        "6,4": 0.8,
+        "6,5": 0.7,
+        "4,6": 0.2,
+        "5,6": 0.4,
+        "6,6": 0.4,
+        "4,2": 0.3,
+        "5,2": 0.6,
+        "6,2": 0.6,
+        "4,1": 0.3,
+        "5,1": 0.3,
+        "6,1": 0.3
+      },
+      "belief": [
+        [
+          0.0009380870045497174,
+          0.0010257041465857569,
+          0.0010113670349358199,
+          0.0010212515176480053,
+          0.0010286660074433401,
+          0.0010432037872591328,
+          0.0009515608016977965
+        ],
+        [
+          0.001029428749283621,
+          0.0010990487830977716,
+          0.0011291690084161516,
+          0.0012047233712550271,
+          0.0012413921302286547,
+          0.0012143877940093595,
+          0.0011021346416567553
+        ],
+        [
+          0.0010277655431590975,
+          0.0011586306552664187,
+          0.0013501247964540285,
+          0.0017599767414012036,
+          0.0020903507354254787,
+          0.001865928810052192,
+          0.0014333201111948538
+        ],
+        [
+          0.0010691890693671183,
+          0.001337294232423349,
+          0.002108153249401249,
+          0.0035484022212782006,
+          0.005185637976180997,
+          0.004905674444375363,
+          0.0031289450229349176
+        ],
+        [
+          0.0011166437343551833,
+          0.002027592294380735,
+          0.004135401089472046,
+          0.010975171979681458,
+          0.0190031946698488,
+          0.021597671051213168,
+          0.011212691791945522
+        ],
+        [
+          0.0011370594869014846,
+          0.002089125757821629,
+          0.012424677440705096,
+          0.03825453607234966,
+          0.10455843045527609,
+          0.08091010363468105,
+          0.03508639925155164
+        ],
+        [
+          0.0010196605574392162,
+          0.0017912943277869687,
+          0.011363237144054553,
+          0.1530511911089993,
+          0.2126972883447867,
+          0.18093759176965282,
+          0.04760151965011541
+        ]
+      ]
+    },
+    {
+      "step": 9,
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.3,
+        "4,5": 0.2,
+        "5,3": 0.6,
+        "5,4": 0.5,
+        "5,5": 0.4,
+        "6,3": 0.8,
+        "6,4": 0.7,
+        "6,5": 0.6,
+        "4,6": 0.1,
+        "5,6": 0.3,
+        "6,6": 0.3,
+        "4,2": 0.3,
+        "5,2": 0.6,
+        "6,2": 0.9,
+        "4,1": 0.3,
+        "5,1": 0.6,
+        "6,1": 0.6,
+        "4,0": 0.3,
+        "5,0": 0.3,
+        "6,0": 0.3
+      },
+      "belief": [
+        [
+          0.0009297001213527233,
+          0.0010123958921099269,
+          0.0009926687077719573,
+          0.000998757296391119,
+          0.0010046314012117576,
+          0.0010263230722784566,
+          0.0009400873559861638
+        ],
+        [
+          0.0010143282423288845,
+          0.0010697734782850478,
+          0.0010768033944517732,
+          0.0011201728337296621,
+          0.0011528111286983728,
+          0.0011502526185577229,
+          0.0010708394742848571
+        ],
+        [
+          0.0010014676063539274,
+          0.0010908256052292206,
+          0.0011888685032702745,
+          0.001376890024402713,
+          0.0015451059138484487,
+          0.001523957480793427,
+          0.0012995196715730952
+        ],
+        [
+          0.0010235676871611814,
+          0.0012243677267214344,
+          0.0015709246665660842,
+          0.00242348303024208,
+          0.00328049327844701,
+          0.0034904326445281994,
+          0.00250391694055244
+        ],
+        [
+          0.0012536509368427599,
+          0.0017521491983568875,
+          0.0038986525469705477,
+          0.008489901886417042,
+          0.01735196567700448,
+          0.013861350542421992,
+          0.00818954111058918
+        ],
+        [
+          0.001297698142738632,
+          0.004601951022224281,
+          0.014655480755668342,
+          0.07122101325323241,
+          0.0781049242241149,
+          0.05887304372136071,
+          0.023245909089499084
+        ],
+        [
+          0.0011684237815853874,
+          0.0046078533934586306,
+          0.10010999572180743,
+          0.17607187235955177,
+          0.20584195675269654,
+          0.12943437100468577,
+          0.036864929081645285
+        ]
+      ]
+    },
+    {
+      "step": 10,
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.2,
+        "4,5": 0.1,
+        "5,3": 0.5,
+        "5,4": 0.4,
+        "5,5": 0.3,
+        "6,3": 0.7,
+        "6,4": 0.6,
+        "6,5": 0.5,
+        "5,6": 0.2,
+        "6,6": 0.2,
+        "4,2": 0.3,
+        "5,2": 0.6,
+        "6,2": 0.8,
+        "4,1": 0.3,
+        "5,1": 0.6,
+        "6,1": 0.9,
+        "4,0": 0.3,
+        "5,0": 0.6,
+        "6,0": 0.6
+      },
+      "belief": [
+        [
+          0.0009531866714549799,
+          0.0010402569399345842,
+          0.001015704582995783,
+          0.00101851567053776,
+          0.0010247539933156205,
+          0.001051125371781912,
+          0.0009619847323564048
+        ],
+        [
+          0.0010413770770263673,
+          0.0010941344385902137,
+          0.0010879255678385342,
+          0.0011111958138531855,
+          0.0011319891299726168,
+          0.0011507227961015786,
+          0.0010865527269477591
+        ],
+        [
+          0.0010205853707287273,
+          0.0010987156878952543,
+          0.0011386845739065942,
+          0.0012514332923795816,
+          0.0013537046272506649,
+          0.0013916901137651146,
+          0.0012482836858976557
+        ],
+        [
+          0.001056717476236891,
+          0.0011899075748588832,
+          0.0014728690563094282,
+          0.002043656758691304,
+          0.0029580154530350323,
+          0.002723755517652959,
+          0.0021555498713665827
+        ],
+        [
+          0.0013139195796393055,
+          0.002083563843737261,
+          0.004037503412661352,
+          0.012273559350587842,
+          0.013030268758929852,
+          0.010866949898439768,
+          0.00531235345469378
+        ],
+        [
+          0.0027028535965277845,
+          0.006707177020847567,
+          0.04773640453939401,
+          0.06562875577915045,
+          0.06470603671123148,
+          0.039153136119998024,
+          0.016980644624495222
+        ],
+        [
+          0.002615009278783969,
+          0.06812659526898035,
+          0.1374472316339881,
+          0.19137333261398687,
+          0.154596070496154,
+          0.08995005968921377,
+          0.026485579755877252
+        ]
+      ]
+    },
+    {
+      "step": 11,
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.1,
+        "5,3": 0.4,
+        "5,4": 0.3,
+        "5,5": 0.2,
+        "6,3": 0.6,
+        "6,4": 0.5,
+        "6,5": 0.4,
+        "5,6": 0.1,
+        "6,6": 0.1,
+        "4,2": 0.3,
+        "5,2": 0.6,
+        "6,2": 0.7,
+        "4,1": 0.3,
+        "5,1": 0.6,
+        "6,1": 0.9,
+        "4,0": 0.3,
+        "5,0": 0.6,
+        "6,0": 0.6
+      },
+      "belief": [
+        [
+          0.0009840278899919978,
+          0.0010782486781218757,
+          0.0010497078119546394,
+          0.0010500530576980265,
+          0.0010558257770581822,
+          0.0010867786872745867,
+          0.0009915438202874492
+        ],
+        [
+          0.0010789141542718308,
+          0.0011341478154325436,
+          0.0011180682115859287,
+          0.001131740953038228,
+          0.001147077057257312,
+          0.0011752840007574498,
+          0.001115495884068811
+        ],
+        [
+          0.001055566961668358,
+          0.0011265497611960954,
+          0.0011489466079604824,
+          0.0012242710581738146,
+          0.0013296802122922248,
+          0.0013379658918871344,
+          0.0012336748188831006
+        ],
+        [
+          0.0010938809487167536,
+          0.0012479830160490538,
+          0.0014889962677415106,
+          0.0023865331240875715,
+          0.002573713113201201,
+          0.0024428959815679923,
+          0.0018204736718603778
+        ],
+        [
+          0.0016219050777980819,
+          0.0024889254234683553,
+          0.00871355118740762,
+          0.012237876741092335,
+          0.011509192776960426,
+          0.007036608974986805,
+          0.004287558785476644
+        ],
+        [
+          0.0042811372801306175,
+          0.0336973970439984,
+          0.06810331169775674,
+          0.061190860482895626,
+          0.045641798798738246,
+          0.027675232435981637,
+          0.012278144476173451
+        ],
+        [
+          0.0217991101449115,
+          0.14048828640240782,
+          0.16422577131693358,
+          0.15339815426554868,
+          0.10787736060770976,
+          0.05546767109452053,
+          0.01927209975101853
+        ]
+      ]
+    },
+    {
+      "step": 12,
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.3,
+        "5,4": 0.2,
+        "5,5": 0.1,
+        "6,3": 0.5,
+        "6,4": 0.4,
+        "6,5": 0.3,
+        "4,2": 0.3,
+        "5,2": 0.6,
+        "6,2": 0.6,
+        "4,1": 0.3,
+        "5,1": 0.6,
+        "6,1": 0.9,
+        "4,0": 0.3,
+        "5,0": 0.6,
+        "6,0": 0.6
+      },
+      "belief": [
+        [
+          0.0009959816597683202,
+          0.0010931117817013897,
+          0.001062710188019389,
+          0.0010614398361813914,
+          0.0010668974284580488,
+          0.001099480644166719,
+          0.0010020800544547149
+        ],
+        [
+          0.0010938334866440838,
+          0.0011498408808202193,
+          0.0011294721729272414,
+          0.0011373199280680286,
+          0.0011523491393126313,
+          0.0011797461404778173,
+          0.0011223294447753724
+        ],
+        [
+          0.001069030336054388,
+          0.001141157056790425,
+          0.0011526382769297071,
+          0.0012512461956588532,
+          0.0012858931498795864,
+          0.0013049372780792948,
+          0.0011918560988861415
+        ],
+        [
+          0.0011398375251848603,
+          0.001295370277258118,
+          0.0019383565078415431,
+          0.002374203250670489,
+          0.0024034602388558865,
+          0.001998597458080823,
+          0.0016405010237121166
+        ],
+        [
+          0.0019551620145604443,
+          0.006370579888291136,
+          0.011732340012092425,
+          0.012091566660910383,
+          0.0076028809743083434,
+          0.00539277211387537,
+          0.0032686545548409342
+        ],
+        [
+          0.018221845402595853,
+          0.06550424805175374,
+          0.08637330381756728,
+          0.04590433384893597,
+          0.03113529999696979,
+          0.017887721005289327,
+          0.007735911253836613
+        ],
+        [
+          0.05004449389858962,
+          0.23533023767988667,
+          0.1463753583890567,
+          0.10470094484618638,
+          0.0627254812245572,
+          0.03216509784672008,
+          0.010948089059518145
+        ]
+      ]
+    },
+    {
+      "step": 13,
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.3,
+        "5,4": 0.1,
+        "6,3": 0.4,
+        "6,4": 0.3,
+        "6,5": 0.2,
+        "4,2": 0.6,
+        "5,2": 0.6,
+        "6,2": 0.6,
+        "4,1": 0.6,
+        "5,1": 0.9,
+        "6,1": 0.8,
+        "4,0": 0.6,
+        "5,0": 0.6,
+        "6,0": 0.6,
+        "3,0": 0.3,
+        "3,1": 0.3,
+        "3,2": 0.3,
+        "3,3": 0.3
+      },
+      "belief": [
+        [
+          0.0009384432846891351,
+          0.0010209227025018942,
+          0.0009946749105166248,
+          0.0009928247579735455,
+          0.000997353015616635,
+          0.0010248772165422839,
+          0.0009424334827569558
+        ],
+        [
+          0.0010215762139754113,
+          0.001069148358547945,
+          0.001050105538506992,
+          0.001057494825991591,
+          0.0010643061065874625,
+          0.001088462223231617,
+          0.0010385943274362575
+        ],
+        [
+          0.001003471556187873,
+          0.0010632937472579743,
+          0.0011032050550543603,
+          0.0011468919816452613,
+          0.0011614870814872383,
+          0.0011511753162258983,
+          0.001076137887921789
+        ],
+        [
+          0.0012641371886932885,
+          0.0018327374495961941,
+          0.0024668031151039074,
+          0.0026238415945009403,
+          0.00177526607262974,
+          0.001588571211481876,
+          0.0013268247454861783
+        ],
+        [
+          0.00691395462675414,
+          0.017283605039443227,
+          0.023230882885796205,
+          0.008605480054022454,
+          0.004964820924490895,
+          0.0033568491747627137,
+          0.0021861327729051617
+        ],
+        [
+          0.0338480839480046,
+          0.20813848085132322,
+          0.0755234685812458,
+          0.03133758066832501,
+          0.016502884055070513,
+          0.008355213053982251,
+          0.004316252528802014
+        ],
+        [
+          0.07702446087777073,
+          0.20891276215057766,
+          0.13314514494847574,
+          0.05232234153502597,
+          0.028754646474508094,
+          0.014721978823499302,
+          0.005669915057067406
+        ]
+      ]
+    },
+    {
+      "step": 14,
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.3,
+        "6,3": 0.3,
+        "6,4": 0.2,
+        "6,5": 0.1,
+        "4,2": 0.6,
+        "5,2": 0.6,
+        "6,2": 0.5,
+        "4,1": 0.9,
+        "5,1": 0.8,
+        "6,1": 0.7,
+        "4,0": 0.6,
+        "5,0": 0.6,
+        "6,0": 0.5,
+        "3,0": 0.6,
+        "3,1": 0.6,
+        "3,2": 0.6,
+        "3,3": 0.3,
+        "2,0": 0.3,
+        "2,1": 0.3,
+        "2,2": 0.3,
+        "2,3": 0.3
+      },
+      "belief": [
+        [
+          0.0009135072820639152,
+          0.0009892782099228102,
+          0.0009642473270413208,
+          0.000962632220289164,
+          0.00096589305769524,
+          0.0009917847056250327,
+          0.0009159121528838227
+        ],
+        [
+          0.000990142565487574,
+          0.001031933952534171,
+          0.0010163941864372535,
+          0.0010190672953082859,
+          0.0010233560451983756,
+          0.0010427349639284319,
+          0.0010002453695806732
+        ],
+        [
+          0.0011237074717203417,
+          0.0012371680593639546,
+          0.0012873356152307018,
+          0.001313292466630866,
+          0.0010731629555660869,
+          0.0010757782331370421,
+          0.0010112592937277308
+        ],
+        [
+          0.0031159357663667975,
+          0.005169521344051102,
+          0.006492098799449095,
+          0.002254756850751752,
+          0.0014986464097877746,
+          0.0013096003255528418,
+          0.0011482235454485555
+        ],
+        [
+          0.013745418763863192,
+          0.11214670292030944,
+          0.02452299763270238,
+          0.007606254306040977,
+          0.0031882780149449564,
+          0.0021487139220836295,
+          0.0015739675597303826
+        ],
+        [
+          0.07349844944879924,
+          0.19880822238668477,
+          0.09554436524843514,
+          0.020120062378782937,
+          0.007717499507148982,
+          0.004418107311208961,
+          0.002509811545640386
+        ],
+        [
+          0.06328182134429818,
+          0.19018007639090945,
+          0.08311688123970001,
+          0.030176091754048107,
+          0.012856240896900118,
+          0.006857387795772867,
+          0.0030450331612151015
+        ]
+      ]
+    },
+    {
+      "step": 15,
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.3,
+        "6,3": 0.2,
+        "6,4": 0.1,
+        "4,2": 0.6,
+        "5,2": 0.5,
+        "6,2": 0.4,
+        "4,1": 0.8,
+        "5,1": 0.7,
+        "6,1": 0.6,
+        "4,0": 0.6,
+        "5,0": 0.5,
+        "6,0": 0.4,
+        "3,0": 0.6,
+        "3,1": 0.9,
+        "3,2": 0.6,
+        "3,3": 0.3,
+        "2,0": 0.6,
+        "2,1": 0.6,
+        "2,2": 0.6,
+        "2,3": 0.3,
+        "1,0": 0.3,
+        "1,1": 0.3,
+        "1,2": 0.3,
+        "1,3": 0.3
+      },
+      "belief": [
+        [
+          0.0009334413079335455,
+          0.0010137699744368544,
+          0.0009868673140755095,
+          0.0009847329900937053,
+          0.0009878439043239813,
+          0.0010153771998601838,
+          0.0009350300762739551
+        ],
+        [
+          0.001176364393150848,
+          0.0012374807411654378,
+          0.001215799400941233,
+          0.001217466769055215,
+          0.0010434510421673789,
+          0.0010648453884351066,
+          0.0010207843563623405
+        ],
+        [
+          0.0022184306874922103,
+          0.002705218549758837,
+          0.0029563804742396187,
+          0.0013664236937728674,
+          0.0010931598486844636,
+          0.001075569413629994,
+          0.0010161073895455447
+        ],
+        [
+          0.006324891364946102,
+          0.06156589061785381,
+          0.008819756073112413,
+          0.002692652788810515,
+          0.001361591132267381,
+          0.0012124019768761237,
+          0.0010925311811755625
+        ],
+        [
+          0.0471170192019587,
+          0.1294860889784765,
+          0.0515002222420031,
+          0.006874875352518059,
+          0.002393054142827277,
+          0.001659556534577211,
+          0.0013105017755616725
+        ],
+        [
+          0.06649394761217332,
+          0.20118616774775078,
+          0.07120539740461533,
+          0.018925898757738428,
+          0.004752117012311742,
+          0.0027011625036018915,
+          0.0017853840787935569
+        ],
+        [
+          0.056190682746752416,
+          0.13405456183719355,
+          0.061277273363108495,
+          0.018160970731655735,
+          0.007274312010628111,
+          0.0033554734363888694,
+          0.0019610724789244378
+        ]
+      ]
+    },
+    {
+      "step": 16,
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.2,
+        "6,3": 0.1,
+        "4,2": 0.5,
+        "5,2": 0.4,
+        "6,2": 0.3,
+        "4,1": 0.7,
+        "5,1": 0.6,
+        "6,1": 0.5,
+        "4,0": 0.5,
+        "5,0": 0.4,
+        "6,0": 0.3,
+        "3,0": 0.6,
+        "3,1": 0.8,
+        "3,2": 0.6,
+        "3,3": 0.3,
+        "2,0": 0.6,
+        "2,1": 0.9,
+        "2,2": 0.6,
+        "2,3": 0.3,
+        "1,0": 0.6,
+        "1,1": 0.6,
+        "1,2": 0.6,
+        "1,3": 0.3,
+        "0,0": 0.3,
+        "0,1": 0.3,
+        "0,2": 0.3,
+        "0,3": 0.3
+      },
+      "belief": [
+        [
+          0.0011597440514417318,
+          0.0012873427732355502,
+          0.0012431566642304502,
+          0.0012392366403435856,
+          0.0010633571996666777,
+          0.0010962920636847142,
+          0.0009996507898439016
+        ],
+        [
+          0.002320063446717561,
+          0.0025286546504816585,
+          0.002520049646664858,
+          0.001386814808623421,
+          0.0011459946056291898,
+          0.0011531071920792642,
+          0.0011002654807388222
+        ],
+        [
+          0.004217530327988625,
+          0.04017309314080965,
+          0.0047535971646507445,
+          0.0018015165084283866,
+          0.0011730390243085839,
+          0.0011518839717557655,
+          0.001083083892917146
+        ],
+        [
+          0.03244041042567559,
+          0.08966540532131832,
+          0.0346899213550353,
+          0.0033048891890639295,
+          0.0014385733782392995,
+          0.0012423890325835942,
+          0.0011301908776791573
+        ],
+        [
+          0.05292935717318159,
+          0.18172543356833606,
+          0.039850372034659874,
+          0.013363483178212402,
+          0.002221047536434162,
+          0.001518955240388531,
+          0.0012631863337635176
+        ],
+        [
+          0.07371824950217296,
+          0.15391558483711126,
+          0.0006122448979591836,
+          0.007335211399780432,
+          0.0046336483943152235,
+          0.0020792216745918212,
+          0.0015411570090961692
+        ],
+        [
+          0.04452241869647693,
+          0.11573570033743243,
+          0.037899159706484366,
+          0.018210195495330882,
+          0.00445842629502015,
+          0.0024302201095577182,
+          0.0015274729558587717
+        ]
+      ]
+    },
+    {
+      "step": 17,
+      "smell_grid": {
+        "4,3": 0.3,
+        "5,3": 0.1,
+        "4,2": 0.4,
+        "5,2": 0.3,
+        "6,2": 0.2,
+        "4,1": 0.6,
+        "5,1": 0.5,
+        "6,1": 0.4,
+        "4,0": 0.4,
+        "5,0": 0.3,
+        "6,0": 0.2,
+        "3,0": 0.5,
+        "3,1": 0.7,
+        "3,2": 0.6,
+        "3,3": 0.6,
+        "2,0": 0.5,
+        "2,1": 0.8,
+        "2,2": 0.9,
+        "2,3": 0.6,
+        "1,0": 0.5,
+        "1,1": 0.6,
+        "1,2": 0.6,
+        "1,3": 0.6,
+        "0,0": 0.3,
+        "0,1": 0.3,
+        "0,2": 0.3,
+        "0,3": 0.3,
+        "0,4": 0.3,
+        "1,4": 0.3,
+        "2,4": 0.3,
+        "3,4": 0.3,
+        "4,4": 0.3
+      },
+      "belief": [
+        [
+          0.0014438806323055393,
+          0.001596535358739816,
+          0.001545870910173787,
+          0.0013634350859364033,
+          0.0013086480656313714,
+          0.0011396730611538558,
+          0.0010338795820600637
+        ],
+        [
+          0.0030069568562231803,
+          0.012830785102278332,
+          0.003743117869326677,
+          0.0026769013067338286,
+          0.0014110895128742191,
+          0.00120446287274971,
+          0.001142504340405677
+        ],
+        [
+          0.01746255945603317,
+          0.06159953894729372,
+          0.04780039385955287,
+          0.0036637087712071536,
+          0.0014785862677111827,
+          0.0011927642616591473,
+          0.0011181751135309458
+        ],
+        [
+          0.038835261945207145,
+          0.12595328446452847,
+          0.045383971632119685,
+          0.014026650491431097,
+          0.001823125453279981,
+          0.0012587331084206845,
+          0.0011462876625031107
+        ],
+        [
+          0.05843040789342522,
+          0.14305484161797052,
+          0.04320381751314577,
+          0.010664865873517136,
+          0.003604057142620363,
+          0.0014380281031744048,
+          0.0012274417929129442
+        ],
+        [
+          0.05546472378157036,
+          0.11656154261862471,
+          0.0006122448979591836,
+          0.006343346251836461,
+          0.002874960702333031,
+          0.0018733932308295672,
+          0.0013892722880533468
+        ],
+        [
+          0.03711712247416892,
+          0.07268769474867999,
+          0.02776752751722696,
+          0.010233298703498537,
+          0.004053458939374291,
+          0.0018771941739932163,
+          0.0013299777440142458
+        ]
+      ]
+    },
+    {
+      "step": 18,
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,2": 0.3,
+        "5,2": 0.2,
+        "6,2": 0.1,
+        "4,1": 0.5,
+        "5,1": 0.4,
+        "6,1": 0.3,
+        "4,0": 0.3,
+        "5,0": 0.2,
+        "6,0": 0.1,
+        "3,0": 0.4,
+        "3,1": 0.6,
+        "3,2": 0.6,
+        "3,3": 0.6,
+        "2,0": 0.4,
+        "2,1": 0.7,
+        "2,2": 0.8,
+        "2,3": 0.9,
+        "1,0": 0.4,
+        "1,1": 0.5,
+        "1,2": 0.6,
+        "1,3": 0.6,
+        "0,0": 0.2,
+        "0,1": 0.3,
+        "0,2": 0.3,
+        "0,3": 0.3,
+        "0,4": 0.3,
+        "1,4": 0.6,
+        "2,4": 0.6,
+        "3,4": 0.6,
+        "4,4": 0.3,
+        "0,5": 0.3,
+        "1,5": 0.3,
+        "2,5": 0.3,
+        "3,5": 0.3,
+        "4,5": 0.3
+      },
+      "belief": [
+        [
+          0.0016180354602789088,
+          0.0032101817922023487,
+          0.0018831249978909594,
+          0.0016898140543909717,
+          0.001449400176628079,
+          0.0014239446912846288,
+          0.0010714503749742219
+        ],
+        [
+          0.007124655457210824,
+          0.01731723291453576,
+          0.018409361337541435,
+          0.0040174939181967665,
+          0.0027811346951898655,
+          0.001515178477590605,
+          0.0011896263335985022
+        ],
+        [
+          0.02226444970192981,
+          0.09248735060596258,
+          0.07355637012031528,
+          0.04172566645760431,
+          0.003081029427249049,
+          0.001497722721299799,
+          0.0011593222564004546
+        ],
+        [
+          0.043582061572162344,
+          0.11013854478975134,
+          0.07469921777801894,
+          0.020106627324256252,
+          0.006337357624571667,
+          0.001580850840692196,
+          0.0011765972674200346
+        ],
+        [
+          0.04588308008004924,
+          0.10844271180151326,
+          0.03502596939068143,
+          0.012843261447559753,
+          0.003378239063566074,
+          0.001928277416701234,
+          0.0012285973656659568
+        ],
+        [
+          0.04374007526878909,
+          0.07235196777514735,
+          0.0006122448979591836,
+          0.004127239390939081,
+          0.0027546448605832103,
+          0.0016428272167376041,
+          0.0013509425012607336
+        ],
+        [
+          0.026972392854204708,
+          0.04733822979477678,
+          0.018501547830274866,
+          0.007844443724375913,
+          0.002928406166658978,
+          0.0017666514664337676,
+          0.0012444465169737366
+        ]
+      ]
+    },
+    {
+      "step": 19,
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,2": 0.3,
+        "5,2": 0.1,
+        "4,1": 0.4,
+        "5,1": 0.3,
+        "6,1": 0.2,
+        "4,0": 0.2,
+        "5,0": 0.1,
+        "3,0": 0.3,
+        "3,1": 0.5,
+        "3,2": 0.5,
+        "3,3": 0.6,
+        "2,0": 0.3,
+        "2,1": 0.6,
+        "2,2": 0.7,
+        "2,3": 0.8,
+        "1,0": 0.3,
+        "1,1": 0.4,
+        "1,2": 0.5,
+        "1,3": 0.6,
+        "0,0": 0.1,
+        "0,1": 0.2,
+        "0,2": 0.3,
+        "0,3": 0.3,
+        "0,4": 0.3,
+        "1,4": 0.6,
+        "2,4": 0.9,
+        "3,4": 0.6,
+        "4,4": 0.3,
+        "0,5": 0.3,
+        "1,5": 0.6,
+        "2,5": 0.6,
+        "3,5": 0.6,
+        "4,5": 0.3,
+        "0,6": 0.3,
+        "1,6": 0.3,
+        "2,6": 0.3,
+        "3,6": 0.3,
+        "4,6": 0.3
+      },
+      "belief": [
+        [
+          0.002546671660637247,
+          0.004005120614613278,
+          0.004415775810605319,
+          0.0020686030618062906,
+          0.001812518695457787,
+          0.0015872523392516358,
+          0.0013269863399767816
+        ],
+        [
+          0.008639973496922464,
+          0.02410651695163309,
+          0.02463443858398768,
+          0.019201097177387202,
+          0.004167781211593218,
+          0.003051687732024515,
+          0.0014945279831572321
+        ],
+        [
+          0.02659806716253081,
+          0.08712216010574257,
+          0.1074476477572164,
+          0.06748518965603684,
+          0.034753982435753714,
+          0.003068631269616694,
+          0.0014474992426418017
+        ],
+        [
+          0.03594826026055257,
+          0.09205419226455805,
+          0.0675526496598724,
+          0.04253376072006218,
+          0.009896209591856546,
+          0.004062344414763018,
+          0.001466149193722493
+        ],
+        [
+          0.035974171946900994,
+          0.06889101227635154,
+          0.0346372975868798,
+          0.012674225787279381,
+          0.004465783382569626,
+          0.0020361419921483956,
+          0.0015491776019960156
+        ],
+        [
+          0.0312631009249277,
+          0.04495840506083438,
+          0.0006122448979591836,
+          0.0038930114799163797,
+          0.0023501636982032796,
+          0.0016828088284235414,
+          0.0013391670006695977
+        ],
+        [
+          0.01724257306843696,
+          0.029601858410476852,
+          0.011145314275408868,
+          0.005791989158096292,
+          0.002542201248476035,
+          0.0016160982077010255,
+          0.0012375577723642713
+        ]
+      ]
+    },
+    {
+      "step": 20,
+      "smell_grid": {
+        "4,3": 0.2,
+        "4,2": 0.2,
+        "4,1": 0.3,
+        "5,1": 0.2,
+        "6,1": 0.1,
+        "4,0": 0.1,
+        "3,0": 0.2,
+        "3,1": 0.4,
+        "3,2": 0.4,
+        "3,3": 0.5,
+        "2,0": 0.2,
+        "2,1": 0.5,
+        "2,2": 0.6,
+        "2,3": 0.7,
+        "1,0": 0.2,
+        "1,1": 0.3,
+        "1,2": 0.4,
+        "1,3": 0.6,
+        "0,1": 0.1,
+        "0,2": 0.3,
+        "0,3": 0.6,
+        "0,4": 0.6,
+        "1,4": 0.9,
+        "2,4": 0.8,
+        "3,4": 0.5,
+        "4,4": 0.2,
+        "0,5": 0.6,
+        "1,5": 0.6,
+        "2,5": 0.6,
+        "3,5": 0.5,
+        "4,5": 0.2,
+        "0,6": 0.3,
+        "1,6": 0.3,
+        "2,6": 0.3,
+        "3,6": 0.3,
+        "4,6": 0.2
+      },
+      "belief": [
+        [
+          0.0027842948811216016,
+          0.005594075330683677,
+          0.006135450472976877,
+          0.008847762608052027,
+          0.003676521211006953,
+          0.0032615169635431076,
+          0.0014995367717677997
+        ],
+        [
+          0.010244002895290098,
+          0.022805186944685772,
+          0.031764437999551934,
+          0.033494547662639367,
+          0.041037546520380094,
+          0.00455016046319604,
+          0.0019205114604989087
+        ],
+        [
+          0.024040915519802093,
+          0.07451725681759928,
+          0.09926452924032697,
+          0.10030458650747091,
+          0.05856429645825901,
+          0.013630465580734403,
+          0.001867540007916443
+        ],
+        [
+          0.029242674036581085,
+          0.06269905911436117,
+          0.06137822199849024,
+          0.04361352744642298,
+          0.021176351834719248,
+          0.005101833454355199,
+          0.0020229401748529593
+        ],
+        [
+          0.02596829319292721,
+          0.04530081284184388,
+          0.026312510898790706,
+          0.014958623362400203,
+          0.004792636277708932,
+          0.0024991968148310563,
+          0.0016072709625142827
+        ],
+        [
+          0.01891762188042796,
+          0.027477353226226357,
+          0.0006122448979591836,
+          0.003634135707905801,
+          0.0024042776688277807,
+          0.001669864952416334,
+          0.0014090822767317034
+        ],
+        [
+          0.011966978203452695,
+          0.018618075607205943,
+          0.007500030734431042,
+          0.004280153826951044,
+          0.0022141907355981774,
+          0.0015810456529287164,
+          0.001235849900634708
+        ]
+      ]
+    },
+    {
+      "step": 21,
+      "smell_grid": {
+        "4,3": 0.1,
+        "4,2": 0.1,
+        "4,1": 0.2,
+        "5,1": 0.1,
+        "3,0": 0.1,
+        "3,1": 0.3,
+        "3,2": 0.3,
+        "3,3": 0.4,
+        "2,0": 0.1,
+        "2,1": 0.4,
+        "2,2": 0.5,
+        "2,3": 0.6,
+        "1,0": 0.1,
+        "1,1": 0.2,
+        "1,2": 0.3,
+        "1,3": 0.5,
+        "0,2": 0.2,
+        "0,3": 0.5,
+        "0,4": 0.6,
+        "1,4": 0.8,
+        "2,4": 0.7,
+        "3,4": 0.4,
+        "4,4": 0.1,
+        "0,5": 0.6,
+        "1,5": 0.9,
+        "2,5": 0.6,
+        "3,5": 0.4,
+        "4,5": 0.1,
+        "0,6": 0.6,
+        "1,6": 0.6,
+        "2,6": 0.6,
+        "3,6": 0.3,
+        "4,6": 0.1
+      },
+      "belief": [
+        [
+          0.0033075731207953935,
+          0.0052563790150014535,
+          0.008398794814968365,
+          0.013041499220503024,
+          0.017842889436228217,
+          0.005070036500606896,
+          0.0031575128936793804
+        ],
+        [
+          0.009784339827439238,
+          0.02077881507982583,
+          0.02966274455808994,
+          0.04822574478434314,
+          0.0709198503152215,
+          0.04323411379508929,
+          0.003953604007251516
+        ],
+        [
+          0.02069466395913972,
+          0.051339157175816864,
+          0.08094392491083797,
+          0.09566648467121847,
+          0.08838538021320679,
+          0.024480943918670343,
+          0.006536579623541504
+        ],
+        [
+          0.021717158345907393,
+          0.042393053141017094,
+          0.0452828300776141,
+          0.04294024812674946,
+          0.023973544096866813,
+          0.008490565557700286,
+          0.0023961160484607157
+        ],
+        [
+          0.015828314103884432,
+          0.028745114130993454,
+          0.020872994020347462,
+          0.013763108056647442,
+          0.006591706491869383,
+          0.002709197505652822,
+          0.0017601377976630829
+        ],
+        [
+          0.01278838803313363,
+          0.017224973420805163,
+          0.0006122448979591836,
+          0.003702747495308217,
+          0.0023964608451869825,
+          0.0017494666857704158,
+          0.0014394418734382957
+        ],
+        [
+          0.007986880559589262,
+          0.010545625928513746,
+          0.005232176347631498,
+          0.003387266036633004,
+          0.0019907324326458318,
+          0.001546822697742215,
+          0.0012516534027937406
+        ]
+      ]
+    },
+    {
+      "step": 22,
+      "smell_grid": {
+        "4,1": 0.1,
+        "3,1": 0.2,
+        "3,2": 0.2,
+        "3,3": 0.3,
+        "2,1": 0.3,
+        "2,2": 0.4,
+        "2,3": 0.5,
+        "1,1": 0.1,
+        "1,2": 0.2,
+        "1,3": 0.4,
+        "0,2": 0.1,
+        "0,3": 0.4,
+        "0,4": 0.5,
+        "1,4": 0.7,
+        "2,4": 0.6,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.8,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.9,
+        "2,6": 0.6,
+        "3,6": 0.3
+      },
+      "belief": [
+        [
+          0.0033124779663168246,
+          0.005427804115460413,
+          0.008893247863264031,
+          0.017794836755805815,
+          0.02613356651311726,
+          0.022635927251391345,
+          0.0053351871698924455
+        ],
+        [
+          0.007763349379914592,
+          0.01645358885155003,
+          0.026541852043993543,
+          0.046649769551322266,
+          0.10343871517834863,
+          0.07522728075946522,
+          0.04086088538682606
+        ],
+        [
+          0.013559976787277044,
+          0.03381388271627027,
+          0.054085360507139885,
+          0.0790646298658812,
+          0.08724374008247371,
+          0.049937605232469706,
+          0.01220079591532416
+        ],
+        [
+          0.013405478718888208,
+          0.02719611213045865,
+          0.033026183136965516,
+          0.03385932723793666,
+          0.026171883288659988,
+          0.010010544786468508,
+          0.0038910466662043074
+        ],
+        [
+          0.010792175513174572,
+          0.018813652607786353,
+          0.013344882452395374,
+          0.011053419368102424,
+          0.00610233292648784,
+          0.0030267887018022776,
+          0.0016899402509050177
+        ],
+        [
+          0.008454510107225722,
+          0.009520186140747013,
+          0.0006122448979591836,
+          0.0034761645301276266,
+          0.0025951444163685965,
+          0.0017881317193219582,
+          0.0014823948180607437
+        ],
+        [
+          0.005329914661927917,
+          0.006914283915734563,
+          0.0035999200333536,
+          0.002841333414309184,
+          0.0018397220871503735,
+          0.0015293138005679704,
+          0.0012584877774053504
+        ]
+      ]
+    },
+    {
+      "step": 23,
+      "smell_grid": {
+        "3,1": 0.1,
+        "3,2": 0.1,
+        "3,3": 0.2,
+        "2,1": 0.2,
+        "2,2": 0.3,
+        "2,3": 0.4,
+        "1,2": 0.1,
+        "1,3": 0.3,
+        "0,3": 0.3,
+        "0,4": 0.4,
+        "1,4": 0.6,
+        "2,4": 0.5,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.7,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.9,
+        "2,6": 0.6,
+        "3,6": 0.3
+      },
+      "belief": [
+        [
+          0.0029721624801471646,
+          0.004887778050992872,
+          0.0077624955273581375,
+          0.016931321882761422,
+          0.032423885115282325,
+          0.04060323851026136,
+          0.02494156276990382
+        ],
+        [
+          0.005826271140533145,
+          0.010615826598801989,
+          0.020252297056574137,
+          0.040866304622231744,
+          0.09577244685145407,
+          0.11257574738225987,
+          0.09550099362573587
+        ],
+        [
+          0.008892414745759194,
+          0.020166597291666064,
+          0.03342104451401892,
+          0.05189814693193923,
+          0.07416237023738402,
+          0.06612501216475605,
+          0.03400080336509589
+        ],
+        [
+          0.008588791505987205,
+          0.01705092169227471,
+          0.021520769275818176,
+          0.02473280601937028,
+          0.02427583631010343,
+          0.014227880576954245,
+          0.005281267700221694
+        ],
+        [
+          0.0070057416041900845,
+          0.010056457768434916,
+          0.009226385702267057,
+          0.008336631944086728,
+          0.0058606919853836925,
+          0.0030826526432319707,
+          0.0018834649233067829
+        ],
+        [
+          0.0054202487293033945,
+          0.006047323393885834,
+          0.0006122448979591836,
+          0.003004436570854405,
+          0.002448999618569552,
+          0.0018104132665352224,
+          0.0014540442763493035
+        ],
+        [
+          0.003624545928758768,
+          0.004410690002896109,
+          0.0026451321338419468,
+          0.0023488466173165715,
+          0.001722856757053636,
+          0.0014804074769520811,
+          0.0012407898131757155
+        ]
+      ]
+    },
+    {
+      "step": 24,
+      "smell_grid": {
+        "3,3": 0.1,
+        "2,1": 0.1,
+        "2,2": 0.2,
+        "2,3": 0.3,
+        "1,3": 0.2,
+        "0,3": 0.2,
+        "0,4": 0.3,
+        "1,4": 0.5,
+        "2,4": 0.4,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.6,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.9,
+        "2,6": 0.6,
+        "3,6": 0.3
+      },
+      "belief": [
+        [
+          0.0024329709204934024,
+          0.0037267115246667703,
+          0.006291843687888625,
+          0.014295071084724848,
+          0.02852494093769989,
+          0.06322954719293705,
+          0.05462403479839999
+        ],
+        [
+          0.003983305476762158,
+          0.0070061929361385465,
+          0.012011140559822744,
+          0.02863928461463027,
+          0.07224222002810808,
+          0.11404578477314456,
+          0.1851002137402308
+        ],
+        [
+          0.005505011788830809,
+          0.01145619033444293,
+          0.01856036271787274,
+          0.030785106255393383,
+          0.04986936289677644,
+          0.07959974364809307,
+          0.060467699451171995
+        ],
+        [
+          0.005342120752332471,
+          0.00850510286780541,
+          0.01135613085122185,
+          0.01596356189293914,
+          0.019816699707772382,
+          0.015936302927964892,
+          0.009417525067945902
+        ],
+        [
+          0.0042172354940278566,
+          0.0060663044990460335,
+          0.005793927933167454,
+          0.005993059787250716,
+          0.004979408526832624,
+          0.00332514481789333,
+          0.001987366306674036
+        ],
+        [
+          0.0035034428023590436,
+          0.0036559830054397227,
+          0.0006122448979591836,
+          0.0024226869826365163,
+          0.002203030752674833,
+          0.0017049217556161043,
+          0.0014111780190373359
+        ],
+        [
+          0.0024313252429200927,
+          0.0029466335817852274,
+          0.0019642582692991338,
+          0.0019275828737239959,
+          0.0015440498630813644,
+          0.0013945244504268192,
+          0.00118150670193741
+        ]
+      ]
+    },
+    {
+      "step": 25,
+      "smell_grid": {
+        "2,2": 0.1,
+        "2,3": 0.2,
+        "1,3": 0.1,
+        "0,3": 0.1,
+        "0,4": 0.3,
+        "1,4": 0.4,
+        "2,4": 0.3,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.6,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.9,
+        "2,6": 0.6,
+        "3,6": 0.3
+      },
+      "belief": [
+        [
+          0.001793671407164133,
+          0.002647170446105361,
+          0.004270914442128911,
+          0.009801181914760234,
+          0.02448170643380945,
+          0.07154454175428797,
+          0.08966104113486272
+        ],
+        [
+          0.002589982349356778,
+          0.004073142919291636,
+          0.007004237530285624,
+          0.017100706668158827,
+          0.04182113316994247,
+          0.12844517051549195,
+          0.26049930488942136
+        ],
+        [
+          0.003200235269125985,
+          0.005134256158441342,
+          0.00920305572038778,
+          0.015851905725889983,
+          0.030018768408084272,
+          0.07492876861401104,
+          0.08896881398336183
+        ],
+        [
+          0.002970837036348603,
+          0.0044139893000758375,
+          0.0059296513271884736,
+          0.007852637883476735,
+          0.01303219318026416,
+          0.01581587301138119,
+          0.012940319244566614
+        ],
+        [
+          0.002544533879826981,
+          0.003343560044621077,
+          0.003323531257154413,
+          0.003822556079389995,
+          0.0037458112840137395,
+          0.003065267046510099,
+          0.0022814079300096223
+        ],
+        [
+          0.0021888957134778026,
+          0.00229167156773337,
+          0.0006122448979591836,
+          0.001854652825694516,
+          0.0018068993814998543,
+          0.0015389428886099037,
+          0.001295802335016691
+        ],
+        [
+          0.0016575455592186808,
+          0.0019564674691366704,
+          0.0014864496606890993,
+          0.0015304386732194726,
+          0.0013271616232673445,
+          0.001246192891350852,
+          0.0010847565539293669
+        ]
+      ]
+    },
+    {
+      "step": 26,
+      "smell_grid": {
+        "2,3": 0.3,
+        "0,4": 0.6,
+        "1,4": 0.6,
+        "2,4": 0.6,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.9,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.6,
+        "1,6": 0.8,
+        "2,6": 0.6,
+        "3,6": 0.3,
+        "0,3": 0.3,
+        "1,3": 0.3,
+        "3,3": 0.3
+      },
+      "belief": [
+        [
+          0.0012663418402170975,
+          0.0016898570644958985,
+          0.0025262215247114257,
+          0.006661837049162289,
+          0.03131393962226323,
+          0.07078010590230445,
+          0.1192943629066
+        ],
+        [
+          0.001593152106430573,
+          0.002173293080990299,
+          0.0035425294900731045,
+          0.009324361560838174,
+          0.044342354670550144,
+          0.3183693770810328,
+          0.2194982811298812
+        ],
+        [
+          0.0017156050872096755,
+          0.0024522381317920996,
+          0.0035701945176811883,
+          0.008026997729652272,
+          0.03489002735857353,
+          0.04786083583772846,
+          0.0006122448979591836
+        ],
+        [
+          0.0016623028990714194,
+          0.002157991700423961,
+          0.002776615822262241,
+          0.004919587546429554,
+          0.007141068627018245,
+          0.014245353544009291,
+          0.004340124921487705
+        ],
+        [
+          0.001502165082174689,
+          0.001843987160871471,
+          0.0018479839065954084,
+          0.002114005125064107,
+          0.002359499426693449,
+          0.0024654708446616037,
+          0.002608578408003653
+        ],
+        [
+          0.0014040809312072342,
+          0.001446005558564797,
+          0.0006122448979591836,
+          0.0013411243273928589,
+          0.0013714970754777627,
+          0.0012699573857276425,
+          0.0011485324207114083
+        ],
+        [
+          0.0011571680648520084,
+          0.001335913983117614,
+          0.0011336457590057458,
+          0.0011862140112342892,
+          0.0010880509308710254,
+          0.001062460388256525,
+          0.0009542106607079114
+        ]
+      ]
+    },
+    {
+      "step": 27,
+      "smell_grid": {
+        "2,3": 0.6,
+        "0,4": 0.6,
+        "1,4": 0.9,
+        "2,4": 0.6,
+        "3,4": 0.3,
+        "0,5": 0.6,
+        "1,5": 0.8,
+        "2,5": 0.6,
+        "3,5": 0.3,
+        "0,6": 0.5,
+        "1,6": 0.7,
+        "2,6": 0.5,
+        "3,6": 0.3,
+        "0,3": 0.6,
+        "1,3": 0.6,
+        "3,3": 0.3,
+        "0,2": 0.3,
+        "1,2": 0.3,
+        "2,2": 0.3,
+        "3,2": 0.3
+      },
+      "belief": [
+        [
+          0.0009986256008499752,
+          0.0012062695917064458,
+          0.002051735816813575,
+          0.010195057844725994,
+          0.02942967624841002,
+          0.10367997366435835,
+          0.0811548713349372
+        ],
+        [
+          0.0011357528563905898,
+          0.0013752546449240402,
+          0.002440436328258192,
+          0.012370773314042127,
+          0.16375722339994842,
+          0.24493981991410527,
+          0.1869816445585589
+        ],
+        [
+          0.0011510638798572555,
+          0.001389331335657353,
+          0.0023228930707743936,
+          0.010319624061069725,
+          0.025264084769419517,
+          0.06908067235816225,
+          0.0006122448979591836
+        ],
+        [
+          0.0011256974042138782,
+          0.0013153725131278124,
+          0.0019336907757683706,
+          0.0027100371481493294,
+          0.005949935860624502,
+          0.008247415780374629,
+          0.0027756922842188704
+        ],
+        [
+          0.0010819623764165907,
+          0.0012338265676796103,
+          0.0012221824218272095,
+          0.0014441239392180801,
+          0.0015729560543081655,
+          0.0020796550353358147,
+          0.0015072897463621906
+        ],
+        [
+          0.0010704135171697366,
+          0.0010998143133804938,
+          0.0006122448979591836,
+          0.0010729660393690023,
+          0.0011119776985411053,
+          0.0011016094791559963,
+          0.0010820882028101198
+        ],
+        [
+          0.0009451094335867728,
+          0.0010658432613411505,
+          0.0009733228384426705,
+          0.0010107072809549006,
+          0.0009568480071515673,
+          0.0009572237910044673,
+          0.0008829638405789357
+        ]
+      ]
+    }
+  ]
+}

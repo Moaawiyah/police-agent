@@ -1,0 +1,113 @@
+{
+  "_schema": "The step-by-step record of ONE sub-game: the step-zero declaration, then every commit-reveal commitment with its payload, nonce and hash, plus what was made of the opponent's hints. Its role is to let the replay simulator (ch. 7) re-verify the whole match cryptographically. mutual_agreement here covers THIS peer's records, so the two peers' sha256 values differ by design and only 'confirmed' is comparable between them.",
+  "schema_version": "1.1",
+  "artifact_type": "sub_game_log",
+  "game_id": "MOAAMOHA-vs-cosmos77",
+  "game_uid": "d67d6291-2c00-3e55-1bc3-d4424c143b56",
+  "links": {
+    "_remark": "These are logical roles, NOT fixed filenames. Each actual file name is derived from the game_id so that files from different games are never mixed. Match-level files (declaration, result) are named <role>_<game_id>.json; per-sub-game files (config, log) are named <role>_<game_id>_g<NN>.json where <NN> is the sub_game_number.",
+    "declaration": "declaration_MOAAMOHA-vs-cosmos77.json",
+    "config": "config_MOAAMOHA-vs-cosmos77_g<NN>.json",
+    "log": "log_MOAAMOHA-vs-cosmos77_g<NN>.json",
+    "result": "result_MOAAMOHA-vs-cosmos77.json"
+  },
+  "sub_game_number": 5,
+  "timezone": "Asia/Jerusalem",
+  "roles": {
+    "MOAAMOHA": "police",
+    "cosmos77": "thief"
+  },
+  "started_at": "2026-08-19T20:43:22.841281+00:00",
+  "ended_at": "2026-08-19T20:43:24.112011+00:00",
+  "duration_seconds": 0.0,
+  "result": "aborted",
+  "winner": null,
+  "abort_reason": null,
+  "steps": 0,
+  "step_zero": {
+    "payload": {
+      "step": 0,
+      "record_type": "step_zero",
+      "declared_at": "2026-08-19T20:43:22.841242+00:00",
+      "group_id": "MOAAMOHA",
+      "group_name": "MOAAMOHA",
+      "members": [
+        "Moaawiyah hajajrah",
+        "Mohamed Selawe"
+      ],
+      "repos": {
+        "cop": "https://github.com/Moaawiyah/police-agent",
+        "thief": "https://github.com/Moaawiyah/Ai_thief"
+      },
+      "sub_game_number": 5,
+      "code_version": "1.00",
+      "repository_url": "https://github.com/Moaawiyah/police-agent",
+      "llm_model": "claude-opus-4-8[1m]",
+      "github_commit": "a613b6f9e72b7c8974dacce90ec98d7cca46b35e",
+      "working_tree_dirty": true,
+      "hardware_spec": {
+        "os": "Darwin 25.6.0",
+        "cpu_type": "Apple M3",
+        "cpu_cores": 8,
+        "cpu_freq_mhz": "unknown",
+        "ram_gb": 16.0,
+        "gpu_type": "Apple M3",
+        "gpu_cores_or_cuda": 10,
+        "vram_gb": "unknown"
+      }
+    },
+    "nonce": "cb116a37a8d77c80090ef97714085f89",
+    "commit": "8ed185993e47e45b23c2cd5eb7afe2ce6e9baa1ef1fc414a1f3d185fc47f2a59"
+  },
+  "records": [],
+  "opponent_messages": [],
+  "hint_readings": [],
+  "opponent_reliability": 0.5,
+  "disputes": [],
+  "tokens": {
+    "tokens_step": 0,
+    "tokens_total": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "model_calls": 0,
+    "budget_per_series": 200000,
+    "peer_tokens_total": 0
+  },
+  "gatekeeper": {
+    "limits": {
+      "requests_per_minute": 30,
+      "concurrent_requests": 2,
+      "retry_backoff_seconds": 5.0,
+      "max_retries": 3,
+      "queue_depth": 100
+    },
+    "submitted": 0,
+    "sent": 0,
+    "retried": 0,
+    "rejected": 0,
+    "failed": 0,
+    "queued": 0,
+    "quota": null,
+    "dos": {
+      "tripped": false,
+      "limit_per_minute": 300.0,
+      "peak_per_minute": 0.0
+    }
+  },
+  "audit": {
+    "passed": false,
+    "verified_steps": 0,
+    "failed_steps": [],
+    "semantic_passed": false,
+    "semantic_failures": [
+      "audit was not exchanged"
+    ],
+    "skipped": true,
+    "peer_tokens_total": 0
+  },
+  "mutual_agreement": {
+    "_remark": "Asymmetric on purpose: sha256 is over this peer's own sealed records. The symmetric digest both peers must agree on is in the result artifact.",
+    "confirmed": false,
+    "sha256": "992acba0fa63fa65704d5e2aa711440e326bd46e9a5ab01df6cedeb8041f2f41"
+  }
+}

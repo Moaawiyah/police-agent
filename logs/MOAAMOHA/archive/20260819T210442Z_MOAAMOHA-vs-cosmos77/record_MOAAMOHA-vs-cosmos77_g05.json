@@ -1,0 +1,203 @@
+{
+  "result": "aborted",
+  "winner": null,
+  "abort_reason": null,
+  "role": "police",
+  "steps": 0,
+  "unique_cells": 1,
+  "barriers_used": 0,
+  "started_at": "2026-08-19T20:43:22.841281+00:00",
+  "ended_at": "2026-08-19T20:43:24.112011+00:00",
+  "duration_seconds": 0.0,
+  "group_name": "MOAAMOHA",
+  "peer_identity": {
+    "group_id": "cosmos77",
+    "group_name": "cosmos77",
+    "llm_model": "gemini-3.5-flash-lite",
+    "mcp_servers": {
+      "self": "https://cosmos77-arena-production.up.railway.app/thief/mcp"
+    },
+    "repos": {
+      "cop": "https://github.com/AbdallahKhaldi/COSMOS77-cop",
+      "thief": "https://github.com/AbdallahKhaldi/COSMOS77-thief"
+    },
+    "members": [
+      "323118794",
+      "212389712"
+    ],
+    "counted_games_played": 0
+  },
+  "terms": {
+    "board_size": 7,
+    "smell_grid_size": 5,
+    "decay_per_step": 0.1,
+    "emit_intensity": 0.9,
+    "min_center_intensity": 0.5,
+    "max_steps": 35,
+    "barriers_max": 14,
+    "setting": "New York",
+    "hint_max_words": 15,
+    "axis_origin_corner": "top-left",
+    "axis_start_index": 0,
+    "thief_start": [
+      3,
+      3
+    ],
+    "cop_start": [
+      0,
+      0
+    ],
+    "num_games": 6
+  },
+  "identity": {
+    "group_id": "MOAAMOHA",
+    "group_name": "MOAAMOHA",
+    "members": [
+      "Moaawiyah hajajrah",
+      "Mohamed Selawe"
+    ],
+    "repos": {
+      "cop": "https://github.com/Moaawiyah/police-agent",
+      "thief": "https://github.com/Moaawiyah/Ai_thief"
+    },
+    "mcp_servers": {
+      "cop": "https://calm-lantern-322.local.dev/mcp",
+      "thief": "https://bright-harbor-604.local.dev/mcp"
+    },
+    "llm_model": "claude-opus-4-8[1m]",
+    "code_version": "1.00",
+    "hardware_spec": {
+      "os": "Darwin 25.6.0",
+      "cpu_type": "Apple M3",
+      "cpu_cores": 8,
+      "cpu_freq_mhz": "unknown",
+      "ram_gb": 16.0,
+      "gpu_type": "Apple M3",
+      "gpu_cores_or_cuda": 10,
+      "vram_gb": "unknown"
+    },
+    "github_commit": "a613b6f9e72b7c8974dacce90ec98d7cca46b35e",
+    "step_zero_commit": "8ed185993e47e45b23c2cd5eb7afe2ce6e9baa1ef1fc414a1f3d185fc47f2a59"
+  },
+  "step_zero": {
+    "step": 0,
+    "record_type": "step_zero",
+    "declared_at": "2026-08-19T20:43:22.841242+00:00",
+    "group_id": "MOAAMOHA",
+    "group_name": "MOAAMOHA",
+    "members": [
+      "Moaawiyah hajajrah",
+      "Mohamed Selawe"
+    ],
+    "repos": {
+      "cop": "https://github.com/Moaawiyah/police-agent",
+      "thief": "https://github.com/Moaawiyah/Ai_thief"
+    },
+    "sub_game_number": 5,
+    "code_version": "1.00",
+    "repository_url": "https://github.com/Moaawiyah/police-agent",
+    "llm_model": "claude-opus-4-8[1m]",
+    "github_commit": "a613b6f9e72b7c8974dacce90ec98d7cca46b35e",
+    "working_tree_dirty": true,
+    "hardware_spec": {
+      "os": "Darwin 25.6.0",
+      "cpu_type": "Apple M3",
+      "cpu_cores": 8,
+      "cpu_freq_mhz": "unknown",
+      "ram_gb": 16.0,
+      "gpu_type": "Apple M3",
+      "gpu_cores_or_cuda": 10,
+      "vram_gb": "unknown"
+    }
+  },
+  "audit": {
+    "passed": false,
+    "verified_steps": 0,
+    "failed_steps": [],
+    "semantic_passed": false,
+    "semantic_failures": [
+      "audit was not exchanged"
+    ],
+    "skipped": true,
+    "peer_tokens_total": 0
+  },
+  "opponent_reliability": 0.5,
+  "tokens": {
+    "tokens_step": 0,
+    "tokens_total": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "model_calls": 0,
+    "budget_per_series": 200000,
+    "peer_tokens_total": 0
+  },
+  "gatekeeper": {
+    "limits": {
+      "requests_per_minute": 30,
+      "concurrent_requests": 2,
+      "retry_backoff_seconds": 5.0,
+      "max_retries": 3,
+      "queue_depth": 100
+    },
+    "submitted": 0,
+    "sent": 0,
+    "retried": 0,
+    "rejected": 0,
+    "failed": 0,
+    "queued": 0,
+    "quota": null,
+    "dos": {
+      "tripped": false,
+      "limit_per_minute": 300.0,
+      "peak_per_minute": 0.0
+    }
+  },
+  "inbound_dos": {
+    "tripped": false,
+    "limit_per_minute": 6000.0,
+    "peak_per_minute": 10.0
+  },
+  "hint_readings": [],
+  "disputes": [],
+  "records": [
+    {
+      "payload": {
+        "step": 0,
+        "record_type": "step_zero",
+        "declared_at": "2026-08-19T20:43:22.841242+00:00",
+        "group_id": "MOAAMOHA",
+        "group_name": "MOAAMOHA",
+        "members": [
+          "Moaawiyah hajajrah",
+          "Mohamed Selawe"
+        ],
+        "repos": {
+          "cop": "https://github.com/Moaawiyah/police-agent",
+          "thief": "https://github.com/Moaawiyah/Ai_thief"
+        },
+        "sub_game_number": 5,
+        "code_version": "1.00",
+        "repository_url": "https://github.com/Moaawiyah/police-agent",
+        "llm_model": "claude-opus-4-8[1m]",
+        "github_commit": "a613b6f9e72b7c8974dacce90ec98d7cca46b35e",
+        "working_tree_dirty": true,
+        "hardware_spec": {
+          "os": "Darwin 25.6.0",
+          "cpu_type": "Apple M3",
+          "cpu_cores": 8,
+          "cpu_freq_mhz": "unknown",
+          "ram_gb": 16.0,
+          "gpu_type": "Apple M3",
+          "gpu_cores_or_cuda": 10,
+          "vram_gb": "unknown"
+        }
+      },
+      "nonce": "cb116a37a8d77c80090ef97714085f89",
+      "commit": "8ed185993e47e45b23c2cd5eb7afe2ce6e9baa1ef1fc414a1f3d185fc47f2a59"
+    }
+  ],
+  "opponent_records": [],
+  "history": [],
+  "my_log": [],
+  "belief_log": []
+}

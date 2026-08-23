@@ -1,0 +1,244 @@
+{
+  "_schema": "The step-by-step record of ONE sub-game: the step-zero declaration, then every commit-reveal commitment with its payload, nonce and hash, plus what was made of the opponent's hints. Its role is to let the replay simulator (ch. 7) re-verify the whole match cryptographically. mutual_agreement here covers THIS peer's records, so the two peers' sha256 values differ by design and only 'confirmed' is comparable between them.",
+  "schema_version": "1.1",
+  "artifact_type": "sub_game_log",
+  "game_id": "MOAAMOHA-vs-cosmos77",
+  "game_uid": "d67d6291-2c00-3e55-1bc3-d4424c143b56",
+  "links": {
+    "_remark": "These are logical roles, NOT fixed filenames. Each actual file name is derived from the game_id so that files from different games are never mixed. Match-level files (declaration, result) are named <role>_<game_id>.json; per-sub-game files (config, log) are named <role>_<game_id>_g<NN>.json where <NN> is the sub_game_number.",
+    "declaration": "declaration_MOAAMOHA-vs-cosmos77.json",
+    "config": "config_MOAAMOHA-vs-cosmos77_g<NN>.json",
+    "log": "log_MOAAMOHA-vs-cosmos77_g<NN>.json",
+    "result": "result_MOAAMOHA-vs-cosmos77.json"
+  },
+  "sub_game_number": 3,
+  "timezone": "Asia/Jerusalem",
+  "roles": {
+    "MOAAMOHA": "police",
+    "cosmos77": "thief"
+  },
+  "started_at": "2026-08-19T20:38:58.118250+00:00",
+  "ended_at": "2026-08-19T20:42:15.404986+00:00",
+  "duration_seconds": 196.0,
+  "result": "technical_loss",
+  "winner": "police",
+  "abort_reason": "watchdog: main loop unresponsive for 64s (limit 60s)",
+  "steps": 2,
+  "step_zero": {
+    "payload": {
+      "step": 0,
+      "record_type": "step_zero",
+      "declared_at": "2026-08-19T20:38:58.118213+00:00",
+      "group_id": "MOAAMOHA",
+      "group_name": "MOAAMOHA",
+      "members": [
+        "Moaawiyah hajajrah",
+        "Mohamed Selawe"
+      ],
+      "repos": {
+        "cop": "https://github.com/Moaawiyah/police-agent",
+        "thief": "https://github.com/Moaawiyah/Ai_thief"
+      },
+      "sub_game_number": 3,
+      "code_version": "1.00",
+      "repository_url": "https://github.com/Moaawiyah/police-agent",
+      "llm_model": "claude-opus-4-8[1m]",
+      "github_commit": "a613b6f9e72b7c8974dacce90ec98d7cca46b35e",
+      "working_tree_dirty": true,
+      "hardware_spec": {
+        "os": "Darwin 25.6.0",
+        "cpu_type": "Apple M3",
+        "cpu_cores": 8,
+        "cpu_freq_mhz": "unknown",
+        "ram_gb": 16.0,
+        "gpu_type": "Apple M3",
+        "gpu_cores_or_cuda": 10,
+        "vram_gb": "unknown"
+      }
+    },
+    "nonce": "ca3410c08c03e367df99543b3013d3aa",
+    "commit": "d7c0804294c072f7276efa623d1482364ffa1692a4d49b33c22413919630a918"
+  },
+  "records": [
+    {
+      "payload": {
+        "step": 1,
+        "state": "grid=7x7;self=[1, 0];barriers=[]",
+        "position": [
+          1,
+          0
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 2,
+        "capture_claim": [
+          1,
+          0
+        ],
+        "rationale": "chase (3, 3): step S, gap 5",
+        "tokens_input": 106,
+        "tokens_output": 96,
+        "tokens_step": 202,
+        "tokens_total": 400,
+        "tokens": 202
+      },
+      "nonce": "9bf1a86149884adc3934e798b8718e2d",
+      "commit": "6ae8142879455221828c01b7c4ba9dec6d7277d80dd3fe471c679774b12bbe85"
+    },
+    {
+      "payload": {
+        "step": 2,
+        "state": "grid=7x7;self=[1, 1];barriers=[]",
+        "position": [
+          1,
+          1
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 3,
+        "capture_claim": [
+          1,
+          1
+        ],
+        "rationale": "chase (3, 3): step E, gap 4",
+        "tokens_input": 107,
+        "tokens_output": 96,
+        "tokens_step": 203,
+        "tokens_total": 802,
+        "tokens": 203
+      },
+      "nonce": "461b61775a975720713db4f05f1c7d21",
+      "commit": "66dec9eeeb5b88daf0a3934377a9008655f08c51c62c1bd0e92e0d5e14cea185"
+    }
+  ],
+  "opponent_messages": [
+    {
+      "step": 1,
+      "sender": "thief",
+      "hint": "The south end of New York suits me fine tonight.",
+      "smell_grid": {
+        "1,1": 0.2,
+        "1,2": 0.2,
+        "1,3": 0.2,
+        "1,4": 0.2,
+        "1,5": 0.2,
+        "2,1": 0.2,
+        "2,2": 0.5,
+        "2,3": 0.5,
+        "2,4": 0.5,
+        "2,5": 0.2,
+        "3,1": 0.2,
+        "3,2": 0.5,
+        "3,3": 0.8,
+        "3,4": 0.5,
+        "3,5": 0.2,
+        "4,1": 0.2,
+        "4,2": 0.5,
+        "4,3": 0.5,
+        "4,4": 0.5,
+        "4,5": 0.2,
+        "5,1": 0.2,
+        "5,2": 0.2,
+        "5,3": 0.2,
+        "5,4": 0.2,
+        "5,5": 0.2
+      },
+      "commit": "9120c1b80d854b46258ff3e915a9d98c006e78e3b0c504cd7f8af8a6d7bd919a",
+      "timestamp": "2026-08-19T20:37:49+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": null,
+      "win_claim": null
+    },
+    {
+      "step": 1,
+      "sender": "thief",
+      "hint": "Heading east toward the river lights of New York, obviously.",
+      "smell_grid": {
+        "1,1": 0.2,
+        "1,2": 0.2,
+        "1,3": 0.2,
+        "1,4": 0.2,
+        "1,5": 0.2,
+        "2,1": 0.2,
+        "2,2": 0.5,
+        "2,3": 0.5,
+        "2,4": 0.5,
+        "2,5": 0.2,
+        "3,1": 0.2,
+        "3,2": 0.5,
+        "3,3": 0.8,
+        "3,4": 0.5,
+        "3,5": 0.2,
+        "4,1": 0.2,
+        "4,2": 0.5,
+        "4,3": 0.5,
+        "4,4": 0.5,
+        "4,5": 0.2,
+        "5,1": 0.2,
+        "5,2": 0.2,
+        "5,3": 0.2,
+        "5,4": 0.2,
+        "5,5": 0.2
+      },
+      "commit": "dc7cadfdd7aad97aff55c8de7bf378f88ed64451451b7860cd7f455e45478bdc",
+      "timestamp": "2026-08-19T20:38:20+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": null,
+      "win_claim": null
+    }
+  ],
+  "hint_readings": [
+    "step 1: claimed S, scent corroborated it (reliability 0.67)",
+    "step 1: claimed S, scent inconclusive"
+  ],
+  "opponent_reliability": 0.667,
+  "disputes": [],
+  "tokens": {
+    "tokens_step": 203,
+    "tokens_total": 802,
+    "prompt_tokens": 418,
+    "completion_tokens": 384,
+    "model_calls": 4,
+    "budget_per_series": 200000,
+    "peer_tokens_total": 0
+  },
+  "gatekeeper": {
+    "limits": {
+      "requests_per_minute": 30,
+      "concurrent_requests": 2,
+      "retry_backoff_seconds": 5.0,
+      "max_retries": 3,
+      "queue_depth": 100
+    },
+    "submitted": 4,
+    "sent": 4,
+    "retried": 0,
+    "rejected": 0,
+    "failed": 0,
+    "queued": 0,
+    "quota": null,
+    "dos": {
+      "tripped": false,
+      "limit_per_minute": 300.0,
+      "peak_per_minute": 4.0
+    }
+  },
+  "audit": {
+    "passed": false,
+    "verified_steps": 0,
+    "failed_steps": [],
+    "semantic_passed": false,
+    "semantic_failures": [
+      "audit was not exchanged"
+    ],
+    "skipped": true,
+    "peer_tokens_total": 0
+  },
+  "mutual_agreement": {
+    "_remark": "Asymmetric on purpose: sha256 is over this peer's own sealed records. The symmetric digest both peers must agree on is in the result artifact.",
+    "confirmed": false,
+    "sha256": "669309a50d63d746026befd7c257211256216fcf5d979ecb0207271129eb7662"
+  }
+}
