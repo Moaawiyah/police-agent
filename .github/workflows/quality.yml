@@ -35,7 +35,7 @@ jobs:
         run: |
           over=$(find src tests research -name '*.py' | while read -r f; do
             n=$(grep -vcE '^\s*(#.*)?$' "$f" || true)
-            [ "$n" -gt 150 ] && echo "$n $f"
+            [ "$n" -gt 150 ] && echo "$n $f" || true
           done)
           if [ -n "$over" ]; then echo "over budget:"; echo "$over"; exit 1; fi
           echo "all files within the 150-line budget"
