@@ -31,10 +31,16 @@ def report(tmp_path):
 
 class TestRecipientsFor:
     def test_uncounted_mails_the_configured_address_only(self):
-        assert recipients_for("us@example.test", LECTURER, counted=False) == ("us@example.test", None)
+        assert recipients_for("us@example.test", LECTURER, counted=False) == (
+            "us@example.test",
+            None,
+        )
 
     def test_counted_mails_the_lecturer_and_ccs_the_configured_address(self):
-        assert recipients_for("us@example.test", LECTURER, counted=True) == (LECTURER, ["us@example.test"])
+        assert recipients_for("us@example.test", LECTURER, counted=True) == (
+            LECTURER,
+            ["us@example.test"],
+        )
 
     def test_counted_does_not_cc_the_lecturer_to_itself(self):
         """`email.recipient` left at its shipped default already IS the
@@ -73,7 +79,9 @@ class TestGmailReporterHonoursCount:
         assert drafted["To"] == "us@example.test"
         assert drafted["Cc"] is None
 
-    def test_an_uncounted_run_configured_at_the_lecturer_refuses_before_writing_anything(self, report):
+    def test_an_uncounted_run_configured_at_the_lecturer_refuses_before_writing_anything(
+        self, report
+    ):
         """The shipped default recipient IS the lecturer's address -- a team
         that never overrides `email.recipient` must not silently mail it."""
         config = _enabled()  # no recipient override: resolves to DEFAULTS

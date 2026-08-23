@@ -1,0 +1,270 @@
+{
+  "_schema": "The binding end-of-game report (rules 32/35/51), emailed to the lecturer by each team separately as a JSON attachment. Summarises every sub-game and totals them for the league weighting. mutual_agreement.sha256 is SYMMETRIC: both peers must derive the same value, so it covers only the agreed outcome -- never timestamps, file paths or token spend, which legitimately differ.",
+  "schema_version": "1.1",
+  "report_type": "final_game_result",
+  "game_id": "MOAAMOHA-vs-cosmos77",
+  "game_uid": "d67d6291-2c00-3e55-1bc3-d4424c143b56",
+  "links": {
+    "_remark": "These are logical roles, NOT fixed filenames. Each actual file name is derived from the game_id so that files from different games are never mixed. Match-level files (declaration, result) are named <role>_<game_id>.json; per-sub-game files (config, log) are named <role>_<game_id>_g<NN>.json where <NN> is the sub_game_number.",
+    "declaration": "declaration_MOAAMOHA-vs-cosmos77.json",
+    "config": "config_MOAAMOHA-vs-cosmos77_g<NN>.json",
+    "log": "log_MOAAMOHA-vs-cosmos77_g<NN>.json",
+    "result": "result_MOAAMOHA-vs-cosmos77.json"
+  },
+  "repositories": {
+    "MOAAMOHA": {
+      "cop": "https://github.com/Moaawiyah/police-agent",
+      "thief": "https://github.com/Moaawiyah/Ai_thief"
+    },
+    "cosmos77": {
+      "cop": "https://github.com/AbdallahKhaldi/COSMOS77-cop",
+      "thief": "https://github.com/AbdallahKhaldi/COSMOS77-thief"
+    }
+  },
+  "timezone": "Asia/Jerusalem",
+  "groups": [
+    "MOAAMOHA",
+    "cosmos77"
+  ],
+  "game_started_at": "2026-08-20T02:57:52.080433+03:00",
+  "game_ended_at": "2026-08-20T03:00:55.009433+03:00",
+  "num_sub_games": 6,
+  "num_sub_games_agreed": 6,
+  "sub_games": [
+    {
+      "sub_game_number": 1,
+      "roles": {
+        "MOAAMOHA": "police",
+        "cosmos77": "thief"
+      },
+      "started_at": "2026-08-19T23:30:09.238224+00:00",
+      "ended_at": "2026-08-19T23:38:39.396710+00:00",
+      "result": "survival",
+      "winner_group": "cosmos77",
+      "tie": false,
+      "github_commit": {
+        "MOAAMOHA": "50610e866ede333a57ba63a3fb5e03b997d335ca",
+        "cosmos77": "741a56f1e36094bf3b1fc302aa947b2e8247e60f"
+      },
+      "tokens": {
+        "MOAAMOHA": 2803,
+        "cosmos77": 0
+      },
+      "score": {
+        "MOAAMOHA": 5,
+        "cosmos77": 10
+      },
+      "audit": {
+        "log_verified": true,
+        "tampered": false
+      },
+      "steps": 35,
+      "log_files": {
+        "MOAAMOHA": "MOAAMOHA/log_MOAAMOHA-vs-cosmos77_g01.json",
+        "cosmos77": "cosmos77/log_MOAAMOHA-vs-cosmos77_g01.json"
+      }
+    },
+    {
+      "sub_game_number": 2,
+      "roles": {
+        "MOAAMOHA": "thief",
+        "cosmos77": "police"
+      },
+      "started_at": "2026-08-20T02:38:42.107733+03:00",
+      "ended_at": "2026-08-20T02:41:08.805733+03:00",
+      "result": "survival",
+      "winner_group": "MOAAMOHA",
+      "tie": false,
+      "github_commit": {
+        "MOAAMOHA": "f361f129e150ad9ff261b154be5819fe215998bd",
+        "cosmos77": "8e2db959bbe5a711c3977938d4f2a9baf1aa06d5"
+      },
+      "tokens": {
+        "MOAAMOHA": 22560,
+        "cosmos77": 0
+      },
+      "score": {
+        "MOAAMOHA": 10,
+        "cosmos77": 5
+      },
+      "audit": {
+        "log_verified": true,
+        "tampered": false
+      },
+      "steps": 35,
+      "log_files": {
+        "MOAAMOHA": "MOAAMOHA/log_MOAAMOHA-vs-cosmos77_g02.json",
+        "cosmos77": "cosmos77/log_MOAAMOHA-vs-cosmos77_g02.json"
+      }
+    },
+    {
+      "sub_game_number": 3,
+      "roles": {
+        "MOAAMOHA": "police",
+        "cosmos77": "thief"
+      },
+      "started_at": "2026-08-19T23:41:08.907740+00:00",
+      "ended_at": "2026-08-19T23:47:44.846127+00:00",
+      "result": "survival",
+      "winner_group": "cosmos77",
+      "tie": false,
+      "github_commit": {
+        "MOAAMOHA": "50610e866ede333a57ba63a3fb5e03b997d335ca",
+        "cosmos77": "741a56f1e36094bf3b1fc302aa947b2e8247e60f"
+      },
+      "tokens": {
+        "MOAAMOHA": 4851,
+        "cosmos77": 0
+      },
+      "score": {
+        "MOAAMOHA": 5,
+        "cosmos77": 10
+      },
+      "audit": {
+        "log_verified": true,
+        "tampered": false
+      },
+      "steps": 35,
+      "log_files": {
+        "MOAAMOHA": "MOAAMOHA/log_MOAAMOHA-vs-cosmos77_g03.json",
+        "cosmos77": "cosmos77/log_MOAAMOHA-vs-cosmos77_g03.json"
+      }
+    },
+    {
+      "sub_game_number": 4,
+      "roles": {
+        "MOAAMOHA": "thief",
+        "cosmos77": "police"
+      },
+      "started_at": "2026-08-20T02:47:48.678602+03:00",
+      "ended_at": "2026-08-20T02:50:26.971602+03:00",
+      "result": "survival",
+      "winner_group": "MOAAMOHA",
+      "tie": false,
+      "github_commit": {
+        "MOAAMOHA": "f361f129e150ad9ff261b154be5819fe215998bd",
+        "cosmos77": "8e2db959bbe5a711c3977938d4f2a9baf1aa06d5"
+      },
+      "tokens": {
+        "MOAAMOHA": 27882,
+        "cosmos77": 0
+      },
+      "score": {
+        "MOAAMOHA": 10,
+        "cosmos77": 5
+      },
+      "audit": {
+        "log_verified": true,
+        "tampered": false
+      },
+      "steps": 35,
+      "log_files": {
+        "MOAAMOHA": "MOAAMOHA/log_MOAAMOHA-vs-cosmos77_g04.json",
+        "cosmos77": "cosmos77/log_MOAAMOHA-vs-cosmos77_g04.json"
+      }
+    },
+    {
+      "sub_game_number": 5,
+      "roles": {
+        "MOAAMOHA": "police",
+        "cosmos77": "thief"
+      },
+      "started_at": "2026-08-19T23:50:27.090719+00:00",
+      "ended_at": "2026-08-19T23:57:49.871305+00:00",
+      "result": "survival",
+      "winner_group": "cosmos77",
+      "tie": false,
+      "github_commit": {
+        "MOAAMOHA": "50610e866ede333a57ba63a3fb5e03b997d335ca",
+        "cosmos77": "741a56f1e36094bf3b1fc302aa947b2e8247e60f"
+      },
+      "tokens": {
+        "MOAAMOHA": 4044,
+        "cosmos77": 0
+      },
+      "score": {
+        "MOAAMOHA": 5,
+        "cosmos77": 10
+      },
+      "audit": {
+        "log_verified": true,
+        "tampered": false
+      },
+      "steps": 35,
+      "log_files": {
+        "MOAAMOHA": "MOAAMOHA/log_MOAAMOHA-vs-cosmos77_g05.json",
+        "cosmos77": "cosmos77/log_MOAAMOHA-vs-cosmos77_g05.json"
+      }
+    },
+    {
+      "sub_game_number": 6,
+      "roles": {
+        "MOAAMOHA": "thief",
+        "cosmos77": "police"
+      },
+      "started_at": "2026-08-20T02:57:52.080433+03:00",
+      "ended_at": "2026-08-20T03:00:55.009433+03:00",
+      "result": "timeout",
+      "winner_group": null,
+      "tie": false,
+      "github_commit": {
+        "MOAAMOHA": "f361f129e150ad9ff261b154be5819fe215998bd",
+        "cosmos77": "8e2db959bbe5a711c3977938d4f2a9baf1aa06d5"
+      },
+      "tokens": {
+        "MOAAMOHA": 7498,
+        "cosmos77": 0
+      },
+      "score": {
+        "MOAAMOHA": 0,
+        "cosmos77": 0
+      },
+      "audit": {
+        "log_verified": false,
+        "tampered": true
+      },
+      "steps": 13,
+      "log_files": {
+        "MOAAMOHA": "MOAAMOHA/log_MOAAMOHA-vs-cosmos77_g06.json",
+        "cosmos77": "cosmos77/log_MOAAMOHA-vs-cosmos77_g06.json"
+      }
+    }
+  ],
+  "final_result": {
+    "total_score": {
+      "MOAAMOHA": 35,
+      "cosmos77": 40
+    },
+    "sub_games_won": {
+      "MOAAMOHA": 2,
+      "cosmos77": 3
+    },
+    "ties": 0,
+    "winner_group": "cosmos77",
+    "series_tie": false,
+    "tokens_total_series": {
+      "MOAAMOHA": 69638,
+      "cosmos77": 0
+    }
+  },
+  "max_tokens_per_game": 200000,
+  "tokens_used": {
+    "_remark": "opponent's figure is the peer's own sealed per-step token counts, revealed and tamper-checked at the audit; 0 if the peer's schema omits them or the audit did not pass. Excluded from mutual_agreement so an honest zero can never cause a disagreement.",
+    "by_group": {
+      "MOAAMOHA": 69638,
+      "cosmos77": 0
+    },
+    "total": 69638,
+    "budget_per_series": 200000,
+    "within_budget": true
+  },
+  "counted": true,
+  "games_played_including_this": 1,
+  "mutual_agreement": {
+    "sha256": "30eca7c49835b35fb353e7e0803f16a537af85e69ecd1c2f3c6c187864b4d161",
+    "confirmed": false,
+    "scope": "symmetric_outcome",
+    "interop_sha256": "f7a7803fa2e5af50a1559372dddb7a6ab5a69e98ae3dd1aa93e2e20713f01c46",
+    "interop_scope": "symmetric_outcome_ascii"
+  }
+}

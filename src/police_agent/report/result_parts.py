@@ -4,6 +4,7 @@ from police_agent.domain.rules import ZEROED_RESULTS
 from police_agent.domain.scoring import aggregate, score_subgame
 from police_agent.report.artifacts import roles_of
 from police_agent.report.ids import log_filename
+from police_agent.report.peer_commits import commits_of
 
 TOKENS_REMARK = (
     "opponent's figure is the peer's own sealed per-step token counts, "
@@ -109,14 +110,6 @@ def agreement_core(game_id: str, sub_games: list, totals: dict) -> dict:
             }
             for block in sub_games
         ],
-    }
-
-
-def commits_of(summary: dict) -> dict:
-    """Return each declared commit keyed by group id."""
-    both = (summary.get("identity") or {}, summary.get("peer_identity") or {})
-    return {
-        side["group_id"]: side.get("github_commit", "") for side in both if side.get("group_id")
     }
 
 

@@ -16,6 +16,7 @@ REMOTE_MODE = "Remote LLM"
 
 NO_MODEL = "None"
 DEFAULT_OLLAMA_MODEL = "qwen3:4b"
+DEFAULT_GLM_MODEL = "GLM-4.7-FlashX"
 
 # Recorded model strings that mean "no model was involved".
 _NO_MODEL_STRINGS = frozenset({"", "-", "none", "template", "stub"})
@@ -31,12 +32,19 @@ def mode_and_model(config) -> tuple[str, str]:
     """
     if config is None:
         return TEMPLATE_MODE, NO_MODEL
-    # Matches strategy/talk.py's own default: an unset key means ollama, not
-    # template -- the label must report what the hint writer actually does.
-    provider = str(config.get("trash_talk.provider", "ollama") or "ollama").lower()
+    # Matches strategy/talk.py's own default, imported rather than repeated so
+    # the label cannot drift from what the hint writer actually does. Taken from
+    # the SDK because a front end may not reach past that layer, and imported
+    # here rather than at module scope so this module stays as light to import
+    # as its docstring claims -- `police_agent.sdk` pulls in the whole runtime.
+    from police_agent.sdk import DEFAULT_PROVIDER, GLM
+
+    provider = str(config.get("trash_talk.provider", "") or DEFAULT_PROVIDER).lower()
     model = str(config.get("trash_talk.model", "") or "")
     if provider == "ollama":
         return OLLAMA_MODE, model or DEFAULT_OLLAMA_MODEL
+    if provider == GLM:
+        return REMOTE_MODE, model or DEFAULT_GLM_MODEL
     if provider == "template":
         return TEMPLATE_MODE, NO_MODEL
     # Any other provider is something this peer was configured with but this

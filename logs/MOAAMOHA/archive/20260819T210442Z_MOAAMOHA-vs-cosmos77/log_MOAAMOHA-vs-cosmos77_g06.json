@@ -1,0 +1,123 @@
+{
+  "_schema": "The step-by-step record of ONE sub-game: the step-zero declaration, then every commit-reveal commitment with its payload, nonce and hash, plus what was made of the opponent's hints. Its role is to let the replay simulator (ch. 7) re-verify the whole match cryptographically. mutual_agreement here covers THIS peer's records, so the two peers' sha256 values differ by design and only 'confirmed' is comparable between them.",
+  "schema_version": "1.1",
+  "artifact_type": "sub_game_log",
+  "game_id": "MOAAMOHA-vs-cosmos77",
+  "game_uid": "d67d6291-2c00-3e55-1bc3-d4424c143b56",
+  "links": {
+    "_remark": "These are logical roles, NOT fixed filenames. Each actual file name is derived from the game_id so that files from different games are never mixed. Match-level files (declaration, result) are named <role>_<game_id>.json; per-sub-game files (config, log) are named <role>_<game_id>_g<NN>.json where <NN> is the sub_game_number.",
+    "declaration": "declaration_MOAAMOHA-vs-cosmos77.json",
+    "config": "config_MOAAMOHA-vs-cosmos77_g<NN>.json",
+    "log": "log_MOAAMOHA-vs-cosmos77_g<NN>.json",
+    "result": "result_MOAAMOHA-vs-cosmos77.json"
+  },
+  "sub_game_number": 6,
+  "timezone": "Asia/Jerusalem",
+  "roles": {
+    "MOAAMOHA": "thief",
+    "cosmos77": "police"
+  },
+  "started_at": "2026-08-19T23:43:26.640710+03:00",
+  "ended_at": "2026-08-19T23:44:32.006710+03:00",
+  "duration_seconds": 65.366,
+  "result": "timeout",
+  "winner": "police",
+  "abort_reason": null,
+  "steps": 1,
+  "step_zero": {
+    "payload": {
+      "step": 0,
+      "type": "system_spec",
+      "spec": {
+        "os": "Darwin 25.6.0 (Darwin Kernel Version 25.6.0: Sat Jul 11 15:23:52 PDT 2026; root:xnu-12377.161.13~4/RELEASE_ARM64_T8122)",
+        "cpu_type": "Apple M3",
+        "cpu_cores": 8,
+        "cpu_freq_mhz": "unknown",
+        "ram_gb": 16.0,
+        "gpu_type": "Apple M3",
+        "gpu_cores_or_cuda": 10,
+        "vram_gb": "unknown"
+      },
+      "model": "claude-opus-4-8[1m]",
+      "code_version": "1.0.0",
+      "github_commit": "46d78a6da6c0d1e1c06bb551de9a2a7b729b6f86",
+      "working_tree_dirty": true,
+      "group_name": "MOAAMOHA-Thief",
+      "sub_game_number": 6
+    },
+    "nonce": "c3b1361890b50926af552c46ccd630a7",
+    "commit": "4152f9096cf79fba98be1898d5a9551072ff7047d2dd3374a11d19c8af46605e"
+  },
+  "records": [
+    {
+      "payload": {
+        "step": 1,
+        "game_id": "MOAAMOHA-vs-cosmos77",
+        "sub_game_number": 6,
+        "role": "thief",
+        "prior_commit": "4152f9096cf79fba98be1898d5a9551072ff7047d2dd3374a11d19c8af46605e",
+        "state": "grid=7x7;self=[3, 4];barriers=[]",
+        "position": [
+          3,
+          4
+        ],
+        "move": "MOVE:E",
+        "intent": "lie",
+        "verdict": "lie",
+        "hint": "Catch me near Harlem in the north.",
+        "prompt_discussion": {
+          "llm_prompt": "",
+          "llm_reasoning": "",
+          "bluff_classification": "lie",
+          "hint_source": "llm",
+          "hint_fallback_reason": "",
+          "strategy_source": "heuristic",
+          "strategy_action_id": "",
+          "strategy_prompt": "",
+          "strategy_reasoning": "",
+          "fallback_reason": ""
+        },
+        "model": "qwen3:4b",
+        "tokens_input": 529,
+        "tokens_output": 67,
+        "tokens_step": 596,
+        "tokens_total": 596,
+        "tokens": 596,
+        "response_seconds": 0.02,
+        "random_move": false
+      },
+      "nonce": "ad9b13a8051386416e3a69d36c1516e9",
+      "commit": "0563032110022b98293c05c902c6008f5703fe0643e951a31015b4538bbe49a6"
+    }
+  ],
+  "opponent_messages": [],
+  "hint_readings": [],
+  "opponent_reliability": null,
+  "disputes": [],
+  "tokens": {
+    "tokens_total": 596,
+    "peer_tokens_total": 0
+  },
+  "gatekeeper": {},
+  "audit": {
+    "passed": false,
+    "own": {
+      "passed": true,
+      "verified_steps": 2,
+      "failed_steps": [],
+      "peer_tokens_total": 596
+    },
+    "opponent": {
+      "passed": false,
+      "verified_steps": 0,
+      "failed_steps": [],
+      "peer_tokens_total": 0
+    },
+    "opponent_records": []
+  },
+  "mutual_agreement": {
+    "_remark": "Asymmetric on purpose: sha256 is over this peer's own sealed records. The symmetric digest both peers must agree on is in the result artifact.",
+    "confirmed": false,
+    "sha256": "a982624a692c144ca046e3f0b25d0b645754ed447f571b79db8a9d8f50a6d12a"
+  }
+}

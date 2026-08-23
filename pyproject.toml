@@ -20,6 +20,10 @@ gmail = [
     "google-api-python-client>=2.0",
     "google-auth-oauthlib>=1.0",
 ]
+research = [
+    "jupyter>=1.1.1",
+    "matplotlib>=3.11.1",
+]
 
 [project.scripts]
 police-agent = "police_agent:main"
@@ -45,18 +49,30 @@ ignore = ["E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# `research/` is a top-level package, not part of the shipped `src/` wheel, so
+# it is not installed into the venv. Putting the repo root on the path is what
+# lets tests import it regardless of the working directory pytest was run from.
+pythonpath = ["."]
 addopts = "-q"
 markers = [
     "slow: talks over real sockets; deselect with -m 'not slow'",
 ]
 
 [tool.coverage.run]
-source = ["src"]
+# `research/` is measured alongside `src/`: it is real, tested code that the
+# report's conclusions rest on, so exempting it would be exempting the evidence.
+source = ["src", "research"]
+# Only the four modules that construct Tk widgets, which cannot be exercised by
+# a headless test process. The rest of gui/ is deliberately Tk-free (see
+# gui/game_mode.py and gui/live_events.py, which say so) and is measured like
+# any other source file. __main__.py and the two MCP modules were omitted
+# historically and no longer are -- they are covered, and omitting covered code
+# only understates what the suite actually reaches.
 omit = [
-    "*/__main__.py",
-    "*/gui/*",
-    "*/infra/mcp_server.py",
-    "*/infra/mcp_client.py",
+    "*/gui/board_view.py",
+    "*/gui/live_controls.py",
+    "*/gui/replay_controls.py",
+    "*/gui/window.py",
 ]
 
 [tool.coverage.report]

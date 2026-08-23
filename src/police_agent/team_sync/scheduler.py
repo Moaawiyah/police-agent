@@ -67,8 +67,11 @@ def run_team_series(agent, base: str = "logs") -> list[dict]:
 
     for n in range(max(status.sub_game_number, 1), total + 1):
         police_turn = role_for_subgame(n, start_role) == POLICE
-        if status.state in (SeriesSyncState.WAITING, SeriesSyncState.WAITING_FOR_SIBLING,
-                            SeriesSyncState.SETTLED):
+        if status.state in (
+            SeriesSyncState.WAITING,
+            SeriesSyncState.WAITING_FOR_SIBLING,
+            SeriesSyncState.SETTLED,
+        ):
             status = status.advance(SeriesSyncState.READY, n)
         helpers.notify_status(agent, "READY" if police_turn else "WAITING", n)
         status = status.advance(SeriesSyncState.PLAYING, n)

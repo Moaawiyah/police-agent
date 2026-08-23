@@ -28,7 +28,7 @@ def test_import_and_persist_writes_artifacts_and_returns_thief_shaped_summary(tm
 
     assert summary["role"] == "thief"
     assert summary["result"] == "capture"
-    written = tmp_path / "OURTEAM" / "record_ourteam-vs-theirteam_g02.json"
+    written = tmp_path / "OURTEAM" / "record_OURTEAM-vs-THEIRTEAM_g02.json"
     assert written.is_file()
 
 

@@ -3,7 +3,13 @@ declaration, split out of test_declaration.py to keep both files under the
 project's line budget.
 """
 
-from police_agent.report.declaration import UNKNOWN, declared_hardware, group_block
+from police_agent.report.declaration import (
+    UNKNOWN,
+    build_declaration,
+    declared_hardware,
+    group_block,
+)
+from police_agent.report.facts import facts_from
 from police_agent.report.ids import consensus_signature
 from tests.conftest import STUB_SPEC
 from tests.report.test_declaration import OUR_IDENTITY, _declaration
@@ -65,3 +71,68 @@ class TestThePerGroupSignature:
         assert block["signature"] == consensus_signature(
             {key: value for key, value in block.items() if key != "signature"}
         )
+
+
+class TestEitherSpellingOfTheContainerKey:
+    """This peer publishes the hardware fields under `hardware_spec`; the
+    sibling Thief publishes the same fields under `spec`. A declaration built
+    from a Thief-owned sub-game's identity must still carry real values."""
+
+    def test_a_thief_sourced_identity_keeps_its_hardware(self):
+        block = group_block({**OUR_IDENTITY, "hardware_spec": None, "spec": STUB_SPEC})
+
+        assert block["hardware_spec"]["cpu_type"] == STUB_SPEC["cpu_type"]
+        assert block["hardware_spec"]["gpu_model"] == STUB_SPEC["gpu_type"]
+
+    def test_our_own_spelling_still_wins_when_both_are_present(self):
+        block = group_block({**OUR_IDENTITY, "hardware_spec": STUB_SPEC, "spec": {}})
+
+        assert block["hardware_spec"]["cpu_type"] == STUB_SPEC["cpu_type"]
+
+    def test_neither_spelling_still_yields_the_fixed_shape(self):
+        block = group_block({**OUR_IDENTITY, "hardware_spec": None})
+
+        assert block["hardware_spec"]["cpu_type"] == UNKNOWN
+
+
+PEER_STEP_ZERO = [
+    {
+        "payload": {
+            "step": 0,
+            "record_type": "step_zero",
+            "github_commit": "deadbeefcafe",
+            "code_version": "2.1",
+            "hardware_spec": {"cpu_type": "Ryzen 9", "gpu_type": "RTX 4090"},
+        }
+    }
+]
+
+
+class TestAPeerThatDeclaresOnlyInStepZero:
+    """cosmos77 omits hardware and commit from the handshake identity and
+    reveals them in the sealed step-zero record instead -- both conformant."""
+
+    def test_the_revealed_hardware_reaches_the_declaration(self):
+        summary = {
+            "identity": OUR_IDENTITY,
+            "peer_identity": {"group_id": "cosmos77", "group_name": "cosmos77"},
+            "opponent_records": PEER_STEP_ZERO,
+        }
+        block = build_declaration(facts_from(summary), summary)["groups"]["group_2"]
+
+        assert block["hardware_spec"]["cpu_type"] == "Ryzen 9"
+        assert block["hardware_spec"]["gpu_model"] == "RTX 4090"
+
+    def test_the_handshake_identity_still_wins_when_it_said_something(self):
+        summary = {
+            "identity": OUR_IDENTITY,
+            "peer_identity": {
+                "group_id": "cosmos77",
+                "group_name": "cosmos77",
+                "hardware_spec": {"cpu_type": "stated-in-handshake"},
+            },
+            "opponent_records": PEER_STEP_ZERO,
+        }
+        block = build_declaration(facts_from(summary), summary)["groups"]["group_2"]
+
+        assert block["hardware_spec"]["cpu_type"] == "stated-in-handshake"

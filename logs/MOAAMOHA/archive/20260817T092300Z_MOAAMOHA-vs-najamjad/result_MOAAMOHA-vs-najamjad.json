@@ -1,0 +1,268 @@
+{
+  "_schema": "The binding end-of-game report (rules 32/35/51), emailed to the lecturer by each team separately as a JSON attachment. Summarises every sub-game and totals them for the league weighting. mutual_agreement.sha256 is SYMMETRIC: both peers must derive the same value, so it covers only the agreed outcome -- never timestamps, file paths or token spend, which legitimately differ.",
+  "schema_version": "1.1",
+  "report_type": "final_game_result",
+  "game_id": "MOAAMOHA-vs-najamjad",
+  "game_uid": "1753965a-1f98-d3fb-4241-0245786936c8",
+  "links": {
+    "_remark": "These are logical roles, NOT fixed filenames. Each actual file name is derived from the game_id so that files from different games are never mixed. Match-level files (declaration, result) are named <role>_<game_id>.json; per-sub-game files (config, log) are named <role>_<game_id>_g<NN>.json where <NN> is the sub_game_number.",
+    "declaration": "declaration_MOAAMOHA-vs-najamjad.json",
+    "config": "config_MOAAMOHA-vs-najamjad_g<NN>.json",
+    "log": "log_MOAAMOHA-vs-najamjad_g<NN>.json",
+    "result": "result_MOAAMOHA-vs-najamjad.json"
+  },
+  "repositories": {
+    "MOAAMOHA": {
+      "cop": "https://github.com/Moaawiyah/police-agent.git",
+      "thief": "https://github.com/Moaawiyah/Ai_thief.git"
+    },
+    "najamjad": {
+      "cop": "https://github.com/najikay/najamjad-cop",
+      "thief": "https://github.com/najikay/najamjad-thief"
+    }
+  },
+  "timezone": "Asia/Jerusalem",
+  "groups": [
+    "MOAAMOHA",
+    "najamjad"
+  ],
+  "game_started_at": "2026-08-16T21:00:28.605124+03:00",
+  "game_ended_at": "2026-08-16T21:03:57.789124+03:00",
+  "num_sub_games": 6,
+  "num_sub_games_agreed": 6,
+  "sub_games": [
+    {
+      "sub_game_number": 1,
+      "roles": {
+        "police": "MOAAMOHA",
+        "thief": "najamjad"
+      },
+      "started_at": "2026-08-16T17:41:40.777674+00:00",
+      "ended_at": "2026-08-16T17:44:04.167473+00:00",
+      "result": "tamper_forfeit",
+      "winner_group": null,
+      "tie": false,
+      "github_commit": {
+        "MOAAMOHA": "eba175da1277c8ff1589dd869ae440b5140edd67",
+        "najamjad": "35ce8eb4087bb006afd8f5e91c47701be79b4c87"
+      },
+      "tokens": {
+        "MOAAMOHA": 5177,
+        "najamjad": 0
+      },
+      "score": {
+        "MOAAMOHA": 0,
+        "najamjad": 0
+      },
+      "audit": {
+        "log_verified": true,
+        "tampered": false
+      },
+      "steps": 13,
+      "log_files": {
+        "MOAAMOHA": "MOAAMOHA/log_MOAAMOHA-vs-najamjad_g01.json",
+        "najamjad": "najamjad/log_MOAAMOHA-vs-najamjad_g01.json"
+      }
+    },
+    {
+      "sub_game_number": 2,
+      "roles": {
+        "thief": "MOAAMOHA",
+        "police": "najamjad"
+      },
+      "started_at": "2026-08-16T20:44:06.288959+03:00",
+      "ended_at": "2026-08-16T20:47:36.596959+03:00",
+      "result": "survival",
+      "winner_group": "MOAAMOHA",
+      "tie": false,
+      "github_commit": {
+        "MOAAMOHA": "1968aff6e34ed61f318fcc836ff71a7baa2eb1f3",
+        "najamjad": "283b3f9020eede2e121ed2056ecac43756536e59"
+      },
+      "tokens": {
+        "MOAAMOHA": 20740,
+        "najamjad": 0
+      },
+      "score": {
+        "MOAAMOHA": 10,
+        "najamjad": 5
+      },
+      "audit": {
+        "log_verified": true,
+        "tampered": false
+      },
+      "steps": 35,
+      "log_files": {
+        "MOAAMOHA": "MOAAMOHA/log_MOAAMOHA-vs-najamjad_g02.json",
+        "najamjad": "najamjad/log_MOAAMOHA-vs-najamjad_g02.json"
+      }
+    },
+    {
+      "sub_game_number": 3,
+      "roles": {
+        "police": "MOAAMOHA",
+        "thief": "najamjad"
+      },
+      "started_at": "2026-08-16T17:47:36.724295+00:00",
+      "ended_at": "2026-08-16T17:53:11.095697+00:00",
+      "result": "survival",
+      "winner_group": "najamjad",
+      "tie": false,
+      "github_commit": {
+        "MOAAMOHA": "eba175da1277c8ff1589dd869ae440b5140edd67",
+        "najamjad": "35ce8eb4087bb006afd8f5e91c47701be79b4c87"
+      },
+      "tokens": {
+        "MOAAMOHA": 13712,
+        "najamjad": 0
+      },
+      "score": {
+        "MOAAMOHA": 5,
+        "najamjad": 10
+      },
+      "audit": {
+        "log_verified": true,
+        "tampered": false
+      },
+      "steps": 35,
+      "log_files": {
+        "MOAAMOHA": "MOAAMOHA/log_MOAAMOHA-vs-najamjad_g03.json",
+        "najamjad": "najamjad/log_MOAAMOHA-vs-najamjad_g03.json"
+      }
+    },
+    {
+      "sub_game_number": 4,
+      "roles": {
+        "thief": "MOAAMOHA",
+        "police": "najamjad"
+      },
+      "started_at": "2026-08-16T20:53:13.037356+03:00",
+      "ended_at": "2026-08-16T20:54:07.142356+03:00",
+      "result": "capture",
+      "winner_group": "najamjad",
+      "tie": false,
+      "github_commit": {
+        "MOAAMOHA": "1968aff6e34ed61f318fcc836ff71a7baa2eb1f3",
+        "najamjad": "283b3f9020eede2e121ed2056ecac43756536e59"
+      },
+      "tokens": {
+        "MOAAMOHA": 5336,
+        "najamjad": 0
+      },
+      "score": {
+        "MOAAMOHA": 5,
+        "najamjad": 20
+      },
+      "audit": {
+        "log_verified": true,
+        "tampered": false
+      },
+      "steps": 9,
+      "log_files": {
+        "MOAAMOHA": "MOAAMOHA/log_MOAAMOHA-vs-najamjad_g04.json",
+        "najamjad": "najamjad/log_MOAAMOHA-vs-najamjad_g04.json"
+      }
+    },
+    {
+      "sub_game_number": 5,
+      "roles": {
+        "police": "MOAAMOHA",
+        "thief": "najamjad"
+      },
+      "started_at": "2026-08-16T17:54:07.283298+00:00",
+      "ended_at": "2026-08-16T18:00:23.775816+00:00",
+      "result": "survival",
+      "winner_group": "najamjad",
+      "tie": false,
+      "github_commit": {
+        "MOAAMOHA": "eba175da1277c8ff1589dd869ae440b5140edd67",
+        "najamjad": "35ce8eb4087bb006afd8f5e91c47701be79b4c87"
+      },
+      "tokens": {
+        "MOAAMOHA": 13796,
+        "najamjad": 0
+      },
+      "score": {
+        "MOAAMOHA": 5,
+        "najamjad": 10
+      },
+      "audit": {
+        "log_verified": true,
+        "tampered": false
+      },
+      "steps": 35,
+      "log_files": {
+        "MOAAMOHA": "MOAAMOHA/log_MOAAMOHA-vs-najamjad_g05.json",
+        "najamjad": "najamjad/log_MOAAMOHA-vs-najamjad_g05.json"
+      }
+    },
+    {
+      "sub_game_number": 6,
+      "roles": {
+        "thief": "MOAAMOHA",
+        "police": "najamjad"
+      },
+      "started_at": "2026-08-16T21:00:28.605124+03:00",
+      "ended_at": "2026-08-16T21:03:57.789124+03:00",
+      "result": "survival",
+      "winner_group": "MOAAMOHA",
+      "tie": false,
+      "github_commit": {
+        "MOAAMOHA": "1968aff6e34ed61f318fcc836ff71a7baa2eb1f3",
+        "najamjad": "283b3f9020eede2e121ed2056ecac43756536e59"
+      },
+      "tokens": {
+        "MOAAMOHA": 20731,
+        "najamjad": 0
+      },
+      "score": {
+        "MOAAMOHA": 10,
+        "najamjad": 5
+      },
+      "audit": {
+        "log_verified": true,
+        "tampered": false
+      },
+      "steps": 35,
+      "log_files": {
+        "MOAAMOHA": "MOAAMOHA/log_MOAAMOHA-vs-najamjad_g06.json",
+        "najamjad": "najamjad/log_MOAAMOHA-vs-najamjad_g06.json"
+      }
+    }
+  ],
+  "final_result": {
+    "total_score": {
+      "MOAAMOHA": 35,
+      "najamjad": 50
+    },
+    "sub_games_won": {
+      "MOAAMOHA": 2,
+      "najamjad": 3
+    },
+    "ties": 0,
+    "winner_group": "najamjad",
+    "series_tie": false,
+    "tokens_total_series": {
+      "MOAAMOHA": 79492,
+      "najamjad": 0
+    }
+  },
+  "max_tokens_per_game": 200000,
+  "tokens_used": {
+    "_remark": "opponent's figure is the peer's own sealed per-step token counts, revealed and tamper-checked at the audit; 0 if the peer's schema omits them or the audit did not pass. Excluded from mutual_agreement so an honest zero can never cause a disagreement.",
+    "by_group": {
+      "MOAAMOHA": 79492,
+      "najamjad": 0
+    },
+    "total": 79492,
+    "budget_per_series": 200000,
+    "within_budget": true
+  },
+  "mutual_agreement": {
+    "sha256": "2288c5cc0b9f881d7a7962fc87a5560100d6f9fc4b0abd9e208e9f846594e8dd",
+    "confirmed": true,
+    "scope": "symmetric_outcome",
+    "interop_sha256": "3a451f450d0922b95b5d1a9677fe206ed3ac51aa118ce875458e6b7e978c3cb7",
+    "interop_scope": "symmetric_outcome_ascii"
+  }
+}

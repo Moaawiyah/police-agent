@@ -1,0 +1,865 @@
+{
+  "_schema": "The step-by-step record of ONE sub-game: the step-zero declaration, then every commit-reveal commitment with its payload, nonce and hash, plus what was made of the opponent's hints. Its role is to let the replay simulator (ch. 7) re-verify the whole match cryptographically. mutual_agreement here covers THIS peer's records, so the two peers' sha256 values differ by design and only 'confirmed' is comparable between them.",
+  "schema_version": "1.1",
+  "artifact_type": "sub_game_log",
+  "game_id": "MOAAMOHA-vs-najamjad",
+  "game_uid": "1753965a-1f98-d3fb-4241-0245786936c8",
+  "links": {
+    "_remark": "These are logical roles, NOT fixed filenames. Each actual file name is derived from the game_id so that files from different games are never mixed. Match-level files (declaration, result) are named <role>_<game_id>.json; per-sub-game files (config, log) are named <role>_<game_id>_g<NN>.json where <NN> is the sub_game_number.",
+    "declaration": "declaration_MOAAMOHA-vs-najamjad.json",
+    "config": "config_MOAAMOHA-vs-najamjad_g<NN>.json",
+    "log": "log_MOAAMOHA-vs-najamjad_g<NN>.json",
+    "result": "result_MOAAMOHA-vs-najamjad.json"
+  },
+  "sub_game_number": 3,
+  "timezone": "Asia/Jerusalem",
+  "roles": {
+    "police": "MOAAMOHA",
+    "thief": "najamjad"
+  },
+  "started_at": "2026-08-15T16:17:15.062151+00:00",
+  "ended_at": "2026-08-15T16:19:29.255473+00:00",
+  "duration_seconds": 130.8,
+  "result": "tamper_forfeit",
+  "winner": "police",
+  "abort_reason": null,
+  "steps": 11,
+  "step_zero": {
+    "payload": {
+      "step": 0,
+      "record_type": "step_zero",
+      "declared_at": "2026-08-15T16:17:15.062118+00:00",
+      "group_id": "MOAAMOHA",
+      "group_name": "MOAAMOHA",
+      "members": [
+        "Moaawiyah hajajrah",
+        "Mohamed Selawe"
+      ],
+      "repos": {
+        "cop": "https://github.com/Moaawiyah/police-agent",
+        "thief": "https://github.com/Moaawiyah/Ai_thief"
+      },
+      "sub_game_number": 3,
+      "code_version": "1.00",
+      "repository_url": "https://github.com/Moaawiyah/police-agent",
+      "llm_model": "claude-opus-4-8[1m]",
+      "github_commit": "f5210e3ce2b514d10e0f39d6f3ac5f8b43dfd59f",
+      "working_tree_dirty": true,
+      "hardware_spec": {
+        "os": "Darwin 25.6.0",
+        "cpu_type": "Apple M3",
+        "cpu_cores": 8,
+        "cpu_freq_mhz": "unknown",
+        "ram_gb": 16.0,
+        "gpu_type": "Apple M3",
+        "gpu_cores_or_cuda": 10,
+        "vram_gb": "unknown"
+      }
+    },
+    "nonce": "89f03585ccfed651b740144ed484bccf",
+    "commit": "17403363eff0ed7707c66c3f3084717cbc3f243d522246147f90f4b7ca016241"
+  },
+  "records": [
+    {
+      "payload": {
+        "step": 1,
+        "state": "grid=7x7;self=[1, 0];barriers=[]",
+        "position": [
+          1,
+          0
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 2,
+        "capture_claim": [
+          1,
+          0
+        ],
+        "rationale": "chase (4, 3): step S, gap 6",
+        "tokens_input": 106,
+        "tokens_output": 96,
+        "tokens_step": 202,
+        "tokens_total": 400,
+        "tokens": 202
+      },
+      "nonce": "2f4bb248092393b3348095d90d088e33",
+      "commit": "cbc1ff67198aea1025d9d8051b1c54a0da5c8e8cd93efafdd6936566de83f511"
+    },
+    {
+      "payload": {
+        "step": 2,
+        "state": "grid=7x7;self=[2, 0];barriers=[]",
+        "position": [
+          2,
+          0
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 3,
+        "capture_claim": [
+          2,
+          0
+        ],
+        "rationale": "chase (4, 4): step S, gap 6",
+        "tokens_input": 106,
+        "tokens_output": 96,
+        "tokens_step": 202,
+        "tokens_total": 800,
+        "tokens": 202
+      },
+      "nonce": "66d79f4723d8baef391b58f5c358f73c",
+      "commit": "0317c6f28e38b7ad4cd0941f3dd153f968e809c13688586e5dbf30a0632e34e2"
+    },
+    {
+      "payload": {
+        "step": 3,
+        "state": "grid=7x7;self=[2, 1];barriers=[]",
+        "position": [
+          2,
+          1
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 4,
+        "capture_claim": [
+          2,
+          1
+        ],
+        "rationale": "chase (5, 4): step E, gap 6",
+        "tokens_input": 108,
+        "tokens_output": 96,
+        "tokens_step": 204,
+        "tokens_total": 1204,
+        "tokens": 204
+      },
+      "nonce": "98386230ce23dcf4767b58d43ef3c9cf",
+      "commit": "ddc229d61345605515de625eb1eba8606b69c7de1d4ee3d06bedc5b68e3426d9"
+    },
+    {
+      "payload": {
+        "step": 4,
+        "state": "grid=7x7;self=[2, 2];barriers=[]",
+        "position": [
+          2,
+          2
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 5,
+        "capture_claim": [
+          2,
+          2
+        ],
+        "rationale": "chase (5, 4): step E, gap 5",
+        "tokens_input": 104,
+        "tokens_output": 96,
+        "tokens_step": 200,
+        "tokens_total": 1600,
+        "tokens": 200
+      },
+      "nonce": "1ce848ac0b99df7a712f93c5ec2df840",
+      "commit": "36f8f0f7e7ed5ca9242fb2140fbee10ad909ece8240f4ceb49fb60d9c81da7c0"
+    },
+    {
+      "payload": {
+        "step": 5,
+        "state": "grid=7x7;self=[2, 3];barriers=[]",
+        "position": [
+          2,
+          3
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 6,
+        "capture_claim": [
+          2,
+          3
+        ],
+        "rationale": "chase (5, 4): step E, gap 4",
+        "tokens_input": 106,
+        "tokens_output": 96,
+        "tokens_step": 202,
+        "tokens_total": 2000,
+        "tokens": 202
+      },
+      "nonce": "89b31e524473c35f1a2d3c657b4d47e3",
+      "commit": "69a38ef55971541e17a85dfdeba3b5adba30d3d79599c921ff561c228519e4fa"
+    },
+    {
+      "payload": {
+        "step": 6,
+        "state": "grid=7x7;self=[2, 4];barriers=[]",
+        "position": [
+          2,
+          4
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 7,
+        "capture_claim": [
+          2,
+          4
+        ],
+        "rationale": "chase (6, 5): step E, gap 5",
+        "tokens_input": 108,
+        "tokens_output": 96,
+        "tokens_step": 204,
+        "tokens_total": 2404,
+        "tokens": 204
+      },
+      "nonce": "d57d3e49c933c31dadfa369c23ad1a94",
+      "commit": "cbceb5652e979fc72cf19a1b738b685984d2442d982afc403ec854506aa36f99"
+    },
+    {
+      "payload": {
+        "step": 7,
+        "state": "grid=7x7;self=[3, 4];barriers=[]",
+        "position": [
+          3,
+          4
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 8,
+        "capture_claim": [
+          3,
+          4
+        ],
+        "rationale": "chase (6, 5): step S, gap 4",
+        "tokens_input": 104,
+        "tokens_output": 96,
+        "tokens_step": 200,
+        "tokens_total": 2800,
+        "tokens": 200
+      },
+      "nonce": "c0b89540ec3387aa0322e1a167ecc5cb",
+      "commit": "193b4d88ebd8b04be5bdd379b723feb1233d3a44cb74bb375f79e800049fd20f"
+    },
+    {
+      "payload": {
+        "step": 8,
+        "state": "grid=7x7;self=[4, 4];barriers=[]",
+        "position": [
+          4,
+          4
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 9,
+        "capture_claim": [
+          4,
+          4
+        ],
+        "rationale": "chase (6, 5): step S, gap 3",
+        "tokens_input": 106,
+        "tokens_output": 96,
+        "tokens_step": 202,
+        "tokens_total": 3200,
+        "tokens": 202
+      },
+      "nonce": "c8ffb275a79c3f54b190e264999c1283",
+      "commit": "f8d90c786891e52d551a7542a2e2212a2b75cbb05eeae6d5b1cb4277108fb79a"
+    },
+    {
+      "payload": {
+        "step": 9,
+        "state": "grid=7x7;self=[5, 4];barriers=[]",
+        "position": [
+          5,
+          4
+        ],
+        "move": "MOVE:S",
+        "barrier": null,
+        "unique_cells": 10,
+        "capture_claim": [
+          5,
+          4
+        ],
+        "rationale": "chase (6, 5): step S, gap 2",
+        "tokens_input": 107,
+        "tokens_output": 96,
+        "tokens_step": 203,
+        "tokens_total": 3602,
+        "tokens": 203
+      },
+      "nonce": "78da6a4f44289071d69769c6ae88aea0",
+      "commit": "342b87784584a0cf8d536105495b74248bfaae9b735bfd7bc7993eb5cb947339"
+    },
+    {
+      "payload": {
+        "step": 10,
+        "state": "grid=7x7;self=[5, 4];barriers=[[6, 4]]",
+        "position": [
+          5,
+          4
+        ],
+        "move": "BARRIER:S",
+        "barrier": [
+          6,
+          4
+        ],
+        "unique_cells": 10,
+        "capture_claim": null,
+        "rationale": "wall (6, 4): leaves the believed thief at (6, 5) 2 step(s)",
+        "tokens_input": 106,
+        "tokens_output": 96,
+        "tokens_step": 202,
+        "tokens_total": 4003,
+        "tokens": 202
+      },
+      "nonce": "4616f3c8cd0b253d7292aeddbd07abdd",
+      "commit": "66da1ac427c87d6114cdda64fa63e7b7df72e136f7e4b0ec179f43447fcdfa43"
+    },
+    {
+      "payload": {
+        "step": 11,
+        "state": "grid=7x7;self=[5, 5];barriers=[[6, 4]]",
+        "position": [
+          5,
+          5
+        ],
+        "move": "MOVE:E",
+        "barrier": null,
+        "unique_cells": 11,
+        "capture_claim": [
+          5,
+          5
+        ],
+        "rationale": "chase (5, 5): step E, gap 0",
+        "tokens_input": 108,
+        "tokens_output": 96,
+        "tokens_step": 204,
+        "tokens_total": 4407,
+        "tokens": 204
+      },
+      "nonce": "ff4c820168555c934fd30ea710ae765c",
+      "commit": "e5cb51e07d9f4417d1b24f737f5a7aae244ae9dd2696ad1122f2b0c108ce6753"
+    }
+  ],
+  "opponent_messages": [
+    {
+      "step": 1,
+      "sender": "thief",
+      "hint": "Still moving east — the waterfront is behind me now.",
+      "smell_grid": {
+        "2,1": 0.3,
+        "2,2": 0.3,
+        "2,3": 0.3,
+        "2,4": 0.3,
+        "2,5": 0.3,
+        "3,1": 0.3,
+        "3,2": 0.6,
+        "3,3": 0.6,
+        "3,4": 0.6,
+        "3,5": 0.3,
+        "4,1": 0.3,
+        "4,2": 0.6,
+        "4,3": 0.9,
+        "4,4": 0.6,
+        "4,5": 0.3,
+        "5,1": 0.3,
+        "5,2": 0.6,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.3,
+        "6,1": 0.3,
+        "6,2": 0.3,
+        "6,3": 0.3,
+        "6,4": 0.3,
+        "6,5": 0.3
+      },
+      "commit": "83088804d62ac382abd82cea6b5e2622f754d62d03327af9af580f26241128f2",
+      "timestamp": "2026-08-15T16:17:19.743754+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": null,
+      "win_claim": null
+    },
+    {
+      "step": 2,
+      "sender": "thief",
+      "hint": "The subway tunnels are damp and echo with distant trains.",
+      "smell_grid": {
+        "2,1": 0.2,
+        "2,2": 0.3,
+        "2,3": 0.3,
+        "2,4": 0.3,
+        "2,5": 0.3,
+        "3,1": 0.2,
+        "3,2": 0.5,
+        "3,3": 0.6,
+        "3,4": 0.6,
+        "3,5": 0.6,
+        "4,1": 0.2,
+        "4,2": 0.5,
+        "4,3": 0.8,
+        "4,4": 0.9,
+        "4,5": 0.6,
+        "5,1": 0.2,
+        "5,2": 0.5,
+        "5,3": 0.6,
+        "5,4": 0.6,
+        "5,5": 0.6,
+        "6,1": 0.2,
+        "6,2": 0.3,
+        "6,3": 0.3,
+        "6,4": 0.3,
+        "6,5": 0.3,
+        "2,6": 0.3,
+        "3,6": 0.3,
+        "4,6": 0.3,
+        "5,6": 0.3,
+        "6,6": 0.3
+      },
+      "commit": "bd9388b0976b08d8707ed2ddef049df8244edf901a1a80beb320c1680ee7ec07",
+      "timestamp": "2026-08-15T16:17:29.758301+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          1,
+          0
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 3,
+      "sender": "thief",
+      "hint": "Slipping past the Brooklyn Bridge while you look the wrong way.",
+      "smell_grid": {
+        "2,1": 0.1,
+        "2,2": 0.2,
+        "2,3": 0.2,
+        "2,4": 0.2,
+        "2,5": 0.2,
+        "3,1": 0.1,
+        "3,2": 0.4,
+        "3,3": 0.5,
+        "3,4": 0.5,
+        "3,5": 0.5,
+        "4,1": 0.1,
+        "4,2": 0.4,
+        "4,3": 0.7,
+        "4,4": 0.8,
+        "4,5": 0.6,
+        "5,1": 0.1,
+        "5,2": 0.4,
+        "5,3": 0.6,
+        "5,4": 0.9,
+        "5,5": 0.6,
+        "6,1": 0.1,
+        "6,2": 0.3,
+        "6,3": 0.6,
+        "6,4": 0.6,
+        "6,5": 0.6,
+        "2,6": 0.2,
+        "3,6": 0.3,
+        "4,6": 0.3,
+        "5,6": 0.3,
+        "6,6": 0.3
+      },
+      "commit": "199329fdb0d786ff7eecbf9a2989a2a88923c84581750dc7903d19317576743a",
+      "timestamp": "2026-08-15T16:17:39.642683+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          0
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 4,
+      "sender": "thief",
+      "hint": "You will not find me anywhere near Harlem.",
+      "smell_grid": {
+        "2,2": 0.1,
+        "2,3": 0.1,
+        "2,4": 0.1,
+        "2,5": 0.1,
+        "3,2": 0.3,
+        "3,3": 0.4,
+        "3,4": 0.4,
+        "3,5": 0.4,
+        "4,2": 0.3,
+        "4,3": 0.6,
+        "4,4": 0.7,
+        "4,5": 0.6,
+        "5,2": 0.3,
+        "5,3": 0.5,
+        "5,4": 0.8,
+        "5,5": 0.9,
+        "6,2": 0.2,
+        "6,3": 0.5,
+        "6,4": 0.6,
+        "6,5": 0.6,
+        "2,6": 0.1,
+        "3,6": 0.3,
+        "4,6": 0.6,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "23ea791d5f221ea2fa4618bd0ab0a268ba771f92572c8aad3fcf6ccf981aae2b",
+      "timestamp": "2026-08-15T16:17:52.298685+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          1
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 5,
+      "sender": "thief",
+      "hint": "You will not find me anywhere near the Brooklyn Bridge.",
+      "smell_grid": {
+        "3,2": 0.2,
+        "3,3": 0.3,
+        "3,4": 0.3,
+        "3,5": 0.3,
+        "4,2": 0.2,
+        "4,3": 0.5,
+        "4,4": 0.6,
+        "4,5": 0.5,
+        "5,2": 0.2,
+        "5,3": 0.4,
+        "5,4": 0.7,
+        "5,5": 0.8,
+        "6,2": 0.1,
+        "6,3": 0.4,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "3,6": 0.2,
+        "4,6": 0.5,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "a5db801112ce7d17e3166174a11e1145194cded12c9df97c623835442d6a1dbe",
+      "timestamp": "2026-08-15T16:18:00.670443+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          2
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 6,
+      "sender": "thief",
+      "hint": "I'm hiding near the Central Park lake, watching the boats.",
+      "smell_grid": {
+        "3,2": 0.1,
+        "3,3": 0.2,
+        "3,4": 0.2,
+        "3,5": 0.2,
+        "4,2": 0.1,
+        "4,3": 0.4,
+        "4,4": 0.5,
+        "4,5": 0.4,
+        "5,2": 0.1,
+        "5,3": 0.3,
+        "5,4": 0.6,
+        "5,5": 0.7,
+        "6,3": 0.3,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "3,6": 0.1,
+        "4,6": 0.4,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "7e796de020d2d1d4375fa3eb40e93c7c4413341b9795f51432b85a487d301c15",
+      "timestamp": "2026-08-15T16:18:12.147101+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          3
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 7,
+      "sender": "thief",
+      "hint": "Taking the long way round by Times Square.",
+      "smell_grid": {
+        "3,3": 0.1,
+        "3,4": 0.1,
+        "3,5": 0.1,
+        "4,3": 0.3,
+        "4,4": 0.4,
+        "4,5": 0.3,
+        "5,3": 0.3,
+        "5,4": 0.6,
+        "5,5": 0.6,
+        "6,3": 0.3,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "4,6": 0.3,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "55cf2ba756c12e4860015ba1abd19b54173a09e1a74fb082163eba4e97e3e3ee",
+      "timestamp": "2026-08-15T16:18:20.855224+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          2,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 8,
+      "sender": "thief",
+      "hint": "I am trying to stay one step ahead of you.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.3,
+        "4,5": 0.3,
+        "5,3": 0.3,
+        "5,4": 0.6,
+        "5,5": 0.6,
+        "6,3": 0.3,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "4,6": 0.3,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "59a4e6a4471e5484645cca4170877a8e4874b745aff7e0c52058aab018c9cecc",
+      "timestamp": "2026-08-15T16:18:34.425493+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          3,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 9,
+      "sender": "thief",
+      "hint": "Slipping past Central Park while you look the wrong way.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.3,
+        "4,5": 0.3,
+        "5,3": 0.3,
+        "5,4": 0.6,
+        "5,5": 0.6,
+        "6,3": 0.3,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "4,6": 0.3,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "30d9b57eb9ec7f3bebc2e1ea5a0c9523c4d7dd224b497945e7f76185e3677579",
+      "timestamp": "2026-08-15T16:18:43.146749+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          4,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 10,
+      "sender": "thief",
+      "hint": "I am the thief, and you will not catch me.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.3,
+        "4,5": 0.3,
+        "5,3": 0.3,
+        "5,4": 0.6,
+        "5,5": 0.6,
+        "6,3": 0.3,
+        "6,4": 0.6,
+        "6,5": 0.9,
+        "4,6": 0.3,
+        "5,6": 0.6,
+        "6,6": 0.6
+      },
+      "commit": "ae5c1e39186bba660b0a5e899a97c04fff8b40d6195b5d0cc09c54af08060c02",
+      "timestamp": "2026-08-15T16:18:58.901796+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          5,
+          4
+        ],
+        "caught": false
+      },
+      "win_claim": null
+    },
+    {
+      "step": 11,
+      "sender": "thief",
+      "hint": "Slipping past the East Village while you look the wrong way.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.6,
+        "4,5": 0.6,
+        "5,3": 0.3,
+        "5,4": 0.6,
+        "5,5": 0.9,
+        "6,3": 0.3,
+        "6,4": 0.6,
+        "6,5": 0.8,
+        "4,6": 0.6,
+        "5,6": 0.6,
+        "6,6": 0.6,
+        "3,3": 0.3,
+        "3,4": 0.3,
+        "3,5": 0.3,
+        "3,6": 0.3
+      },
+      "commit": "89e28b1712df4c6a3f474b6be220e3c32a774a62a6b6843ea69fa7a475012efb",
+      "timestamp": "2026-08-15T16:19:07.886423+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": null,
+      "win_claim": null
+    },
+    {
+      "step": 12,
+      "sender": "thief",
+      "hint": "I'm hiding near the Central Park fountain.",
+      "smell_grid": {
+        "4,3": 0.3,
+        "4,4": 0.6,
+        "4,5": 0.9,
+        "5,3": 0.3,
+        "5,4": 0.6,
+        "5,5": 0.8,
+        "6,3": 0.3,
+        "6,4": 0.5,
+        "6,5": 0.7,
+        "4,6": 0.6,
+        "5,6": 0.6,
+        "6,6": 0.5,
+        "3,3": 0.3,
+        "3,4": 0.6,
+        "3,5": 0.6,
+        "3,6": 0.6,
+        "2,3": 0.3,
+        "2,4": 0.3,
+        "2,5": 0.3,
+        "2,6": 0.3
+      },
+      "commit": "6726a46206f4650186ade7acd7071377c95703c752e4150764e15c323562887a",
+      "timestamp": "2026-08-15T16:19:21.479117+00:00",
+      "barrier_placed": null,
+      "capture_claim": null,
+      "claim_response": {
+        "claim": [
+          5,
+          5
+        ],
+        "caught": true
+      },
+      "win_claim": null
+    }
+  ],
+  "hint_readings": [
+    "step 1: claimed S, scent corroborated it (reliability 0.67)",
+    "step 2: claimed S, scent inconclusive",
+    "step 3: no direction claimed",
+    "step 4: no direction claimed",
+    "step 5: claimed S, scent corroborated it (reliability 0.75)",
+    "step 6: claimed S, scent corroborated it (reliability 0.80)",
+    "step 7: claimed S, scent corroborated it (reliability 0.83)",
+    "step 8: no direction claimed",
+    "step 9: claimed N, scent inconclusive",
+    "step 10: claimed S, scent inconclusive",
+    "step 11: claimed S, scent contradicted it (reliability 0.71)",
+    "step 12: no direction claimed"
+  ],
+  "opponent_reliability": 0.714,
+  "disputes": [],
+  "tokens": {
+    "tokens_step": 400,
+    "tokens_total": 4603,
+    "prompt_tokens": 2395,
+    "completion_tokens": 2208,
+    "model_calls": 23,
+    "budget_per_series": 200000,
+    "peer_tokens_total": 0
+  },
+  "gatekeeper": {
+    "limits": {
+      "requests_per_minute": 30,
+      "concurrent_requests": 2,
+      "retry_backoff_seconds": 5.0,
+      "max_retries": 3,
+      "queue_depth": 100
+    },
+    "submitted": 23,
+    "sent": 23,
+    "retried": 0,
+    "rejected": 0,
+    "failed": 0,
+    "queued": 0,
+    "quota": null,
+    "dos": {
+      "tripped": false,
+      "limit_per_minute": 300.0,
+      "peak_per_minute": 12.0
+    }
+  },
+  "audit": {
+    "passed": true,
+    "verified_steps": 13,
+    "failed_steps": [],
+    "peer_tokens_total": 0,
+    "semantic_passed": false,
+    "semantic_failures": [
+      "turn 6 has an illegal move",
+      "turn 7 has an illegal move",
+      "turn 8 has an illegal move",
+      "turn 9 has an illegal move",
+      "turn 10 has an illegal move"
+    ],
+    "semantic_corrections": [],
+    "terminal": {
+      "result": "capture",
+      "winner": "police",
+      "step": 12,
+      "reason": "claim"
+    }
+  },
+  "mutual_agreement": {
+    "_remark": "Asymmetric on purpose: sha256 is over this peer's own sealed records. The symmetric digest both peers must agree on is in the result artifact.",
+    "confirmed": true,
+    "sha256": "d1c54449b6ae7a97712b23882740b6439efe70ba156f9131aca8a68657ffc6d1"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "_schema": "Static declaration for the WHOLE game (the full series of sub-games) between two teams. The single home for every field that does NOT change while the sub-games are played: team identity, members, cop/thief repository URLs, MCP server URLs, hardware spec, LLM model, the agreed max-tokens-per-game cap, and the game start/end times. Roles switch across the sub-games, so no role and no sub_game_number appear here. Data that changes per sub-game lives in the log and result artifacts.",
+  "schema_version": "1.1",
+  "declaration_type": "pre_game_declaration",
+  "game_id": "MOAAMOHA-vs-cosmos77",
+  "game_uid": "d67d6291-2c00-3e55-1bc3-d4424c143b56",
+  "links": {
+    "_remark": "These are logical roles, NOT fixed filenames. Each actual file name is derived from the game_id so that files from different games are never mixed. Match-level files (declaration, result) are named <role>_<game_id>.json; per-sub-game files (config, log) are named <role>_<game_id>_g<NN>.json where <NN> is the sub_game_number.",
+    "declaration": "declaration_MOAAMOHA-vs-cosmos77.json",
+    "config": "config_MOAAMOHA-vs-cosmos77_g<NN>.json",
+    "log": "log_MOAAMOHA-vs-cosmos77_g<NN>.json",
+    "result": "result_MOAAMOHA-vs-cosmos77.json"
+  },
+  "timezone": "Asia/Jerusalem",
+  "game_started_at": "2026-08-19T23:43:26.640710+03:00",
+  "game_ended_at": "2026-08-19T23:44:32.006710+03:00",
+  "num_sub_games": 6,
+  "max_tokens_per_game": 200000,
+  "counted_games_played": 0,
+  "groups": {
+    "group_1": {
+      "group_id": "MOAAMOHA",
+      "group_name": "MOAAMOHA-Thief",
+      "members": [
+        "id-1001",
+        "id-1002"
+      ],
+      "repos": {
+        "cop": "https://github.com/Moaawiyah/police-agent.git",
+        "thief": "https://github.com/Moaawiyah/Ai_thief.git"
+      },
+      "mcp_servers": {
+        "cop": "https://calm-lantern-322.local.dev/mcp",
+        "thief": "https://bright-harbor-604.local.dev/mcp"
+      },
+      "llm_model": "claude-opus-4-8[1m]",
+      "hardware_spec": {
+        "cpu_type": "unknown",
+        "cpu_freq_mhz": "unknown",
+        "cpu_cores": "unknown",
+        "ram_gb": "unknown",
+        "gpu_model": "unknown",
+        "vram_gb": "unknown"
+      },
+      "signature": "85c1f1129cd7af4b491cf6ec549ba7b9c4a1adc52547807b587b70e896e4e5d9"
+    },
+    "group_2": {
+      "group_id": "cosmos77",
+      "group_name": "cosmos77",
+      "members": [
+        "323118794",
+        "212389712"
+      ],
+      "repos": {
+        "cop": "https://github.com/AbdallahKhaldi/COSMOS77-cop",
+        "thief": "https://github.com/AbdallahKhaldi/COSMOS77-thief"
+      },
+      "mcp_servers": {
+        "self": "https://cosmos77-arena-production.up.railway.app/cop/mcp"
+      },
+      "llm_model": "gemini-3.5-flash-lite",
+      "hardware_spec": {
+        "cpu_type": "unknown",
+        "cpu_freq_mhz": "unknown",
+        "cpu_cores": "unknown",
+        "ram_gb": "unknown",
+        "gpu_model": "unknown",
+        "vram_gb": "unknown"
+      },
+      "signature": "d4ae49e3ad9b862f1bde8d3d00920b38421c1a79e287b75ae4e45ba156217a3b"
+    }
+  }
+}

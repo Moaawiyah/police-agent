@@ -27,12 +27,16 @@ from police_agent.cli_args import options_from as _options
 from police_agent.cli_args import parse_args as _parse_args
 from police_agent.exceptions import PoliceAgentError
 from police_agent.sdk import PoliceAgentSDK
+from police_agent.shared.dotenv import load_dotenv
 
 _announce_tunnel = announce_tunnel
 
 
 def main(argv: list[str] | None = None) -> int:
     """Parse argv, run one match (or series/GUI/replay) through the SDK, and print the result."""
+    # Before anything reads a credential: the gitignored `.env` is where this
+    # peer's keys live, since config/ is compared with the opponent's copy.
+    load_dotenv()
     args = _parse_args(argv)
     try:
         agent = PoliceAgentSDK(_options(args))

@@ -1,0 +1,73 @@
+{
+  "_schema": "Static declaration for the WHOLE game (the full series of sub-games) between two teams. The single home for every field that does NOT change while the sub-games are played: team identity, members, cop/thief repository URLs, MCP server URLs, hardware spec, LLM model, the agreed max-tokens-per-game cap, and the game start/end times. Roles switch across the sub-games, so no role and no sub_game_number appear here. Data that changes per sub-game lives in the log and result artifacts.",
+  "schema_version": "1.1",
+  "declaration_type": "pre_game_declaration",
+  "game_id": "MOAAMOHA-vs-najamjad",
+  "game_uid": "1753965a-1f98-d3fb-4241-0245786936c8",
+  "links": {
+    "_remark": "These are logical roles, NOT fixed filenames. Each actual file name is derived from the game_id so that files from different games are never mixed. Match-level files (declaration, result) are named <role>_<game_id>.json; per-sub-game files (config, log) are named <role>_<game_id>_g<NN>.json where <NN> is the sub_game_number.",
+    "declaration": "declaration_MOAAMOHA-vs-najamjad.json",
+    "config": "config_MOAAMOHA-vs-najamjad_g<NN>.json",
+    "log": "log_MOAAMOHA-vs-najamjad_g<NN>.json",
+    "result": "result_MOAAMOHA-vs-najamjad.json"
+  },
+  "timezone": "Asia/Jerusalem",
+  "game_started_at": "2026-08-16T21:00:28.605124+03:00",
+  "game_ended_at": "2026-08-16T21:03:57.789124+03:00",
+  "num_sub_games": 6,
+  "max_tokens_per_game": 200000,
+  "groups": {
+    "group_1": {
+      "group_id": "MOAAMOHA",
+      "group_name": "MOAAMOHA-Thief",
+      "members": [
+        "id-1001",
+        "id-1002"
+      ],
+      "repos": {
+        "cop": "https://github.com/Moaawiyah/police-agent.git",
+        "thief": "https://github.com/Moaawiyah/Ai_thief.git"
+      },
+      "mcp_servers": {
+        "cop": "https://calm-lantern-322.local.dev/mcp",
+        "thief": "https://bright-harbor-604.local.dev/mcp"
+      },
+      "llm_model": "claude-opus-4-8[1m]",
+      "hardware_spec": {
+        "cpu_type": "unknown",
+        "cpu_freq_mhz": "unknown",
+        "cpu_cores": "unknown",
+        "ram_gb": "unknown",
+        "gpu_model": "unknown",
+        "vram_gb": "unknown"
+      },
+      "signature": "85c1f1129cd7af4b491cf6ec549ba7b9c4a1adc52547807b587b70e896e4e5d9"
+    },
+    "group_2": {
+      "group_id": "najamjad",
+      "group_name": "NajAmjad",
+      "members": [
+        "Naji Kayal",
+        "Amjad Abed"
+      ],
+      "repos": {
+        "cop": "https://github.com/najikay/najamjad-cop",
+        "thief": "https://github.com/najikay/najamjad-thief"
+      },
+      "mcp_servers": {
+        "cop": "https://cop.4laboratory.com/mcp",
+        "thief": "https://thief.4laboratory.com/mcp"
+      },
+      "llm_model": "deepseek-v4-flash",
+      "hardware_spec": {
+        "cpu_type": "unknown",
+        "cpu_freq_mhz": "unknown",
+        "cpu_cores": "unknown",
+        "ram_gb": "unknown",
+        "gpu_model": "unknown",
+        "vram_gb": "unknown"
+      },
+      "signature": "c5b3f6fd809cfe3b5496fd47c9718b693146b6d9b49afc19dad770fce871d306"
+    }
+  }
+}

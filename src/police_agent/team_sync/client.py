@@ -40,6 +40,7 @@ class TeamSyncClient:
         self.last_message_id = message.get("message_id", "")
 
         async def invoke() -> dict:
+            """The awaitable half of one call, run to completion by `asyncio.run`."""
             async with Client(
                 self._url, timeout=self._call_timeout, init_timeout=self._call_timeout
             ) as client:
@@ -72,8 +73,13 @@ class TeamSyncClient:
             return response
 
     def send_series_start(
-        self, series_id: str, game_id: str, num_sub_games: int, first_sibling_subgame: int,
-        start_role: str = "police", next_role: str = "thief",
+        self,
+        series_id: str,
+        game_id: str,
+        num_sub_games: int,
+        first_sibling_subgame: int,
+        start_role: str = "police",
+        next_role: str = "thief",
     ) -> dict:
         """Announce a new series to the sibling Thief process.
 
@@ -93,8 +99,12 @@ class TeamSyncClient:
         return self._send_with_retry(messages.SERIES_START, message)
 
     def send_handoff(
-        self, series_id: str, completed_subgame: int, next_subgame: int,
-        start_role: str = "police", next_role: str = "thief",
+        self,
+        series_id: str,
+        completed_subgame: int,
+        next_subgame: int,
+        start_role: str = "police",
+        next_role: str = "thief",
     ) -> dict:
         """Tell the sibling one sub-game settled and the next one is unlocked."""
         message = messages.SubgameHandoff(

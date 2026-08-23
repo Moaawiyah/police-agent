@@ -15,6 +15,12 @@ from police_agent.gui.live_apply import apply_event
 
 
 def worker(app) -> None:
+    """Play the whole series on a background thread, off Tk's event loop.
+
+    Nothing here touches a widget directly: a restart is bounced back through
+    `after`, and a failure is posted to the queue for `drain` to render. Tk is
+    not thread-safe, so this thread's only outputs are those two hand-offs.
+    """
     try:
         app._summaries = app._agent.play_series()
     except RestartRequested:
@@ -41,6 +47,11 @@ def on_event(app, event: dict) -> None:
 
 
 def drain(app, interval_ms: int) -> None:
+    """Apply every queued event to the window, then re-arm itself on Tk's loop.
+
+    Self-rescheduling rather than looping, because a blocking loop on the Tk
+    thread would freeze the board it is trying to draw.
+    """
     while not app._events.empty():
         event = app._events.get_nowait()
         apply_event(app._window, event)
@@ -52,6 +63,12 @@ def drain(app, interval_ms: int) -> None:
 
 
 def tick_clock(app, title: str, interval_ms: int) -> None:
+    """Keep the elapsed match time in the window title, re-arming like `drain`.
+
+    Driven off the clock rather than off events so the title keeps moving while
+    the agent is blocked waiting on the opponent -- which is exactly when the
+    person watching wants to know how long it has been.
+    """
     if app._started_at is not None:
         elapsed = int(time.monotonic() - app._started_at)
         app._window.root.title(f"{title} | {elapsed // 60:02d}:{elapsed % 60:02d}")

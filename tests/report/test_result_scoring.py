@@ -57,8 +57,12 @@ class TestScoringTheSeries:
         zeroed sub-games isn't a tracked field, so it must show up as neither
         of the other two). A real capture sits alongside it so the series
         isn't degenerately all-zeroed."""
-        forfeited = {**_capture(), "result": "tamper_forfeit", "winner": "police",
-                     "step_zero": {"sub_game_number": 2}}
+        forfeited = {
+            **_capture(),
+            "result": "tamper_forfeit",
+            "winner": "police",
+            "step_zero": {"sub_game_number": 2},
+        }
         summaries = [_capture(), forfeited]
 
         artifact = build_result(facts_from(summaries[0]), summaries)

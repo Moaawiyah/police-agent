@@ -17,14 +17,20 @@ belong in Git history and the feature documentation, not in this checklist.
 - [x] Gmail send-only implementation, local draft flow and setup guide.
 - [x] Fresh localhost two-process series on 2026-08-12: Police 2–0, score 40–10.
 - [x] Fresh cross-log replay: both production logs re-verified, `Verified OK` displayed.
-- [x] Current quality gate: 1,031 passed, 1 skipped, 98.11% coverage, Ruff clean,
-  formatting clean and all Python files within the 150-line cap.
+- [x] Current quality gate: 1,242 passed, 0 skipped, 95.37% coverage over `src/` + `research/`
+  (93% with no omissions), Ruff clean, formatting clean and all Python files within the
+  150-line cap.
+- [x] MIT licence, ISO/IEC 25010 mapping and documented extension points added.
+- [x] Parameter sensitivity study: nine constants swept at 500 episodes/point with 95%
+  intervals, figures and a notebook ([RESEARCH.md](RESEARCH.md)).
 
 ## Required before claiming submission readiness
 
-- [ ] Resolve the final-result consensus mismatch. Police and Thief agree on game ID, UID,
-  scores, winners, per-game outcomes and audit flags, but compute different
-  `mutual_agreement.sha256` and `interop_sha256` values.
+- [x] Final-result consensus mismatch resolved in `a613b6f`: `roles_of()` returned
+  `{role: group}` while the sibling thief repo and najamjad's independent implementation
+  both use `{group: role}`, and `agreement_core` hashes that block verbatim. Verified
+  against a real exchanged report -- all three now agree byte-for-byte on
+  `mutual_agreement.sha256` and `interop_sha256`.
 - [ ] Run the current revisions through authenticated ngrok reserved domains on separate
   public endpoints; record both peer revisions, URLs, results, audits and released ports.
 - [ ] Complete and preserve valid matches against at least two different external opponent
@@ -43,7 +49,11 @@ belong in Git history and the feature documentation, not in this checklist.
 - [ ] Persist Police's outgoing verbal reply in the production log for complete replay text.
 - [ ] Narrow the broad retry exception in `McpTransport._send_with_retry` to expected
   transport failures.
-- [ ] Add a formal ISO/IEC 25010 quality mapping if the optional standards score is pursued.
+- [ ] Make the tunnel a pluggable seam. `sdk/agent_connection.py:75` calls ngrok directly and
+  `sdk/league.py:13` hard-requires `--tunnel` plus `network.tunnel_domain`, so an externally
+  managed tunnel cannot use `--league` and silently loses the public-opponent-URL check and
+  the `turn_timeout_seconds == watchdog_timeout_seconds` guard. A `network.public_url` key
+  that league mode validates instead would close it.
 
 ## Evidence discipline
 

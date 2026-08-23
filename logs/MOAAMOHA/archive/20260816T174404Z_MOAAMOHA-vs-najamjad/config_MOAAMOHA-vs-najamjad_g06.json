@@ -1,0 +1,92 @@
+{
+  "_schema": "The agreed configuration for ONE sub-game: every quantitative parameter of the game (Appendix Vav), loaded byte-identically by both peers and hashed into config_sha256 so the two copies can be compared without reading them. Defines the physics and the scoring both groups agreed to; it decides nothing that happened, which is the log's and the result's job.",
+  "schema_version": "1.1",
+  "artifact_type": "agreed_config",
+  "game_id": "MOAAMOHA-vs-najamjad",
+  "game_uid": "1753965a-1f98-d3fb-4241-0245786936c8",
+  "links": {
+    "_remark": "These are logical roles, NOT fixed filenames. Each actual file name is derived from the game_id so that files from different games are never mixed. Match-level files (declaration, result) are named <role>_<game_id>.json; per-sub-game files (config, log) are named <role>_<game_id>_g<NN>.json where <NN> is the sub_game_number.",
+    "declaration": "declaration_MOAAMOHA-vs-najamjad.json",
+    "config": "config_MOAAMOHA-vs-najamjad_g<NN>.json",
+    "log": "log_MOAAMOHA-vs-najamjad_g<NN>.json",
+    "result": "result_MOAAMOHA-vs-najamjad.json"
+  },
+  "sub_game_number": 6,
+  "timezone": "Asia/Jerusalem",
+  "agreed_between": [
+    "MOAAMOHA",
+    "najamjad"
+  ],
+  "config": {
+    "schema_version": "1.3",
+    "_note": "Shared, agreed game terms. BOTH peers must hold a byte-identical copy; the pre-game signature exchange refuses to play on any mismatch. This overlays the private per-peer game.toml. Book: Appendix F.",
+    "agreed_between": [
+      "segal-police-team",
+      "segal-thief-team"
+    ],
+    "board_and_agents": {
+      "grid_size": 7,
+      "num_agents": 2,
+      "thief_start": [
+        3,
+        3
+      ],
+      "cop_start": [
+        0,
+        0
+      ],
+      "axis_origin_corner": "top-left",
+      "axis_start_index": 0,
+      "_axis_note": "Negotiated coordinate system both peers agree on. axis_origin_corner = where cell (0,0) sits: top-left|top-right|bottom-left|bottom-right (default top-left). axis_start_index = the first index of each axis (default 0)."
+    },
+    "world": {
+      "_note": "The real-world area the game is set in (e.g. 'New York', 'Manhattan', 'London'). Drives the location-based landmarks in the trash-talk hints. Default empty string = generic landmarks. Agreed & signed term.",
+      "map_area": "New York",
+      "hint_max_words": 15,
+      "_hint_max_words_note": "Hard cap on the number of words in each trash-talk hint sent across the wire (both template and LLM providers obey it; the LLM is also told the limit in its system prompt). Agreed & signed term; this simulator uses 15."
+    },
+    "movement_and_barriers": {
+      "move_set": [
+        "N",
+        "S",
+        "E",
+        "W",
+        "STAY"
+      ],
+      "max_barriers": 14,
+      "max_moves": 35,
+      "survival_threshold": 35
+    },
+    "scoring": {
+      "capture_cop": 20,
+      "capture_thief": 5,
+      "survival_cop": 5,
+      "survival_thief": 10,
+      "tie_score": 2,
+      "technical_loss": 0
+    },
+    "pheromones": {
+      "pheromone_center_intensity": 0.9,
+      "pheromone_decay": 0.1,
+      "pheromone_grid_size": 5,
+      "pheromone_min_center_intensity": 0.5
+    },
+    "network_and_league": {
+      "response_timeout_sec": 30,
+      "watchdog_timeout_sec": 60,
+      "num_games": 6,
+      "diversity_reward": 10,
+      "min_games_to_pass": 2,
+      "max_games_per_team": 10,
+      "token_budget_per_series": 200000
+    },
+    "rate_limiter_gatekeeper": {
+      "requests_per_minute": 30,
+      "concurrent_requests": 2,
+      "retry_backoff_sec": 5,
+      "max_retries": 3,
+      "queue_depth": 100
+    }
+  },
+  "config_sha256": "7985afe2df407a1a8238cb3c603da95c8eaa86a669283ddfe7a4c5304cf471d9"
+}

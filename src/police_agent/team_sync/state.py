@@ -57,17 +57,29 @@ _TRANSITIONS: dict[SeriesSyncState, frozenset[SeriesSyncState]] = {
             SeriesSyncState.ERROR,
         }
     ),
-    SeriesSyncState.WAITING: frozenset({SeriesSyncState.READY, SeriesSyncState.WAITING_FOR_SIBLING,
-                                        SeriesSyncState.NEGOTIATING, SeriesSyncState.SYNC_ERROR,
-                                        SeriesSyncState.ERROR}),
-    SeriesSyncState.NEGOTIATING: frozenset({SeriesSyncState.PLAYING, SeriesSyncState.SYNC_ERROR,
-                                            SeriesSyncState.ERROR}),
-    SeriesSyncState.PLAYING: frozenset(
-        {SeriesSyncState.AUDITING, SeriesSyncState.SETTLED, SeriesSyncState.SYNC_ERROR,
-         SeriesSyncState.ERROR}
+    SeriesSyncState.WAITING: frozenset(
+        {
+            SeriesSyncState.READY,
+            SeriesSyncState.WAITING_FOR_SIBLING,
+            SeriesSyncState.NEGOTIATING,
+            SeriesSyncState.SYNC_ERROR,
+            SeriesSyncState.ERROR,
+        }
     ),
-    SeriesSyncState.AUDITING: frozenset({SeriesSyncState.SETTLED, SeriesSyncState.SYNC_ERROR,
-                                         SeriesSyncState.ERROR}),
+    SeriesSyncState.NEGOTIATING: frozenset(
+        {SeriesSyncState.PLAYING, SeriesSyncState.SYNC_ERROR, SeriesSyncState.ERROR}
+    ),
+    SeriesSyncState.PLAYING: frozenset(
+        {
+            SeriesSyncState.AUDITING,
+            SeriesSyncState.SETTLED,
+            SeriesSyncState.SYNC_ERROR,
+            SeriesSyncState.ERROR,
+        }
+    ),
+    SeriesSyncState.AUDITING: frozenset(
+        {SeriesSyncState.SETTLED, SeriesSyncState.SYNC_ERROR, SeriesSyncState.ERROR}
+    ),
     SeriesSyncState.SETTLED: frozenset(
         {
             SeriesSyncState.WAITING_FOR_SIBLING,
@@ -78,8 +90,12 @@ _TRANSITIONS: dict[SeriesSyncState, frozenset[SeriesSyncState]] = {
         }
     ),
     SeriesSyncState.WAITING_FOR_SIBLING: frozenset(
-        {SeriesSyncState.READY, SeriesSyncState.SETTLED, SeriesSyncState.SYNC_ERROR,
-         SeriesSyncState.ERROR}
+        {
+            SeriesSyncState.READY,
+            SeriesSyncState.SETTLED,
+            SeriesSyncState.SYNC_ERROR,
+            SeriesSyncState.ERROR,
+        }
     ),
     SeriesSyncState.SERIES_COMPLETE: frozenset(),
     SeriesSyncState.SYNC_ERROR: frozenset(),

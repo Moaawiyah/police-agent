@@ -6,11 +6,11 @@ calling a tool on the server we host ourselves. Everything here is the *inbound*
 half of the link -- what the opponent pushes INTO this agent. The outbound half
 lives in `mcp_client.py`.
 
-The tools do no game reasoning at all: they drop the raw payload into a
-thread-safe queue and return. Uvicorn serves each request on its own worker, so
-the queue -- not the tool body -- is the hand-over point to the single-threaded
-game loop that drains it. Keeping the tools this thin also means a slow or
-crashing strategy can never stall the opponent's HTTP call.
+The tools do no game reasoning: they drop the raw payload into a thread-safe
+queue and return (negotiate also echoes the greeting the game loop published --
+lookup, not reasoning). Uvicorn serves each request on its own worker, so the
+queue -- not the tool body -- is the hand-over point to the single-threaded game
+loop that drains it. A slow or crashing strategy can never stall the opponent.
 
 Tool names are the wire contract with another team's implementation, so they
 match the names used across the course's reference implementation.
@@ -44,9 +44,8 @@ def _ensure_port_free(host: str, port: int) -> None:
 
     Uvicorn's own bind error surfaces deep inside a background thread where the
     game loop cannot see it: the peer would sit waiting for turns that can never
-    arrive. Probing first turns that into an immediate, actionable error. This is
-    a local configuration/environment problem, not a broken link to the
-    opponent, hence ConfigError rather than TransportError.
+    arrive. Probing first makes that immediate and actionable. It is a local
+    environment problem, hence ConfigError rather than TransportError.
     """
     probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -73,6 +72,8 @@ class PeerInboxes:
     def __init__(self, dos_limit_per_minute: float = DEFAULT_DOS_LIMIT_PER_MINUTE) -> None:
         """Four empty mailboxes and an inbound DoS detector tuned to `dos_limit_per_minute`."""
         self.agreements: queue.Queue = queue.Queue()
+        # Published by `exchange_agreement`, for negotiate's reply body.
+        self.greeting: dict | None = None
         self.turns: queue.Queue = queue.Queue()
         self.audits: queue.Queue = queue.Queue()
         self.controls: queue.Queue = queue.Queue()
@@ -93,9 +94,12 @@ def build_peer_server(role: Role, inboxes: PeerInboxes) -> FastMCP:
 
     @mcp.tool
     def negotiate(message: dict) -> dict:
-        """Receive the opponent's signed pre-game agreement."""
+        """Receive the opponent's agreement, answering with mine once I have one.
+
+        A push peer ignores the extra key; a request/response peer needs it.
+        """
         inboxes.agreements.put(message)
-        return {"ok": True}
+        return {"ok": True, "message": inboxes.greeting} if inboxes.greeting else {"ok": True}
 
     @mcp.tool
     def receive_turn(message: dict) -> dict:

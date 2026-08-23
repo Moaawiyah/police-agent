@@ -32,8 +32,8 @@ token.json
 # OS / editor
 .DS_Store
 
-# Logs and replays
-logs/
+# Team-sync bookkeeping state (internal, not a counted game record)
+logs/*/team_sync/
 
 # Generated match output: exported GIF/MP4 and the report artifacts, all
 # reproducible from a run (--export / --report). Kept local like logs/.
