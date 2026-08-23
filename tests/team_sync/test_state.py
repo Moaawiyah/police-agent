@@ -2,12 +2,8 @@
 
 import pytest
 
-from police_agent.team_sync.state import (
-    SeriesSyncState,
-    SeriesSyncStatus,
-    can_transition,
-    role_for_subgame,
-)
+from police_agent.team_sync.state import SeriesSyncState, SeriesSyncStatus, role_for_subgame
+from police_agent.team_sync.state_transitions import can_transition
 
 
 @pytest.mark.parametrize(

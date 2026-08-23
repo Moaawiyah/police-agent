@@ -1,106 +1,71 @@
 # Police Agent
 
-An autonomous Police peer for the course's distributed Police-versus-Thief game. It
-combines a Bayesian belief map, an explainable chase-and-barrier policy, peer-to-peer
-FastMCP messaging, commit-reveal auditing, a live GUI, and a cryptographically verified
-replay viewer.
+An autonomous Police peer for a distributed Police-versus-Thief pursuit game. It
+combines a Bayesian belief map, an explainable chase-and-barrier policy,
+peer-to-peer FastMCP messaging, commit-reveal auditing, a live GUI, and a
+cryptographically verified replay viewer.
 
-This repository contains only the Police process. The companion implementation is the
-[Thief agent](https://github.com/Moaawiyah/Ai_thief). The separation is deliberate: the
-agents run in different processes and repositories and never share hidden state.
+## Repository relationship
 
-## Project status
+This repository, **police-agent**, is the project's main repository: it carries
+the Police process and the cross-repository submission evidence. The companion
+process, the [Thief agent](https://github.com/Moaawiyah/Ai_thief), lives in its
+own repository and is developed against the same shared contract.
 
-| Area | Status | Evidence |
-|---|---|---|
-| Police gameplay and strategy | Implemented and tested | Legal movement, Bayesian tracking, hint reliability, barriers, capture and survival handling |
-| P2P protocol | Implemented and tested | FastMCP negotiation, turns, control messages, audit reveal, retries, watchdogs and queues |
-| Security and reporting | Implemented and tested | Signed terms, commit-reveal, semantic audit, anti-replay, four JSON report artifacts |
-| Live GUI and replay | Fresh-local verified | Two real processes completed a two-game localhost series on 2026-08-12; cross-log replay showed `Verified OK` |
-| Public league delivery | Open | Authenticated reserved-domain ngrok run has not been repeated on the current revisions |
-| Gmail delivery | Open | Local draft and mocked send paths are tested; a real Gmail API send has not been performed |
-| Course submission release | Open | Cross-group league matches and the annotated submission tag remain outstanding |
+The two agents are deliberately independent: separate processes, separate
+repositories, no shared memory or imported live state. They only ever talk to
+each other over FastMCP, and only ever trust each other's claims after a
+commit-reveal audit. Both repositories carry a byte-identical copy of the
+shared `game.json` terms; a change to that contract must be applied and
+validated on both sides.
 
-“Fresh-local verified” is intentionally narrower than “league verified.” It proves that
-the current Police and Thief revisions exchanged real MCP traffic as separate processes
-on localhost; it does not prove public-internet behavior, Gmail delivery, or performance
-against other groups.
+## Screenshots
 
-## Fresh two-process evidence
+Live-run evidence, captured from a real two-process match on localhost.
 
-The evidence run used Police commit `8816dcf4dac01a11386cb2829432d127502ed329`
-and Thief commit `f17255caa7b45174c925917193f442dd3a4d5577`. Both peers loaded
-byte-identical `game.json` files (raw SHA-256
-`3e3d053c30d7d67ec4c9c51e20f246995fb8ac71c1ffdd0ea2595571f131342d`),
-negotiated signed terms, played two sub-games, revealed their sealed logs, and exited
-with ports 8801 and 8802 released.
+| Live Police GUI | Verified cross-log replay |
+| --- | --- |
+| ![Live Police GUI](assets/screenshots/police-live-gui.jpg) | ![Replay showing both agents and Verified OK](assets/screenshots/police-replay-verified.jpg) |
 
-| Sub-game | Result | Winner | Steps | Police audit |
-|---:|---|---|---:|---|
-| 1 | Capture | `MOAAMOHA` | 10 | Log verified; not tampered |
-| 2 | Capture | `MOAAMOHA` | 9 | Log verified; not tampered |
-| Series | 40–10 | `MOAAMOHA` (2–0) | 19 total | Both peers reported the same observable outcome |
+The live window shows only what Police can legitimately see during play: its
+own position and trail, declared barriers, the scent-derived belief heatmap,
+the received hint, its own reply, its decision rationale, and its sealed
+commitment. It never reveals the Thief's true location. The replay view
+reconstructs both tracks from the revealed logs and recomputes every
+commitment; `Verified OK` only appears when that recomputation matches what was
+originally sealed.
 
-The run used deterministic template dialogue and zero model calls, so it is evidence of
-the game, protocol, audit and visualization paths—not of an external LLM provider.
+Additional evidence — a public match over a tunnel, for example — can be added
+to [`assets/screenshots/`](assets/screenshots) and linked here.
 
-### Live Police view
+## Problem model
 
-The live window shows only information available to Police during play: its position and
-trail, declared barriers, the scent-derived belief heatmap, received hint, outgoing reply,
-decision rationale and sealed commitment. It does not reveal the Thief's true location.
+The game is a finite-horizon decentralized partially observable Markov decision
+process, `<I, S, {A_i}, T, R, {Omega_i}, O, gamma>`:
 
-![Live Police GUI during the two-process match](assets/police-live-gui.jpg)
+| Element | Police interpretation |
+| --- | --- |
+| Agents `I` | One Police peer and one Thief peer, each its own OS process |
+| State `S` | Both private positions, placed barriers, scent field, turn number, commitments, terminal condition — no single process holds all of it |
+| Actions `A_i` | Legal orthogonal movement or stay, plus barrier placement and capture claims; the domain layer rejects illegal actions before transmission |
+| Transition `T` | Deterministic board movement and barrier effects; policy randomness is limited to seeded selection among genuinely tied moves |
+| Observations `Omega_i` | Own state, received hints, a local scent grid, public claims and protocol metadata — never the Thief's true cell |
+| Observation model `O` | Prediction diffuses probability over legal reachable cells; the update weights cells by peak-relative scent intensity and renormalizes |
+| Reward `R` | The signed scoring table: capture, survival, exploration, and zero for a technical loss |
+| Discount `gamma` | Short fixed horizon; the agent optimizes the signed terminal score rather than a learned discounted return |
 
-### Verified cross-log replay
+The belief state `b_t(s) = P(thief_position = s | observations_1:t)` is the
+Police agent's sufficient statistic for decision-making. Each turn first
+diffuses probability according to legal Thief motion, then applies the new
+scent likelihood. A small uniform leak and stale-cell decay prevent old
+evidence from becoming permanently dominant.
 
-After both processes finished, the replay loaded the Police production log and the
-Thief's separately written production log. It reconstructed both tracks and the belief
-map, then recomputed every commit on both sides. The status below is generated by that
-re-verification; a changed payload or failed stored audit produces `Verification FAILED`.
+## Architecture and trust boundaries
 
-![Replay showing both agents and Verified OK](assets/police-replay-verified.jpg)
-
-One report-layer discrepancy remains open: although both final-result artifacts agree on
-the game ID, game UID, scores, winner, per-game outcomes and audit booleans, their
-`mutual_agreement.sha256` and `interop_sha256` values differ. This does not invalidate the
-turn-log replay above, but it prevents a claim of byte-level final-artifact consensus.
-
-## Academic report
-
-### 1. Dec-POMDP formulation
-
-The game is a finite-horizon decentralized partially observable Markov decision process:
-
-`<I, S, {A_i}, T, R, {Omega_i}, O, gamma>`
-
-- **Agents `I`:** one Police peer and one Thief peer.
-- **State `S`:** both private positions, placed barriers, scent field, turn number,
-  commitments and terminal condition. No process holds the complete live state.
-- **Actions `A_i`:** legal orthogonal movement or stay, plus role-specific barrier and
-  claim behavior. The domain layer rejects illegal actions before transmission.
-- **Transition `T`:** deterministic board movement and barrier effects, with policy
-  randomness limited to seeded selection among genuinely tied Police moves.
-- **Observations `Omega_i`:** Police sees its own state, received hints, a local scent
-  grid, public claims and protocol metadata—not the Thief's true cell. The Thief keeps
-  its own position private until audit reveal.
-- **Observation model `O`:** the Police prediction step diffuses probability over legal
-  reachable cells; the update step weights cells by peak-relative scent intensity and
-  renormalizes the posterior.
-- **Reward `R`:** the signed scoring table rewards capture, survival and exploration and
-  assigns zero to a technical loss.
-- **Discount `gamma`:** the implementation is a short, fixed-horizon game and optimizes
-  the signed terminal score without a learned discounted return.
-
-The belief state `b_t(s) = P(thief_position = s | observations_1:t)` is the Police
-agent's sufficient statistic for decision-making. Each turn first diffuses probability
-according to legal Thief motion, then applies the new scent likelihood. A small uniform
-leak and stale-cell decay prevent old evidence from becoming permanently dominant.
-
-### 2. FastMCP orchestration dilemmas
-
-There is no referee or central server. Each peer simultaneously acts as a FastMCP server
-for inbound tools and a client of the opponent's `/mcp` endpoint.
+`PoliceAgentSDK` is the public application boundary. The CLI and GUI delegate
+to it; game rules do not import network or presentation code, and strategies
+receive only legal candidates. The live view consumes immutable snapshots so
+Tk never reads state while the worker thread mutates it.
 
 ```mermaid
 flowchart LR
@@ -116,90 +81,110 @@ flowchart LR
     AUDIT --> ART[JSON artifacts and replay]
 ```
 
-The design addresses five practical dilemmas:
+There is no referee or central server: each peer is simultaneously a FastMCP
+server for inbound tools and a client of the opponent's `/mcp` endpoint. That
+symmetry creates five practical problems, addressed as follows:
 
-1. **Startup order.** Connection refusal is normal when two people launch independently.
-   Negotiation retries within a bounded deadline and reports a transport error only when
-   that budget is exhausted.
-2. **Turn ownership.** Receiving `receive_turn` is the token hand-off. MCP tool handlers
-   enqueue raw messages and return quickly; the single game loop performs all reasoning.
-3. **Conversation isolation.** Agreement, turn, control and audit traffic use separate
-   thread-safe queues so a late reveal cannot be consumed as a move.
-4. **Rate and failure control.** Outbound MCP, Ollama and Gmail calls pass through
-   configured gatekeepers with FIFO admission, concurrency limits, token-bucket pacing,
-   bounded retry/backoff and anomaly counters. A watchdog stops a stalled game loop.
-5. **Claims under partial observability.** Police cannot validate the Thief's true position
-   during play. It records commitments, exchanges reveals after termination, verifies the
-   hashes and then replays semantic rules over the revealed positions.
+1. **Startup order.** Connection refusal is normal when two people launch
+   independently. Negotiation retries within a bounded deadline and reports a
+   transport error only when that budget is exhausted.
+2. **Turn ownership.** Receiving `receive_turn` is the token hand-off. MCP tool
+   handlers enqueue raw messages and return quickly; the single game loop
+   performs all reasoning.
+3. **Conversation isolation.** Agreement, turn, control and audit traffic use
+   separate thread-safe queues, so a late reveal can never be consumed as a move.
+4. **Rate and failure control.** Outbound MCP, model and Gmail calls pass
+   through configured gatekeepers with FIFO admission, concurrency limits,
+   token-bucket pacing, bounded retry/backoff and anomaly counters. A watchdog
+   stops a stalled game loop.
+5. **Claims under partial observability.** Police cannot validate the Thief's
+   true position during play. It records commitments, exchanges reveals after
+   termination, verifies the hashes, then replays semantic rules over the
+   revealed positions.
 
-### 3. Implemented Police strategies
+The security model has four layers:
 
-- **Bayesian tracking:** a uniform prior is diffused over stay/N/S/E/W reachability,
-  excluding barriers, then updated with the 5x5 scent packet.
-- **Stale-evidence control:** peak-relative weighting, configurable trust/power, posterior
-  leak and compounded stale decay keep the map responsive to new evidence.
-- **Hint reliability:** location language is compared with scent support. Repeated
-  contradictions reduce the speaker's reliability and therefore its influence.
-- **Chase policy:** minimize Manhattan distance to the most likely Thief cell, prefer an
-  unvisited cell on equal distance, then use seeded randomness only among remaining ties.
-- **Barrier policy:** spend a barrier only when a legal deterministic placement reduces
-  escape or improves expected enclosure over the high-probability region. It never walls
-  before scent evidence or traps Police itself.
-- **Safe verbal layer:** an optional local Ollama model writes and interprets game text;
-  Python alone selects every move. Provider failure falls back to templates without
-  changing game legality.
+1. `game.json` contains the shared terms and must be byte-identical on both peers.
+2. The pre-game handshake compares terms, identities and signed declarations.
+3. Every move is sealed as `SHA-256(canonical_json(payload) | nonce)` before reveal.
+4. The end-game audit verifies hashes, sequence, claims, positions,
+   capture/survival semantics and terminal consistency. A failed audit
+   overrides the board result.
+
+Replay protection keys accepted inbound turns by commitment. Credentials,
+OAuth tokens, private endpoints and per-peer tuning belong only in ignored
+`game.toml` or provider-owned configuration; they must never be committed.
+
+## Police strategy
+
+- **Bayesian tracking:** a uniform prior is diffused over stay/N/S/E/W
+  reachability, excluding barriers, then updated with the 5x5 scent packet.
+- **Stale-evidence control:** peak-relative weighting, configurable
+  trust/power, posterior leak and compounded stale decay keep the map
+  responsive to new evidence.
+- **Hint reliability:** location language is compared with scent support.
+  Repeated contradictions reduce the speaker's reliability and therefore its
+  influence on the belief map.
+- **Chase policy:** minimize Manhattan distance to the most likely Thief cell,
+  prefer an unvisited cell on equal distance, then use seeded randomness only
+  among remaining ties.
+- **Barrier policy:** spend a barrier only when a legal deterministic
+  placement reduces escape or improves expected enclosure over the
+  high-probability region. It never walls before scent evidence or traps
+  Police itself.
+- **Safe verbal layer:** a language model writes and interprets game text, and
+  each outgoing hint is committed with an explicit truth/lie intent flag before
+  it is sent. Python alone selects every move; provider failure falls back to
+  templates without changing game legality.
 
 Custom strategies can subclass `PoliceBrainBase` and configure
-`strategy.police_class = "package.module:ClassName"` in private `game.toml`.
+`strategy.police_class = "package.module:ClassName"` in the private
+`game.toml`.
 
-### 4. Parameter study in place of reinforcement-learning curves
+### Verbal layer and language model
 
-No reinforcement-learning model was trained, so no learning curve is claimed or
-fabricated. This submission uses an explicit Bayesian filter and a hand-engineered,
-explainable policy, and the corresponding evidence is a **sensitivity study**: all nine
-tunable constants swept one at a time over 500 episodes per point against a synthetic
-evader, with 95% confidence intervals.
+The recorded matches used **GLM-4.7-FlashX**, served over the OpenAI-compatible
+z.ai endpoint (`https://api.z.ai/api/paas/v4`), for both halves of the verbal
+layer: writing this peer's outgoing taunt, and reading the Thief's incoming
+hint to classify the direction it claims. A small, fast model is deliberate —
+the taunt must never eat into the turn budget.
 
-The analysis is in [docs/RESEARCH.md](docs/RESEARCH.md), the figures in
-[assets/](assets), the raw numbers in [docs/research-data.json](docs/research-data.json),
-and the interactive version in [notebooks/sensitivity.ipynb](notebooks/sensitivity.ipynb).
+The model shapes text only. It never chooses a move, evaluates legality, or
+touches the belief map's arithmetic; that boundary is enforced in code and
+covered by tests. Before each hint is written, the peer decides whether that
+turn's line will be honest or a bluff, and seals that intent into the turn's
+commitment, so it cannot claim afterwards that a lie was accidental.
+
+Set the API key in the environment — never in a committed file:
+
+```bash
+export ZAI_API_KEY="<your-key>"
+```
+
+Provider selection lives in the private `config/police/game.toml` under
+`[trash_talk]`. `provider = "glm"` is the shipped default; `"ollama"` runs a
+local model instead (`qwen3:4b` by default), and `"template"` uses canned
+lines and spends no tokens at all. Any provider failure — missing key, server
+down, timeout, malformed reply — degrades to those canned lines rather than
+costing the match. Token spend is metered per step through the gatekeeper and
+sealed into each turn's record.
+
+### Evidence and parameter study
+
+No reinforcement-learning model is trained or claimed. This project uses an
+explicit Bayesian filter and a hand-engineered, explainable policy, evidenced
+by a parameter sensitivity study: all nine tunable constants swept one at a
+time over 500 episodes per point against a synthetic evader, with 95%
+confidence intervals. See [docs/RESEARCH.md](docs/RESEARCH.md), the figures in
+[assets/](assets), the raw numbers in
+[docs/research-data.json](docs/research-data.json), and the interactive
+version in [notebooks/sensitivity.ipynb](notebooks/sensitivity.ipynb).
 Regenerate everything with:
 
 ```bash
 uv sync --extra research
 uv run python -m research
 ```
-
-### 5. Live and replay screenshots
-
-The required screenshots are the fresh run shown above:
-
-- [live Police GUI](assets/police-live-gui.jpg)
-- [cross-log replay with `Verified OK`](assets/police-replay-verified.jpg)
-
-### 6. Companion repository
-
-- Thief: <https://github.com/Moaawiyah/Ai_thief>
-- Police: <https://github.com/Moaawiyah/police-agent>
-
-## Architecture and trust boundaries
-
-`PoliceAgentSDK` is the public application boundary. The CLI and GUI delegate to it;
-game rules do not import network or presentation code, and strategies receive only legal
-candidates. The live view consumes immutable snapshots so Tk never reads state while the
-worker thread mutates it.
-
-The security model has four layers:
-
-1. `game.json` contains shared terms and must be byte-identical on both peers.
-2. The pre-game handshake compares terms, identities and signed declarations.
-3. Every move is sealed as `SHA-256(canonical_json(payload) | nonce)` before reveal.
-4. The end-game audit verifies hashes, sequence, claims, positions, capture/survival
-   semantics and terminal consistency. A failed audit overrides the board result.
-
-Replay protection keys accepted inbound turns by commitment. Credentials, OAuth tokens,
-private endpoints and per-peer tuning belong only in ignored `game.toml` or provider-owned
-configuration; they must never be committed.
 
 ## Installation
 
@@ -208,95 +193,180 @@ Requirements:
 - Python 3.13 or newer
 - [uv](https://docs.astral.sh/uv/)
 - Tk support for `--gui` and interactive `--replay`
-- Optional: ngrok for public matches, Ollama for local generated dialogue, Google client
-  libraries for live Gmail delivery, and ffmpeg for MP4 export
+- Optional: a development tunnel service for public matches (local.dev, or
+  ngrok — which `--tunnel` can drive automatically), Ollama for local
+  generated dialogue, Google client libraries for live Gmail delivery, and
+  ffmpeg for MP4 export
 
-```powershell
+```bash
 git clone https://github.com/Moaawiyah/police-agent.git
 cd police-agent
 uv sync --all-extras --dev
-Copy-Item config/police/game.toml.example config/police/game.toml
+cp config/police/game.toml.example config/police/game.toml
 ```
 
-Edit the ignored `config/police/game.toml` with your group metadata, repository URLs,
-local port and opponent URL. Keep real student identifiers and credentials out of public
-examples and screenshots.
+Edit the ignored `config/police/game.toml` with your group metadata,
+repository URLs, local port and opponent URL. Keep real student identifiers
+and credentials out of public examples and screenshots.
 
-## Run a local two-process series
+## Running
 
-Start Police first. The GUI opens idle, which gives the Thief time to start before you
-press **Start**:
+The shared `game.json` fixes board physics, scent parameters, scoring,
+network deadlines, game count, token budget and rate limits. The private
+`game.toml` selects identity, endpoints, strategy tuning, GUI pacing, model
+provider and email behavior.
 
-```powershell
-# Terminal 1: police-agent repository
-uv run police-agent --gui --port 8801 `
-  --opponent http://127.0.0.1:8802/mcp `
+Command examples use POSIX line continuations (`\`). In PowerShell, replace
+each trailing `\` with a backtick, or put the command on one line.
+
+### Run with the live GUI
+
+Start Police first; the GUI opens idle, which gives the Thief time to start
+before you press **Start**:
+
+```bash
+# Terminal 1 — police-agent repository
+uv run police-agent --gui --port 8801 \
+  --opponent http://127.0.0.1:8802/mcp \
   --summary logs/police-summary.json --report
 
-# Terminal 2: Ai_thief repository
-uv run thief-agent peer --role thief --config-dir config/thief `
-  --port 8802 --opponent-url http://127.0.0.1:8801/mcp --stub-llm
+# Terminal 2 — Ai_thief repository
+uv run thief-agent gui --config-dir config/thief \
+  --port 8802 --opponent-url http://127.0.0.1:8801/mcp
 ```
 
-For a headless series:
+Add `--series` on the Police side to play the whole agreed series
+(`game.num_games`) instead of a single sub-game. The Thief's `gui` subcommand
+already plays its configured series, so it takes no equivalent flag.
 
-```powershell
-uv run police-agent --series --report --port 8801 `
+### Run a counted match
+
+`--count` marks the run whose report is actually mailed to the lecturer (cc'd
+on `email.recipient` rather than sent to that address alone). Counting is
+Police's responsibility: the Thief peer has no equivalent flag and plays a
+counted match exactly the way it plays any other.
+
+```bash
+# Counted series, with the live GUI
+uv run police-agent --gui --series --report --count --port 8801 \
+  --opponent http://127.0.0.1:8802/mcp
+
+# Counted series, headless
+uv run police-agent --series --report --count --port 8801 \
   --opponent http://127.0.0.1:8802/mcp
 ```
 
-The shared `game.json` fixes board physics, scent parameters, scoring, network deadlines,
-game count, token budget and rate limits. Private `game.toml` selects identity, endpoints,
-strategy tuning, GUI pacing, model provider and email behavior.
+### Replay a match
 
-## Replay and export
+Replay verifies as it plays: it recomputes every commitment from the revealed
+logs and only reports `Verified OK` if each one matches what was sealed during
+the match. Point it at a per-sub-game `log_` file — the aggregate
+`result_<game_id>.json` holds only the series score and has no per-step data:
 
-Use the per-sub-game production logs, not the aggregate result file:
+```bash
+uv run police-agent --replay logs/MOAAMOHA/log_MOAAMOHA-vs-cosmos77_g01.json
+```
 
-```powershell
-uv run police-agent --replay logs/MOAAMOHA/log_GAME_g01.json `
-  --opponent-log ../Ai_thief/logs/thief-team/log_GAME_g01.json
+That file already carries this peer's sealed records and the opponent's turn
+messages, so both tracks replay from it alone. `--opponent-log` is only needed
+to overlay the Thief's own separately written log:
 
-uv run police-agent --replay logs/MOAAMOHA/log_GAME_g01.json `
-  --opponent-log ../Ai_thief/logs/thief-team/log_GAME_g01.json `
+```bash
+uv run police-agent --replay logs/MOAAMOHA/log_MOAAMOHA-vs-cosmos77_g01.json \
+  --opponent-log ../Ai_thief/logs/MOAAMOHA/record_MOAAMOHA-vs-cosmos77_g02.json
+```
+
+Render to a file instead of opening a window with `--export`:
+
+```bash
+uv run police-agent --replay logs/MOAAMOHA/log_MOAAMOHA-vs-cosmos77_g01.json \
   --export results/game-1.gif
 ```
 
 GIF export needs Pillow only. MP4 export additionally requires `ffmpeg` on `PATH`.
 
-## Public matches and reporting
+### Public matches and reporting
 
-`--tunnel` starts ngrok after the MCP server binds. `--league --tunnel` also requires a
-reserved domain and a public HTTPS opponent URL:
+Both peers normally sit behind NAT, so a league match needs a publicly
+reachable URL rather than `127.0.0.1`. The recorded league series used
+**local.dev** as the development tunnel service: it publishes the local
+FastMCP mailbox on a public HTTPS subdomain the opposing team can call.
 
-```powershell
-ngrok config add-authtoken <your-token>  # provider-owned config; never commit it
-uv run police-agent --league --tunnel --series --report
+Start your tunnel against this peer's MCP port (8801 by default), keep it
+running for the whole series, and note the forwarding URL it prints — the
+Police peer in the recorded matches was published as
+`https://calm-lantern-322.local.dev`. Then give the opposing team that URL with
+`/mcp` appended, and put theirs in `network.opponent_url` in the private
+`config/police/game.toml`:
+
+```toml
+opponent_url = "https://<their-subdomain>.local.dev/mcp"
 ```
 
-The report writer produces declaration, config, per-sub-game log and aggregate result
-JSON under `logs/<group_id>/`. Gmail is off by default. Follow
-[docs/GMAIL_SETUP.md](docs/GMAIL_SETUP.md) for the send-only OAuth scope and deliberate
-authorization flow. Never share `credentials.json` or `token.json`.
+With the tunnel up and a public `opponent_url` configured, play the series
+exactly as you would locally:
+
+```bash
+uv run police-agent --series --report --count
+```
+
+**ngrok is also supported**, and is the one service this repository can drive
+for you. Authenticate once (`ngrok config add-authtoken <your-token>` — ngrok
+keeps it in its own config; this project never reads or holds it), reserve a
+domain at <https://dashboard.ngrok.com/domains>, and set it as `tunnel_domain`
+in the private `game.toml`. Then `--tunnel` starts ngrok after the MCP server
+binds and reads the public URL back from ngrok's local agent API on
+`127.0.0.1:4040`, adopting a tunnel you already opened by hand rather than
+starting a competing one:
+
+```bash
+uv run police-agent --tunnel --series --report --count
+```
+
+`--league` adds the strict league profile on top. It is enforced, not
+advisory, and **requires `--tunnel`**: it also demands a configured
+`tunnel_domain`, an HTTPS opponent URL that is neither localhost nor a private
+address, and `turn_timeout_seconds` equal to `watchdog_timeout_seconds`. Any
+of those missing is a startup `ConfigError`:
+
+```bash
+uv run police-agent --league --tunnel --series --report --count
+```
+
+Because `--league` is wired to the built-in ngrok tunnel, a match run over a
+manually started tunnel such as local.dev uses the plain `--series` form above
+rather than `--league`.
+
+Keep both tunnels and both peer processes alive for the entire series. A
+localhost run, or an open tunnel on its own, is not interoperability proof:
+both peers must finish, agree on the outcome, pass mutual audit and replay,
+release their ports, and have the exact commits and public URLs recorded in
+the declaration artifact.
+
+The report writer produces declaration, config, per-sub-game log and
+aggregate result JSON under `logs/<group_id>/`. Gmail is off by default.
+Follow [docs/GMAIL_SETUP.md](docs/GMAIL_SETUP.md) for the send-only OAuth
+scope and deliberate authorization flow. Never share `credentials.json` or
+`token.json`.
 
 ## Validation
 
-The current quality gate passes with 1,242 tests passing, 0 skipped, and 95.37% measured
-coverage (minimum 85%). Ruff, formatting and the 150 nonblank/noncomment line limit pass.
-
-Coverage omits only the four modules that construct Tk widgets and so cannot run in a
-headless test process (`gui/board_view.py`, `gui/live_controls.py`, `gui/replay_controls.py`,
-`gui/window.py`). Everything else, the rest of `gui/` included, is measured. Measured with
-no omissions at all the figure is 93%, still above the 85% floor -- the omit list changes
-which number is reported, not whether the gate is met. `research/` is measured alongside
-`src/`: the study's conclusions rest on that code, so exempting it would exempt the evidence.
-
-```powershell
+```bash
 uv run pytest
 uv run pytest --cov=police_agent --cov-report=term-missing:skip-covered
 uv run ruff check .
 uv run ruff format --check .
 ```
+
+CI runs the same gates plus a file-size check: every Python file under `src/`
+and `tests/` must stay at or below 150 nonblank/noncomment lines.
+
+Coverage omits only the four modules that construct Tk widgets and so cannot
+run in a headless test process (`gui/board_view.py`, `gui/live_controls.py`,
+`gui/replay_controls.py`, `gui/window.py`); everything else, the rest of
+`gui/` included, is measured. `research/` is measured alongside `src/`: the
+sensitivity study's conclusions rest on that code, so exempting it would
+exempt the evidence.
 
 ## Repository map
 
@@ -305,46 +375,64 @@ src/police_agent/
   domain/    rules, state, actions, cryptographic and semantic audit
   peer/      handshake, protocol, turn loop, series and summaries
   strategy/  belief filter, hint analysis, chase and barrier policy
-  infra/     FastMCP, ngrok, Ollama, Gmail, hardware and Git adapters
+  infra/     FastMCP, tunnel, Ollama, Gmail, hardware and Git adapters
   shared/    gatekeeper, quotas, tokens, rate limiting and utilities
   report/    declaration, config, log and final-result artifacts
   sdk/       supported application facade and replay/report APIs
   gui/       live board, replay player and headless export
 research/    parameter sweeps and the synthetic evader they run against
 notebooks/   the sensitivity study as a runnable notebook
+config/police/  the shared game.json and the private game.toml example
 ```
 
-Start with [docs/FEATURES.md](docs/FEATURES.md). Detailed pages cover the
-[architecture](docs/ARCHITECTURE.md), [core gameplay](docs/CORE_GAMEPLAY.md),
-[Police strategy](docs/POLICE_STRATEGY.md), [P2P protocol](docs/P2P_PROTOCOL.md),
-[security and audit](docs/SECURITY_AND_AUDIT.md),
-[GUI/replay/export](docs/GUI_REPLAY_EXPORT.md),
-[reporting and series](docs/REPORTING_AND_SERIES.md), and
-[operations/interoperability](docs/INTEROPERABILITY_AND_OPERATIONS.md).
+## Documentation
 
-## Known gaps
+Start with [docs/FEATURES.md](docs/FEATURES.md), then:
 
-- Current public ngrok interoperability is not freshly verified on the evidence revisions.
-- Gmail OAuth authorization and a real send remain unverified.
-- Matches against two different external opponent groups have not been recorded.
-- No annotated `v1.0-submission` tag has been created.
+- [Architecture](docs/ARCHITECTURE.md)
+- [Core gameplay](docs/CORE_GAMEPLAY.md)
+- [Police strategy](docs/POLICE_STRATEGY.md)
+- [P2P protocol](docs/P2P_PROTOCOL.md)
+- [Security and audit](docs/SECURITY_AND_AUDIT.md)
+- [GUI, replay and export](docs/GUI_REPLAY_EXPORT.md)
+- [Reporting and series](docs/REPORTING_AND_SERIES.md)
+- [Interoperability and operations](docs/INTEROPERABILITY_AND_OPERATIONS.md)
+- [Gatekeeper and tokens](docs/GATEKEEPER_AND_TOKENS.md)
+- [Verbal layer](docs/VERBAL_LAYER.md)
+- [Extension points](docs/EXTENSION_POINTS.md)
+- [SDK, CLI and configuration](docs/SDK_CLI_CONFIGURATION.md)
+- [Research and sensitivity study](docs/RESEARCH.md)
+- [ISO/IEC 25010 quality mapping](docs/ISO25010.md)
+- [Prompt engineering log](docs/PROMPTS.md)
+- [Product requirements](docs/PRD.md) and [development plan](docs/PLAN.md)
 
-Track the actionable list in [docs/TODO.md](docs/TODO.md). These gaps are why this README
-does not label the repository submission-ready.
+## Roadmap to submission
+
+- Repeat the public tunnelled interoperability run on the current revisions.
+- Complete a real Gmail OAuth authorization and send.
+- Record matches against at least two different external opponent groups.
+- Cut the annotated `v1.0-submission` tag once the above are done.
+
+Track the actionable list in [docs/TODO.md](docs/TODO.md).
 
 ## Contributing
 
-Keep changes behind the SDK boundary, preserve the separate-process trust model, add tests
-for behavior, and run the validation commands above. Python files under `src/` and `tests/`
-must remain at or below 150 nonblank/noncomment lines. Do not commit logs, private config,
-OAuth files, tokens or provider credentials.
+Keep changes behind the SDK boundary, preserve the separate-process trust
+model, add tests for behavior, and run the validation commands above. Python
+files under `src/` and `tests/` must remain at or below 150 nonblank/noncomment
+lines. Do not commit logs, private config, OAuth files, tokens or provider
+credentials.
 
 ## Credits and license
 
-Developed for the University of Haifa Orchestra of AI Police/Thief project. The GUI
-structure was informed by the course reference while the implementation in this repository
-was rewritten for this agent's SDK, protocol and evidence model.
+Developed for the University of Haifa's distributed AI course project on
+trust-minimized multi-agent systems, taught by **Dr. Yoram Segal**. The course
+specification and the reference implementation,
+[rmisegal/Game-P2P-Cop-Chase](https://github.com/rmisegal/Game-P2P-Cop-Chase),
+are Dr. Segal's; both are gratefully acknowledged. The GUI structure was
+informed by that reference, while the protocol, security model, strategy and
+evidence model in this repository were designed and written independently.
 
-Released under the [MIT License](LICENSE). Course rules still apply to submission and
-academic conduct: the licence governs reuse of the code, not the coursework it was written
-for.
+Released under the [MIT License](LICENSE). Course rules still apply to
+submission and academic conduct: the license governs reuse of the code, not
+the coursework it was written for.

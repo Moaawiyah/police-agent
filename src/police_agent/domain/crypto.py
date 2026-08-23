@@ -64,9 +64,15 @@ class CommitReveal:
 
     @classmethod
     def verify(cls, payload: dict[str, Any], nonce: str, commit: str) -> None:
-        """Raise CryptoError unless `payload` and `nonce` hash to `commit`."""
+        """Raise CryptoError unless `payload` and `nonce` hash to `commit`.
+
+        `secrets.compare_digest` rather than `==`: both are public hex digests
+        at audit time, not a live secret an attacker could time an oracle
+        against, but ch. 5.3.1's own reference `verify()` uses it, so this does
+        too rather than presenting a second, weaker way to check a commitment.
+        """
         recomputed = cls.commit_of(payload, nonce)
-        if recomputed != commit:
+        if not secrets.compare_digest(recomputed, commit):
             raise CryptoError(
                 f"Commit mismatch: published {commit[:16]}..., recomputed {recomputed[:16]}..."
             )

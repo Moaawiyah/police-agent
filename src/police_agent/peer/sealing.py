@@ -31,7 +31,12 @@ def _state_str(state: OwnGameState) -> str:
 
 
 def sealed_step_record(
-    state: OwnGameState, rationale: str, capture_claim: Cell | None, tokens: dict | None = None
+    state: OwnGameState,
+    rationale: str,
+    capture_claim: Cell | None,
+    tokens: dict | None = None,
+    hint: str = "",
+    intent: str = "truth",
 ) -> dict:
     """Seal one turn's truth: where I am, what I did, and what I claimed.
 
@@ -39,6 +44,12 @@ def sealed_step_record(
     is what makes the claim binding: at the audit the thief can check that the
     cell the police *claimed* is the cell the police actually stood on, so a
     police peer cannot later deny a claim its opponent answered honestly.
+
+    `hint` and `intent` seal ch. 5.3.1's Intent flag: whether *this* turn's
+    hint (sent openly, see `TurnMessage.hint`) was declared honest or a lie
+    before it went out. Sealing the pair together, atomically with state and
+    move, is what stops a peer claiming after the fact that it "meant" to lie
+    -- the declaration is fixed the instant the commit is published.
 
     `tokens` (`TokenLedger.step_snapshot()`) rides along too -- the reference
     record schema carries it (SPEC 3), and sealing it here means a peer's
@@ -58,6 +69,8 @@ def sealed_step_record(
         "unique_cells": state.unique_cells,
         "capture_claim": list(capture_claim) if capture_claim else None,
         "rationale": rationale,
+        "hint": hint,
+        "intent": intent,
         "tokens_input": tokens.get("tokens_input", 0),
         "tokens_output": tokens.get("tokens_output", 0),
         "tokens_step": tokens.get("tokens_step", 0),

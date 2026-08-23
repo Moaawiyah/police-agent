@@ -122,7 +122,8 @@ class TestTheResolvedWriterReallyCallsOllama:
             config_with(trash_talk__provider="ollama", trash_talk__timeout_seconds=1.5)
         )
 
-        assert writer(None, None, "catch me") == "I own every bridge off this island."
+        text, _intent = writer(None, None, "catch me")
+        assert text == "I own every bridge off this island."
         assert sent["payload"]["model"] == DEFAULT_MODEL
         assert sent["timeout"] == 1.5
 

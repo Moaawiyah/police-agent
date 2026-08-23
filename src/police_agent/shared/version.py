@@ -15,4 +15,3 @@ SUPPORTED_CONFIG_VERSIONS = ("1.10",)
 
 PROJECT_TITLE = "Police Agent - P2P Cops-and-Robbers"
 REPOSITORY_URL = "https://github.com/Moaawiyah/police-agent"
-THIEF_REPOSITORY_URL = "https://github.com/Moaawiyah/Ai_thief"

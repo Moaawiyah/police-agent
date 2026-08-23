@@ -65,7 +65,7 @@ def _full_runtime(threat, decision, usage):
 
     def hint_writer(state, claim, opponent_hint):
         tokens.record(usage)
-        return "a hint"
+        return "a hint", "truth"
 
     return SimpleNamespace(
         state=OwnGameState((3, 3), 7),
