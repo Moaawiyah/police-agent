@@ -21,7 +21,8 @@ def writer(reply="Closing in on you near Times Square.", **kwargs) -> HintWriter
 
 
 def hint(subject: HintWriter, claim=None, opponent="") -> str:
-    return subject(state=None, capture_claim=claim, opponent_hint=opponent)
+    text, _intent = subject(state=None, capture_claim=claim, opponent_hint=opponent)
+    return text
 
 
 class TestWhatTheModelSays:
@@ -107,3 +108,40 @@ class TestBanterNeverCostsAGame:
             hint(subject)
 
         assert len(calls) == 2
+
+
+class TestIntentIsSealedBeforeTheModelSpeaks:
+    """ch. 5.3.1: whether a hint is honest or a lie must be decided before it
+    is written, not read off what the model happened to say."""
+
+    def test_a_zero_bluff_rate_always_declares_the_truth(self):
+        subject = writer(bluff_rate=0.0)
+
+        for _ in range(5):
+            _, intent = subject(None, None, "")
+            assert intent == "truth"
+
+    def test_a_certain_bluff_rate_always_declares_a_lie(self):
+        subject = writer(bluff_rate=1.0)
+
+        for _ in range(5):
+            _, intent = subject(None, None, "")
+            assert intent == "lie"
+
+    def test_the_declared_intent_shapes_what_the_model_is_told(self):
+        seen = {}
+        subject = writer(bluff_rate=1.0)
+        subject._ask = lambda prompt, system: seen.setdefault("system", system) or "Soho."
+
+        subject(None, None, "")
+
+        assert "mislead" in seen["system"].lower()
+
+    def test_a_fallback_line_is_always_sealed_truthful(self):
+        """No model, or the turn between spoken ones: no claim was made, so
+        nothing to declare a lie about."""
+        subject = HintWriter(None, "New York", bluff_rate=1.0, rng=random.Random(0))
+
+        _, intent = subject(None, None, "")
+
+        assert intent == "truth"

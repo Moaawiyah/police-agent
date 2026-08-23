@@ -58,9 +58,17 @@ def take_turn(runtime, claim_response: dict | None = None, transmit: bool = True
     # reflect this step's real spend instead of always reading the zero
     # `begin_step()` just set. Skipped when not transmitting: nobody would
     # hear it, so spending a call (and tokens) on it would be wasted.
-    hint = runtime.hint_writer(runtime.state, claim, _opponent_hint(runtime)) if transmit else ""
+    #
+    # The writer also returns this turn's Intent (ch. 5.3.1: honest or a lie,
+    # declared before the hint is sent) so it can be sealed alongside it below
+    # rather than left an unverifiable, after-the-fact claim.
+    hint, intent = (
+        runtime.hint_writer(runtime.state, claim, _opponent_hint(runtime))
+        if transmit
+        else ("", "truth")
+    )
     record = sealed_step_record(
-        runtime.state, decision.rationale, claim, runtime.tokens.step_snapshot()
+        runtime.state, decision.rationale, claim, runtime.tokens.step_snapshot(), hint, intent
     )
     runtime.records.append(record)
     if not transmit:
@@ -79,9 +87,10 @@ def take_turn(runtime, claim_response: dict | None = None, transmit: bool = True
             "type": "moved",
             "decision": decision,
             "commit": record["commit"],
-            # The line that went out with the move. It is nowhere in the sealed
-            # record -- the payload is the peer's *truth*, and a taunt is not --
-            # so an observer that missed this event cannot recover it later.
+            # The line that went out with the move, and the Intent it was
+            # sealed under -- both now live in the sealed record too (above),
+            # so an observer that missed this event can still recover them
+            # from the audit at the end of the game.
             "hint": message.hint,
         }
     )

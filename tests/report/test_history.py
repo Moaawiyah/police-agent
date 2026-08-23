@@ -1,8 +1,10 @@
 """Archiving a finished series before a rematch overwrites it.
 
 `history.py`'s core job: move a completed series' files aside before a fresh
-sub-game 1 for the same opponent lands on them. Counting the resulting
-ledger is covered separately in test_history_counting.py (150-line rule).
+sub-game 1 for the same opponent lands on them. The written ledger entry's
+own content is covered in test_history_ledger.py, and counting the ledger in
+test_history_counting.py -- both split out to keep every file under the
+project's 150-line rule; their fixtures are defined here and imported there.
 """
 
 import json
@@ -69,46 +71,6 @@ class TestArchivingAFinishedSeries:
         archive_completed_series(tmp_path, facts(), now=clock)
 
         assert colliding.is_file()
-
-    def test_archiving_appends_one_ledger_entry(self, tmp_path):
-        write_result(
-            tmp_path,
-            num_sub_games=2,
-            agreed=2,
-            game_uid="the-uid",
-            game_started_at="2026-08-01T09:00:00+00:00",
-            game_ended_at="2026-08-01T09:10:00+00:00",
-            final_result={"winner_group": POLICE},
-            counted=True,
-        )
-
-        archive_completed_series(tmp_path, facts(), now=clock)
-
-        entries = json.loads((tmp_path / "series_history.json").read_text())
-        assert entries == [
-            {
-                "game_id": GAME_ID,
-                "game_uid": "the-uid",
-                "opponent_group_id": THIEF,
-                "own_group_id": POLICE,
-                "num_sub_games": 2,
-                "final_result": {"winner_group": POLICE},
-                "started_at": "2026-08-01T09:00:00+00:00",
-                "ended_at": "2026-08-01T09:10:00+00:00",
-                "archived_at": CLOCK.isoformat(),
-                "counted": True,
-            }
-        ]
-
-    def test_a_warm_up_is_archived_but_not_marked_counted(self, tmp_path):
-        """`--count` was never passed, so the ledger entry says so -- and
-        count_series must not fold it into the tally."""
-        write_result(tmp_path, num_sub_games=2, agreed=2)
-
-        archive_completed_series(tmp_path, facts(), now=clock)
-
-        entries = json.loads((tmp_path / "series_history.json").read_text())
-        assert entries[0]["counted"] is False
 
     def test_archiving_leaves_the_directory_clean_for_the_next_series(self, tmp_path):
         write_result(tmp_path, num_sub_games=2, agreed=2)

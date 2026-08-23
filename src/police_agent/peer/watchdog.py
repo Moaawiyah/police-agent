@@ -30,7 +30,6 @@ from police_agent.peer.controls import GameControls
 # in its tables (Table 19 item 7 = 60s) -- never in body-text example code.
 DEFAULT_TIMEOUT_SEC = 180.0
 WATCHDOG_POLL_SECONDS = 5.0
-WATCHDOG_POLL_SECONDS = 5.0
 
 
 class Watchdog:

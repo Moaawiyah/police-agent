@@ -43,71 +43,6 @@ def role_for_subgame(n: int, start_role: str = POLICE) -> str:
     return THIEF if start_role == POLICE else POLICE
 
 
-# Legal forward transitions: every value in the set is a state `advance` may
-# move *to* from the key. Kept explicit so an out-of-order or duplicated
-# event fails loudly (`ValueError`) instead of silently overwriting progress.
-_TRANSITIONS: dict[SeriesSyncState, frozenset[SeriesSyncState]] = {
-    SeriesSyncState.IDLE: frozenset({SeriesSyncState.READY, SeriesSyncState.WAITING}),
-    SeriesSyncState.READY: frozenset(
-        {
-            SeriesSyncState.NEGOTIATING,
-            SeriesSyncState.WAITING_FOR_SIBLING,
-            SeriesSyncState.PLAYING,
-            SeriesSyncState.SYNC_ERROR,
-            SeriesSyncState.ERROR,
-        }
-    ),
-    SeriesSyncState.WAITING: frozenset(
-        {
-            SeriesSyncState.READY,
-            SeriesSyncState.WAITING_FOR_SIBLING,
-            SeriesSyncState.NEGOTIATING,
-            SeriesSyncState.SYNC_ERROR,
-            SeriesSyncState.ERROR,
-        }
-    ),
-    SeriesSyncState.NEGOTIATING: frozenset(
-        {SeriesSyncState.PLAYING, SeriesSyncState.SYNC_ERROR, SeriesSyncState.ERROR}
-    ),
-    SeriesSyncState.PLAYING: frozenset(
-        {
-            SeriesSyncState.AUDITING,
-            SeriesSyncState.SETTLED,
-            SeriesSyncState.SYNC_ERROR,
-            SeriesSyncState.ERROR,
-        }
-    ),
-    SeriesSyncState.AUDITING: frozenset(
-        {SeriesSyncState.SETTLED, SeriesSyncState.SYNC_ERROR, SeriesSyncState.ERROR}
-    ),
-    SeriesSyncState.SETTLED: frozenset(
-        {
-            SeriesSyncState.WAITING_FOR_SIBLING,
-            SeriesSyncState.READY,
-            SeriesSyncState.SERIES_COMPLETE,
-            SeriesSyncState.SYNC_ERROR,
-            SeriesSyncState.ERROR,
-        }
-    ),
-    SeriesSyncState.WAITING_FOR_SIBLING: frozenset(
-        {
-            SeriesSyncState.READY,
-            SeriesSyncState.SETTLED,
-            SeriesSyncState.SYNC_ERROR,
-            SeriesSyncState.ERROR,
-        }
-    ),
-    SeriesSyncState.SERIES_COMPLETE: frozenset(),
-    SeriesSyncState.SYNC_ERROR: frozenset(),
-    SeriesSyncState.ERROR: frozenset(),
-}
-
-
-def can_transition(current: SeriesSyncState, target: SeriesSyncState) -> bool:
-    """Whether moving from `current` to `target` is a legal step."""
-    return target in _TRANSITIONS.get(current, frozenset())
-
-
 @dataclass
 class SeriesSyncStatus:
     """One series' local position: which sub-game, in what state, since when."""
@@ -122,6 +57,11 @@ class SeriesSyncStatus:
         self, target: SeriesSyncState, sub_game_number: int | None = None
     ) -> "SeriesSyncStatus":
         """A new status moved to `target`, or `ValueError` if that is not legal."""
+        # Imported here, not at module level: `state_transitions.py` imports
+        # `SeriesSyncState` from this module, so a top-level import back would
+        # be circular.
+        from police_agent.team_sync.state_transitions import can_transition
+
         if not can_transition(self.state, target):
             raise ValueError(f"illegal team_sync transition: {self.state} -> {target}")
         return SeriesSyncStatus(

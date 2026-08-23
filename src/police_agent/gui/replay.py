@@ -94,9 +94,6 @@ class ReplayApp:
         """Reset playback to step zero."""
         replay_actions.restart(self)
 
-    def _render_empty(self) -> None:
-        replay_actions.render_empty(self)
-
     def goto(self, step: int) -> None:
         """Jump playback to a specific step."""
         replay_actions.goto(self, step)

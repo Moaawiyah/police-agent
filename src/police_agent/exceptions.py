@@ -23,10 +23,6 @@ class ProtocolError(PoliceAgentError):
     """A wire message arrived, but its shape or contents violate the protocol."""
 
 
-class MoveError(PoliceAgentError):
-    """An illegal or invalid game move."""
-
-
 class CryptoError(PoliceAgentError):
     """A commitment did not match what was revealed, or terms were not signed."""
 

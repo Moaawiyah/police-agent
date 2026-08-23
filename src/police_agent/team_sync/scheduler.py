@@ -23,7 +23,7 @@ from police_agent.sdk import GameControls
 from police_agent.team_sync import client as ts_client
 from police_agent.team_sync import config as ts_config
 from police_agent.team_sync import coordinator as ts_coordinator
-from police_agent.team_sync import import_adapter
+from police_agent.team_sync import import_adapter, scheduler_status
 from police_agent.team_sync import scheduler_helpers as helpers
 from police_agent.team_sync.resume import backfill_missing_summaries
 from police_agent.team_sync.scheduler_fail import fail
@@ -38,7 +38,7 @@ __all__ = ["run_team_series"]
 def run_team_series(agent, base: str = "logs") -> list[dict]:
     """Run all six live sub-games, importing Thief-owned settled results."""
     settings = ts_config.settings(agent.config)
-    start_role = helpers.start_role(agent.config, settings)
+    start_role = scheduler_status.start_role(agent.config, settings)
     secret = secret_from_env()
     store = TeamSyncStore(report_dir(base, helpers.group_id(agent.config)) / "team_sync")
     fresh_start = agent._team_sync_fresh_start

@@ -41,7 +41,8 @@ class TestOneGateForBothHalves:
         analyst = resolve_bluff_analyst(config, gate)
         gate.dos.record(10_000)
 
-        assert writer(None, None) != ""  # a canned line, never an exception
+        text, _intent = writer(None, None)
+        assert text != ""  # a canned line, never an exception
         assert analyst.assess("heading north", (0, 0), None).direction is not None
 
     def test_the_silence_is_the_gate_refusing_and_not_the_model_answering(self, monkeypatch):
@@ -64,7 +65,7 @@ class TestTheGateIsBuiltFromTheAgreedFile:
             captured["limits"] = gate.limits
             return lambda prompt, system="": ""
 
-        monkeypatch.setattr("police_agent.strategy.talk.ollama_asker", spy)
+        monkeypatch.setattr("police_agent.strategy.talk_asker.ollama_asker", spy)
 
         asker_from_config(talking_config(gatekeeper__requests_per_minute=90).get)
 
