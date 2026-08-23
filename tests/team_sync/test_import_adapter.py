@@ -29,6 +29,12 @@ def test_import_and_persist_writes_artifacts_and_returns_thief_shaped_summary(tm
     assert summary["role"] == "thief"
     assert summary["result"] == "capture"
     written = tmp_path / "OURTEAM" / "record_ourteam-vs-theirteam_g02.json"
+    if not written.is_file():
+        import sys
+
+        print("DEBUG tmp_path=", tmp_path, file=sys.stderr)
+        print("DEBUG tmp_path contents=", list(tmp_path.rglob("*")), file=sys.stderr)
+        print("DEBUG summary identity=", summary.get("identity"), file=sys.stderr)
     assert written.is_file()
 
 
