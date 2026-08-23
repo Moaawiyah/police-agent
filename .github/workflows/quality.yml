@@ -34,7 +34,7 @@ jobs:
       - name: File size (<= 150 non-blank, non-comment lines)
         run: |
           over=$(find src tests research -name '*.py' | while read -r f; do
-            n=$(grep -vcE '^\s*(#.*)?$' "$f")
+            n=$(grep -vcE '^\s*(#.*)?$' "$f" || true)
             [ "$n" -gt 150 ] && echo "$n $f"
           done)
           if [ -n "$over" ]; then echo "over budget:"; echo "$over"; exit 1; fi

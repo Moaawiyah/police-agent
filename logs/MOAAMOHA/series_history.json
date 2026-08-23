@@ -1,0 +1,304 @@
+[
+  {
+    "game_id": "MOAAMOHA-vs-MOAAMOHA",
+    "game_uid": "5cb3c052-2e56-412e-8708-f714613e1b47",
+    "opponent_group_id": "MOAAMOHA",
+    "own_group_id": "MOAAMOHA",
+    "num_sub_games": 6,
+    "final_result": {
+      "total_score": {
+        "MOAAMOHA": 85
+      },
+      "sub_games_won": {
+        "MOAAMOHA": 6
+      },
+      "ties": 0,
+      "winner_group": "MOAAMOHA",
+      "series_tie": false,
+      "tokens_total_series": {
+        "MOAAMOHA": 52983
+      }
+    },
+    "started_at": "2026-08-14T17:18:43.728412+03:00",
+    "ended_at": "2026-08-14T17:20:21.745412+03:00",
+    "archived_at": "2026-08-14T16:03:50.842453+00:00"
+  },
+  {
+    "game_id": "MOAAMOHA-vs-najamjad",
+    "game_uid": "1753965a-1f98-d3fb-4241-0245786936c8",
+    "opponent_group_id": "najamjad",
+    "own_group_id": "MOAAMOHA",
+    "num_sub_games": 6,
+    "final_result": {
+      "total_score": {
+        "MOAAMOHA": 15,
+        "najamjad": 60
+      },
+      "sub_games_won": {
+        "MOAAMOHA": 0,
+        "najamjad": 3
+      },
+      "ties": 3,
+      "winner_group": "najamjad",
+      "series_tie": false,
+      "tokens_total_series": {
+        "MOAAMOHA": 47183,
+        "najamjad": 0
+      }
+    },
+    "started_at": "2026-08-15T19:26:14.560536+03:00",
+    "ended_at": "2026-08-15T19:27:10.187536+03:00",
+    "archived_at": "2026-08-16T16:50:42.218515+00:00"
+  },
+  {
+    "game_id": "MOAAMOHA-vs-najamjad",
+    "game_uid": "1753965a-1f98-d3fb-4241-0245786936c8",
+    "opponent_group_id": "najamjad",
+    "own_group_id": "MOAAMOHA",
+    "num_sub_games": 6,
+    "final_result": {
+      "total_score": {
+        "MOAAMOHA": 25,
+        "najamjad": 30
+      },
+      "sub_games_won": {
+        "MOAAMOHA": 2,
+        "najamjad": 1
+      },
+      "ties": 0,
+      "winner_group": "najamjad",
+      "series_tie": false,
+      "tokens_total_series": {
+        "MOAAMOHA": 88534,
+        "najamjad": 0
+      }
+    },
+    "started_at": "2026-08-16T20:11:40.319862+03:00",
+    "ended_at": "2026-08-16T20:13:12.395862+03:00",
+    "archived_at": "2026-08-16T17:44:04.170739+00:00"
+  },
+  {
+    "game_id": "MOAAMOHA-vs-najamjad",
+    "game_uid": "1753965a-1f98-d3fb-4241-0245786936c8",
+    "opponent_group_id": "najamjad",
+    "own_group_id": "MOAAMOHA",
+    "num_sub_games": 6,
+    "final_result": {
+      "total_score": {
+        "MOAAMOHA": 35,
+        "najamjad": 50
+      },
+      "sub_games_won": {
+        "MOAAMOHA": 2,
+        "najamjad": 3
+      },
+      "ties": 0,
+      "winner_group": "najamjad",
+      "series_tie": false,
+      "tokens_total_series": {
+        "MOAAMOHA": 79492,
+        "najamjad": 0
+      }
+    },
+    "started_at": "2026-08-16T21:00:28.605124+03:00",
+    "ended_at": "2026-08-16T21:03:57.789124+03:00",
+    "archived_at": "2026-08-17T09:23:00.359146+00:00",
+    "counted": false
+  },
+  {
+    "game_id": "MOAAMOHA-vs-najamjad",
+    "game_uid": "1753965a-1f98-d3fb-4241-0245786936c8",
+    "opponent_group_id": "najamjad",
+    "own_group_id": "MOAAMOHA",
+    "num_sub_games": 6,
+    "final_result": {
+      "total_score": {
+        "MOAAMOHA": 45,
+        "najamjad": 85
+      },
+      "sub_games_won": {
+        "MOAAMOHA": 1,
+        "najamjad": 5
+      },
+      "ties": 0,
+      "winner_group": "najamjad",
+      "series_tie": false,
+      "tokens_total_series": {
+        "MOAAMOHA": 36551,
+        "najamjad": 0
+      }
+    },
+    "started_at": "2026-08-17T12:31:44.997359+03:00",
+    "ended_at": "2026-08-17T12:32:44.639359+03:00",
+    "archived_at": "2026-08-17T09:55:00.419995+00:00",
+    "counted": false
+  },
+  {
+    "game_id": "MOAAMOHA-vs-najamjad",
+    "game_uid": "1753965a-1f98-d3fb-4241-0245786936c8",
+    "opponent_group_id": "najamjad",
+    "own_group_id": "MOAAMOHA",
+    "num_sub_games": 6,
+    "final_result": {
+      "total_score": {
+        "MOAAMOHA": 45,
+        "najamjad": 85
+      },
+      "sub_games_won": {
+        "MOAAMOHA": 1,
+        "najamjad": 5
+      },
+      "ties": 0,
+      "winner_group": "najamjad",
+      "series_tie": false,
+      "tokens_total_series": {
+        "MOAAMOHA": 37360,
+        "najamjad": 0
+      }
+    },
+    "started_at": "2026-08-17T13:02:17.008599+03:00",
+    "ended_at": "2026-08-17T13:03:11.195599+03:00",
+    "archived_at": "2026-08-17T10:27:34.497483+00:00",
+    "counted": false
+  },
+  {
+    "game_id": "MOAAMOHA-vs-moamteam",
+    "game_uid": "3aed462f-727b-958f-b536-9bebe4174d0d",
+    "opponent_group_id": "moamteam",
+    "own_group_id": "MOAAMOHA",
+    "num_sub_games": 6,
+    "final_result": {
+      "total_score": {
+        "MOAAMOHA": 30,
+        "moamteam": 15
+      },
+      "sub_games_won": {
+        "MOAAMOHA": 3,
+        "moamteam": 0
+      },
+      "ties": 0,
+      "winner_group": "MOAAMOHA",
+      "series_tie": false,
+      "tokens_total_series": {
+        "MOAAMOHA": 103177,
+        "moamteam": 0
+      }
+    },
+    "started_at": "2026-08-18T20:51:19.362752+00:00",
+    "ended_at": "2026-08-18T20:56:25.225978+00:00",
+    "archived_at": "2026-08-18T21:35:55.388592+00:00",
+    "counted": false
+  },
+  {
+    "game_id": "MOAAMOHA-vs-moamteam",
+    "game_uid": "3aed462f-727b-958f-b536-9bebe4174d0d",
+    "opponent_group_id": "moamteam",
+    "own_group_id": "MOAAMOHA",
+    "num_sub_games": 6,
+    "final_result": {
+      "total_score": {
+        "MOAAMOHA": 30,
+        "moamteam": 15
+      },
+      "sub_games_won": {
+        "MOAAMOHA": 3,
+        "moamteam": 0
+      },
+      "ties": 0,
+      "winner_group": "MOAAMOHA",
+      "series_tie": false,
+      "tokens_total_series": {
+        "MOAAMOHA": 70896,
+        "moamteam": 0
+      }
+    },
+    "started_at": "2026-08-18T21:56:49.744220+00:00",
+    "ended_at": "2026-08-18T21:58:04.250172+00:00",
+    "archived_at": "2026-08-18T22:24:08.277773+00:00",
+    "counted": false
+  },
+  {
+    "game_id": "MOAAMOHA-vs-cosmos77",
+    "game_uid": "d67d6291-2c00-3e55-1bc3-d4424c143b56",
+    "opponent_group_id": "cosmos77",
+    "own_group_id": "MOAAMOHA",
+    "num_sub_games": 6,
+    "final_result": {
+      "total_score": {
+        "MOAAMOHA": 5,
+        "cosmos77": 10
+      },
+      "sub_games_won": {
+        "MOAAMOHA": 0,
+        "cosmos77": 1
+      },
+      "ties": 1,
+      "winner_group": "cosmos77",
+      "series_tie": false,
+      "tokens_total_series": {
+        "MOAAMOHA": 16588,
+        "cosmos77": 0
+      }
+    },
+    "started_at": "2026-08-19T23:43:26.640710+03:00",
+    "ended_at": "2026-08-19T23:44:32.006710+03:00",
+    "archived_at": "2026-08-19T21:04:42.071833+00:00",
+    "counted": false
+  },
+  {
+    "game_id": "MOAAMOHA-vs-cosmos77",
+    "game_uid": "d67d6291-2c00-3e55-1bc3-d4424c143b56",
+    "opponent_group_id": "cosmos77",
+    "own_group_id": "MOAAMOHA",
+    "num_sub_games": 6,
+    "final_result": {
+      "total_score": {
+        "MOAAMOHA": 47,
+        "cosmos77": 47
+      },
+      "sub_games_won": {
+        "MOAAMOHA": 3,
+        "cosmos77": 3
+      },
+      "ties": 0,
+      "winner_group": null,
+      "series_tie": true,
+      "tokens_total_series": {
+        "MOAAMOHA": 104025,
+        "cosmos77": 0
+      }
+    },
+    "started_at": "2026-08-20T00:19:52.087464+03:00",
+    "ended_at": "2026-08-20T00:22:43.546464+03:00",
+    "archived_at": "2026-08-19T22:11:41.507150+00:00",
+    "counted": false
+  },
+  {
+    "game_id": "MOAAMOHA-vs-cosmos77",
+    "game_uid": "d67d6291-2c00-3e55-1bc3-d4424c143b56",
+    "opponent_group_id": "cosmos77",
+    "own_group_id": "MOAAMOHA",
+    "num_sub_games": 6,
+    "final_result": {
+      "total_score": {
+        "MOAAMOHA": 35,
+        "cosmos77": 40
+      },
+      "sub_games_won": {
+        "MOAAMOHA": 2,
+        "cosmos77": 3
+      },
+      "ties": 0,
+      "winner_group": "cosmos77",
+      "series_tie": false,
+      "tokens_total_series": {
+        "MOAAMOHA": 86216,
+        "cosmos77": 0
+      }
+    },
+    "started_at": "2026-08-20T01:26:58.959262+03:00",
+    "ended_at": "2026-08-20T01:28:29.684262+03:00",
+    "archived_at": "2026-08-19T23:10:42.745738+00:00",
+    "counted": false
+  }
+]
