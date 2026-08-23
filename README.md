@@ -21,22 +21,45 @@ validated on both sides.
 
 ## Screenshots
 
-Live-run evidence, captured from a real two-process match on localhost.
+Evidence captured from real two-process matches against external opponents.
 
-| Live Police GUI | Verified cross-log replay |
-| --- | --- |
-| ![Live Police GUI](assets/screenshots/police-live-gui.jpg) | ![Replay showing both agents and Verified OK](assets/screenshots/police-replay-verified.jpg) |
+### Live Police view
 
-The live window shows only what Police can legitimately see during play: its
-own position and trail, declared barriers, the scent-derived belief heatmap,
-the received hint, its own reply, its decision rationale, and its sealed
-commitment. It never reveals the Thief's true location. The replay view
-reconstructs both tracks from the revealed logs and recomputes every
-commitment; `Verified OK` only appears when that recomputation matches what was
-originally sealed.
+![Live Police GUI mid-chase](assets/screenshots/LIVEGAME_POLICE.png)
 
-Additional evidence — a public match over a tunnel, for example — can be added
-to [`assets/screenshots/`](assets/screenshots) and linked here.
+Sub-game 3, step 27, mid-decision. The window shows only what Police can
+legitimately see: its own position and trail, the seven barriers it has
+declared of the fourteen allowed, and the scent-derived belief heatmap — the
+deepening red where it believes the Thief to be. The Thief's true cell is
+never drawn.
+
+The right column is the audit trail as it forms: the Thief's incoming taunt,
+this peer's reply, the rationale in the agent's own terms
+(`wall (3, 2): leaves the believed thief at (3, 1) 3 step(s)`), the sealed
+SHA-256 commitment for the turn, and confirmation that the pre-game terms were
+signed and verified. The verbal layer is running the remote GLM-4.7-FlashX
+model; the move itself is pure Python.
+
+### Series result
+
+![Series complete, audit passed](assets/screenshots/reults_livegame.png)
+
+All six sub-games complete against `najamjad`, ending 40–60 on points and 2–4
+on sub-games. `Audit PASSED` is the part that matters here: every sealed
+commitment from the series was revealed and recomputed successfully, so the
+scoreline is one both peers can independently derive rather than one either
+side asserts. This run used the local Ollama provider and spent no remote
+tokens.
+
+### Verified cross-log replay
+
+![Replay showing both agents and Verified OK](assets/screenshots/police-replay-verified.jpg)
+
+Replay loads this peer's log alongside the Thief's separately written one and
+reconstructs both tracks. It recomputes every commitment as it steps: the
+per-step `[verified OK]` and the `Verified OK` status appear only when each
+recomputed hash matches what was sealed during the live match. A single
+altered payload would surface here instead as a tamper halt.
 
 ## Problem model
 
