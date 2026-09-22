@@ -21,10 +21,10 @@ modes of naive designs, not hypothetical ones (see §4).
 
 | # | Requirement | Source |
 |---|---|---|
-| R1 | Within `BARRIER_REACH` (2 cells — the geometric maximum at which any wall can touch one of the believed cell's immediate escapes), remove a genuine escape when reachable. | `strategy/barrier.py::_best_placement` |
+| R1 | Within `BARRIER_REACH` (2 cells — the geometric maximum at which any wall can touch one of the believed cell's immediate escapes), remove a genuine escape when reachable. | `strategy/placement.py::best_placement` |
 | R2 | Never wall the cell underfoot, and never wall the believed cell itself (a barrier there is an ambiguous capture condition the spec does not resolve against a sealed, simultaneous move). | `strategy/barrier.py::choose_barrier` |
 | R3 | Never place a wall that would leave the police with no legal step of its own. | `strategy/barrier.py::_would_confine` |
-| R4 | Unless it is the thief's *last* remaining escape (sealing it is the capture), a close-range wall must not lengthen the police's own barrier-aware path to the believed cell. | `strategy/barrier.py::_best_placement` |
+| R4 | Unless it is the thief's *last* remaining escape (sealing it is the capture), a close-range wall must not lengthen the police's own barrier-aware path to the believed cell. | `strategy/placement.py::best_placement` |
 | R5 | Past `BARRIER_REACH`, out to `WIDE_REACH` (4), judge a wall by how much it shrinks the believed cell's whole reachable pocket (flood fill), not by touching a single escape — geometrically impossible at that range. | `strategy/encirclement.py::wide_placement` |
 | R6 | A wide-range wall must clear both a minimum fraction of the pocket and an absolute floor of cells removed, and must never increase the police's own path length to the target. Held the same in every round, including the match's last — no endgame exemption. | `strategy/encirclement.py::MIN_GAIN_FRACTION`, `MIN_GAIN_FLOOR` |
 | R7 | Movement tie-breaks among equally-good candidates are broken by a seeded RNG, never by the board's fixed N/S/E/W enumeration order. | `strategy/brain.py::_pick_move` |

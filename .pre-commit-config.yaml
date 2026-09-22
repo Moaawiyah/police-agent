@@ -1,0 +1,27 @@
+# Local mirror of the gates in .github/workflows/quality.yml, so violations
+# are caught before commit instead of only in CI. Install with:
+#   uv run pre-commit install
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.1
+    hooks:
+      - id: ruff
+        name: ruff lint (0 violations required)
+        args: [--fix]
+      - id: ruff-format
+        name: ruff format
+
+  - repo: local
+    hooks:
+      - id: file-size-budget
+        name: file size (<= 150 non-blank, non-comment lines)
+        entry: bash -c '
+          over=$(find src tests research -name "*.py" | while read -r f; do
+            n=$(grep -vcE "^\s*(#.*)?$" "$f" || true);
+            [ "$n" -gt 150 ] && echo "$n $f" || true;
+          done);
+          if [ -n "$over" ]; then echo "over budget:"; echo "$over"; exit 1; fi;
+          exit 0'
+        language: system
+        pass_filenames: false
+        types: [python]
