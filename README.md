@@ -406,6 +406,8 @@ src/police_agent/
 research/    parameter sweeps and the synthetic evader they run against
 notebooks/   the sensitivity study as a runnable notebook
 config/police/  the shared game.json and the private game.toml example
+docs/        architecture, protocol, strategy and per-mechanism PRDs (see below)
+tests/       mirrors src/police_agent/ package-for-package, plus sdk/ and team_sync/
 ```
 
 ## Documentation

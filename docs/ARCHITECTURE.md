@@ -63,6 +63,41 @@ immediate escapes, so the wide-range path judges by shrinking the thief's
 whole reachable pocket instead (`strategy/encirclement.py`), gated by a much
 stricter bar than the course reference uses, for the reason documented there.
 
+## Technology choices
+
+Each major dependency was picked for a reason grounded in this project's own
+constraints, not by default:
+
+- **FastMCP, symmetric peer-to-peer, no central server.** The specification
+  forbids a referee or shared live state (ch. 2.4.2); each peer must be
+  independently runnable and independently trustworthy. FastMCP lets each
+  process be simultaneously a server for inbound tool calls and a client of
+  the opponent's endpoint, which is what makes the "no referee" requirement
+  implementable at all — see the five practical problems that symmetry
+  creates and how they're addressed, in `README.md`'s "Architecture and trust
+  boundaries" section.
+- **A hand-engineered Bayesian filter, not a trained RL policy.** The board
+  is a Dec-POMDP where the Police agent never observes the Thief's true cell
+  (see `README.md`'s "Problem model" section). An explicit belief update over
+  legal reachability plus scent likelihood is directly explainable move by
+  move, which the project's evidence requirement rewards: `README.md`'s
+  "Evidence and parameter study" section documents that no RL model is
+  trained or claimed, backed instead by a parameter sensitivity study over
+  all nine tunable constants (`docs/RESEARCH.md`,
+  `docs/research-data.json`). A learned policy would have no equivalent
+  proof of behaviour.
+- **SHA-256 commit-reveal, not mutual trust.** Neither peer can see the
+  other's true state during play, so every claim has to be either legal-rule
+  derivable or cryptographically provable after the fact (`docs/PRD.md`,
+  Problem). Sealing `SHA-256(canonical_json(payload) | nonce)` before reveal
+  (see the wire-protocol diagram above, and `domain/crypto.py`) means a
+  tampered log is detectable at audit time rather than merely alleged.
+- **`uv` for dependency management.** Both CI (`.github/workflows/quality.yml`)
+  and local development sync from the same committed `uv.lock`, so "it works
+  on my machine" cannot happen between the grader's run and the submitted
+  environment — the quality gates in CI are literally the same `uv run`
+  invocations documented in `README.md`'s Validation section.
+
 ## Where this lives in the package
 
 See `README.md`'s own "Layout" section for the directory tree; this document
